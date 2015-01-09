@@ -31,14 +31,30 @@ int main()
 {
     char debut;
     printf("\n inside main");
-	sysClkRateSet(1000);
+	//sysClkRateSet(1000);
 	printf("\n scanning user input");
 	//afficherPageAccueil();
-	scanf("%c",&debut);
 	
+	
+	init();
+	
+	printf("\n\n\n\n\n\n\n");
+	printf("	*****************************************************************\n");
+	printf("	*								*\n");
+	printf("	*		        PROGRAMME DE				*\n");
+	printf("	*               TELEOPERATION DU BRAS 7 AXES			*\n");
+	printf("	*								*\n");
+	printf("	*****************************************************************\n");
+	printf("\n\n\n");
+	printf("Tapez une touche puis validez pour initialiser les muscles, ou q pour quitter\n");
+    
+	
+	scanf("%c",&debut);
 	if(debut!='0')
 	{
-		principale();
+		main1 = taskSpawn("t_main",110,0,22000,(FUNCPTR)principale,0,0,0,0,0,0,0,0,0,0); 
+		//principale();
+		//taskDelete(main1);
 	}
 	finProgramme();
 }	//FIN main

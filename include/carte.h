@@ -12,8 +12,8 @@ class carte {
 public :
   virtual void daconv(int ,unsigned int ){}
   virtual void initialisation(){}
-  virtual unsigned int adconv(int ){}
-  virtual unsigned char dread(){}
+  virtual unsigned int adconv(int ){ return 0;}
+  virtual unsigned char dread(){ return 0;}
 };
 
 #endif

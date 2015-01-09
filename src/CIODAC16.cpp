@@ -8,7 +8,7 @@ Historique des modifications
 
 */
 #include "CIODAC16.h"
-
+#include <string.h>
 /************************************************************************
  *									*
  *		CONVERSION NUMERIQUE -> ANALOGIQUE			*
@@ -23,16 +23,32 @@ Historique des modifications
  *	4 - Ecriture du mot de 8 bits dans BASE_1			*
  *									*
  ************************************************************************/
-void CIODAC16::daconv(int chan ,unsigned int valeur)
+CIODAC16::~CIODAC16()
 {
-	unsigned char buffer;
+	
+//	ClientUDP::~ClientUDP();
+}
+void CIODAC16::daconv(int chan ,unsigned int value)
+{
+	char* buffer_send;
+	//ClientUDP *client;
+	send_packet.CLIENT_HEADER = '0';
+    send_packet.control_cmd = 1;//value;
+    
+                
+    buffer_send = (char*)&send_packet;
+	
 	// prise des 8 bits de poids fort de valeur
 	// filtrage pour n'avoir que les 4 bits de poids faible
-	buffer = (valeur>>8) & 0x000f;
-	// on récupére les 4 bits de poids faible de chan (contenant l'info) 
-	// que l'on décale de 4 bits pour l'additionner avec buffer
-	buffer = ((chan<<4) & 0x00f0) | buffer ;
-	// envoie des données
+	
+	///buffer = (value>>8) & 0x000f;
+	// on rï¿½cupï¿½re les 4 bits de poids faible de chan (contenant l'info) 
+	// que l'on dï¿½cale de 4 bits pour l'additionner avec buffer
+	///buffer = ((chan<<4) & 0x00f0) | buffer ;
+	// envoie des donnï¿½es
 	//sysOutByte (BASE_0,(unsigned char) valeur);
+	//printf("buffer of davconv %s", buffer);
 	//sysOutByte (BASE_1, buffer);
+	//client -> 
+	client_send(buffer_send, sizeof(send_packet));
 }

@@ -36,14 +36,16 @@ SET(${PROJECT_NAME}_HEADERS
 	include/capteur_position.h  
 	include/carte.h  
 	include/CIODAC16.h  
-	include/CIODAS64.h  
+	include/CIODAS64.h
+	include/clientudp3.h
 	include/controleur_axe.h  
 	include/controleur_outil.h  
 	include/fichier.h  
 	include/I_teleop.h  
 	include/joystick.h  
 	include/modele.h
-	include/main_controleur.h
+	include/port.h
+	#include/main_controleur.h
 
 )
 SET(CXX_DISABLE_WERROR TRUE)

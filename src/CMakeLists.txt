@@ -39,13 +39,14 @@ ADD_LIBRARY(${LIBRARY_NAME}
   capteur.cpp  
   capteur_position.cpp  
   CIODAC16.cpp  
-  CIODAS64.cpp  
+  CIODAS64.cpp
+  clientudp3.cpp
   controleur_axe.cpp  
   controleur_outil.cpp  
   fichier.cpp  
   I_teleop.cpp  
   joystick.cpp  
-  main_controleur.cpp  
+    
   modele.cpp
   
 

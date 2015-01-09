@@ -127,11 +127,13 @@
  *   			    						      		*
  ****************************************************************************************/
 #include "carte.h"
-
-class CIODAS64 : public carte
+#include "clientudp3.h"
+#include "port.h"
+class CIODAS64 : public carte, public ClientUDP
 {
 	public :
-		CIODAS64(){}
+		CIODAS64(): ClientUDP()
+		{}
 		virtual void initialisation ();
 		virtual unsigned int adconv(int chan);
 	 	virtual unsigned char dread ();

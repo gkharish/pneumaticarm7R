@@ -12,15 +12,23 @@ double I_teleop:: get_seuil() {
 
 
 
-/********************************************************************
- *                          CONSTRUCTEUR                            *
- ********************************************************************
- *                                                                  *
- *    PARAMETRES :                                                  *
- *                pcard : pointeur sur une carte du type CIODAS6402 *
+/********************************************************************
+
+ *                          CONSTRUCTEUR                            *
+
+ ********************************************************************
+
+ *                                                                  *
+
+ *    PARAMETRES :                                                  *
+
+ *                pcard : pointeur sur une carte du type CIODAS6402 *
+
  *                + Numero du canal	                            *
- *                                                                  *
- ********************************************************************/
+ *                                                                  *
+
+ ********************************************************************/
+
  
 palonnier :: palonnier(carte * card, int canal,double delta) {
      pcarte = card;
@@ -30,14 +38,22 @@ palonnier :: palonnier(carte * card, int canal,double delta) {
 }
 
 
-/********************************************************************
- *             Lecture de la position indiquee par le palonnier     *
- ********************************************************************
- *                                                                  *
- *    RETOURNE :                                                    *
- *                	valeur mesurée en volt	                    *
- *                                                                  *
- ********************************************************************/
+/********************************************************************
+
+ *             Lecture de la position indiquee par le palonnier     *
+
+ ********************************************************************
+
+ *                                                                  *
+
+ *    RETOURNE :                                                    *
+
+ *                	valeur mesurï¿½e en volt	                    *
+
+ *                                                                  *
+
+ ********************************************************************/
+
  
 double palonnier::lire_position (void) {
     double valeur;

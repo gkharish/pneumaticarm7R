@@ -5,7 +5,7 @@
 #ifndef CIODAC
 #define CIODAC
 
-#include "carte.h"
+
 /************************************************************************
  *									*
  *				DEFINES					*
@@ -31,19 +31,35 @@
  *				INCLUDES				*
  *									*
  ************************************************************************/
+#include "carte.h"
+#include "clientudp3.h"
+#include "port.h"
 //#include "sysLib.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
+
+
 /************************************************************************
  *									*
  *			CLASSE CIODAC16					*
  *									*
  ************************************************************************/
-class CIODAC16 : public carte
+
+struct udppacket_control                    // clientheader = '0';
+{
+    char CLIENT_HEADER;
+    //double control_cmd[3];
+    unsigned int control_cmd;
+}client_packet_control;
+
+class CIODAC16 : public carte, public  ClientUDP
 {	 
 	public :
-		CIODAC16(){}  // constructeur
+		CIODAC16():  ClientUDP()
+		{}  // constructeur
+		virtual ~CIODAC16();
 		virtual void daconv(int chan ,unsigned int valeur);
+		udppacket_control send_packet;
 };
 
 #endif

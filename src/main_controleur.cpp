@@ -517,13 +517,14 @@ void init(){
 	printf("\n jusqu'ici tout va bien 1");
      //Actionneurs
      a1 = actionneur(VOIE_1_1,VOIE_1_2,ciodac16);
+     printf("\n init()debug1 \n");
      a2 = actionneur(VOIE_2_1,VOIE_2_2,ciodac16);
      a3 = actionneur(VOIE_3_1,VOIE_3_2,ciodac16);
      a4 = actionneur(VOIE_4_1,VOIE_4_2,ciodac16);
      a5 = actionneur(VOIE_5_1,VOIE_5_2,ciodac16);
      a6 = actionneur(VOIE_6_1,VOIE_6_2,ciodac16);
      a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16);
-
+	printf("\n init()debug2 \n");
      //construction des joysticks
      // -1 : pas de connection
      joy1 = new joystick(ciodas64,VOIE_X_1,VOIE_Y_1,VOIE_Z_1,
@@ -532,11 +533,12 @@ void init(){
      joy2 = new joystick(ciodas64,VOIE_X_2,VOIE_Y_2,VOIE_Z_2,
      			VOIE_BOUTTON_A_2,VOIE_INUTILISEE,VOIE_INUTILISEE,
      			VOIE_INUTILISEE,VOIE_INUTILISEE,SEUIL_JOY);
+    printf("\n init()debug1 \n"); 			
      ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
-     
+    printf("\n init()debug1 \n"); 
      for (int i = 0;i < 7;i++)
      	buffer_joy[i] = new char [2 * sizeof(double) + 2];
-     	
+    printf("\n init()debug1 \n"); 	
      //Controleur de la pince
      controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
      printf("\n jusqu'ici tout va bien 2");     
@@ -1125,7 +1127,10 @@ void principale (void) {
  			ok2 = true;
  			printf("\n ..... initialisation des parametres ...\n");
         		init_capteurs();
+        		printf("\n ..... debug1...\n");
         		controleur_pince.initialiser();
+        		printf("\n ..... debug2...\n");
+        		
         		while (!ok3) 	{
         				printf("\nTaper o pour commander en BOUCLE OUVERTE, ou f pour commander en BOUCLE FERMEE, puis validez : ");
         				scanf("%s",tmp);

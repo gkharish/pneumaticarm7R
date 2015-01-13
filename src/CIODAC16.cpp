@@ -33,8 +33,8 @@ void CIODAC16::daconv(int chan ,unsigned int value)
 	char* buffer_send;
 	//ClientUDP *client;
 	send_packet.CLIENT_HEADER = '0';
-    send_packet.control_cmd = 1;//value;
-    
+    send_packet.control_cmd = value;//value;
+    //client_start();
                 
     buffer_send = (char*)&send_packet;
 	

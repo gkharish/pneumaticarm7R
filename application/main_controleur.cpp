@@ -15,6 +15,8 @@
 */
 
 
+#define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__ 
+#define ODEBUG(x) std::cerr << x << DBG_INFO << std::endl
 
 /***** DEFINITION DE L'ADRESSAGE DES CARTES *****/
 /*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
@@ -162,6 +164,7 @@
 //#include "taskLib.h"
 //#include "wdLib.h"
 #include <iostream>
+#include <limits>
 #include "stdlib.h"
 #include "string.h"
 #include <vxworks/vxworks.h>
@@ -198,9 +201,10 @@
 using namespace std;
 /***** VARIABLES GLOBALES *****/
 
+RT_TASK principal_task;
 //Controleurs d'axes
 controleur_axe controleur1,controleur2,controleur3,
-  controleur4,controleur5,controleur6,controleur7;
+						   controleur4,controleur5,controleur6,controleur7;
 
 //Controleur d'outil
 controleur_outil controleur_pince;
@@ -229,15 +233,15 @@ WDOG_ID tempo;
 MSG_Q_ID msgq1,msgq2,msgq3,msgq4,msgq5,msgq6,msgq7,msgq_pince,msgqfin;
 
 //taches
-long int main1,tgo,
-  tache_arret,tache_controle_mvt,tache_controle_outil,
-  tache_init_1,tache_init_2,tache_init_3,
-  tache_init_4,tache_init_5,tache_init_6,tache_init_7,
-  tache_joy,
-  tache_muscle_1,tache_muscle_2,tache_muscle_3,
-  tache_muscle_4,tache_muscle_5,tache_muscle_6,tache_muscle_7,
-  tache_fin_1,tache_fin_2,tache_fin_3,
-  tache_fin_4,tache_fin_5,tache_fin_6,tache_fin_7;
+long int  main1,tgo,
+          tache_arret,tache_controle_mvt,tache_controle_outil,
+          tache_init_1,tache_init_2,tache_init_3,
+          tache_init_4,tache_init_5,tache_init_6,tache_init_7,
+					tache_joy,
+					tache_muscle_1,tache_muscle_2,tache_muscle_3,
+					tache_muscle_4,tache_muscle_5,tache_muscle_6,tache_muscle_7,
+					tache_fin_1,tache_fin_2,tache_fin_3,
+					tache_fin_4,tache_fin_5,tache_fin_6,tache_fin_7;
 
 
 //modele
@@ -267,56 +271,73 @@ char * buffer_joy[7];
  *	trois etapes.			                *
  ********************************************************/
 
-void init_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * delta, double * vitesse) {
+void init_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * delta, double * vitesse) 
+{
   controleur_i->initialisation_muscles(*delta,*vitesse);
   msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
-void reset_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * , double * vitesse) {
+void reset_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * , double * vitesse)
+{
   controleur_i->degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
   msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }	
 
 
-void trait_muscle1 (double * delta, double * vitesse) {
+void trait_muscle1 (long int li_delta, long int li_vitesse) 
+{
+  double * delta = (double *)li_delta; 
+  double * vitesse=(double *)li_vitesse;
+  ODEBUG("tm1_0");
   //Variables locales
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  ODEBUG("tm1_1");
+  if (!fin) 
+  {
+    ODEBUG("tm1_2");
+    if (!tele_op) 
+    {
+      ODEBUG("tm1_3");
       double del = *delta;
       controleur1.initialisation_muscles(del,vit);
 			
       //signale a la tache principale la fin de l'initialisation
       msgQSend(msgq1,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	//Reception de tache_joy des informations de controle 
-	msgQReceive(msgq1,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-				
-	//verification s'il s'agit d'un message de donnees ou d'un signal de fin
-	if ((strncmp(buffer,"fin",3))) {
-				
-	  //extraction des deux reels de la chaine de caracteres  
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur1.controler (pos_joy,coef,VITESSE_ANGLE);
-	  controleur1.get_delta();
-					
-	  //Enregistrement des donnees dans des tableaux
-	  //lecture de l'angle actuel de l'axe
-	  angle[0] = controleur1.lire_position();
-	}
-			
-	else
-	  taskDelete(tache_muscle_1);
+    else 
+    {
+      ODEBUG("tm1_4");
+      while (!sortie) 
+      {
+      	//Reception de tache_joy des informations de controle 
+      	msgQReceive(msgq1,buffer,2 * sizeof(double) + 2, WAIT_FOREVER);
+      				
+      	//verification s'il s'agit d'un message de donnees ou d'un signal de fin
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      				
+      	  //extraction des deux reels de la chaine de caracteres  
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur1.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  controleur1.get_delta();
+      					
+      	  //Enregistrement des donnees dans des tableaux
+      	  //lecture de l'angle actuel de l'axe
+      	  angle[0] = controleur1.lire_position();
+      	}
+      			
+      	else
+      	  taskDelete(tache_muscle_1);
       }
     }
   }
-  else  { 
+  else  
+  { 
+    ODEBUG("tm1_5");
     controleur1.degonfle(vit);
     //signale a la tache principale la fin du degonflement des muscles
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
@@ -324,181 +345,231 @@ void trait_muscle1 (double * delta, double * vitesse) {
 }
 
 
-void trait_muscle2 (double * delta, double * vitesse) {
+void trait_muscle2 (double * delta, double * vitesse) 
+{
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  if (!fin) 
+  {
+    if (!tele_op) 
+    {
       double del = *delta;
       controleur2.initialisation_muscles(del,vit);
       msgQSend(msgq2,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq2,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur2.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[1] = controleur2.lire_position();
-	}
-				
-	else
-	  taskDelete(tache_muscle_2);
+    else 
+    {
+      while (!sortie) 
+      {
+      	msgQReceive(msgq2,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur2.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[1] = controleur2.lire_position();
+      	}
+      				
+      	else
+      	  taskDelete(tache_muscle_2);
       }
     }
   }
-  else  { 
+  else  
+  { 
     controleur2.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
 
-void trait_muscle3 (double * delta, double * vitesse) {
+void trait_muscle3 (double * delta, double * vitesse) 
+{
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  ODEBUG("tm3_1");
+  if (!fin) 
+  {
+    ODEBUG("tm3_2");
+    if (!tele_op) 
+    {
+      ODEBUG("tm3_3");
       double del = *delta;
       controleur3.initialisation_muscles(del,vit);
       msgQSend(msgq3,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq3,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur3.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[2] = controleur3.lire_position();
-
-	}
-	else
-	  taskDelete(tache_muscle_3);
+    else 
+    {
+      ODEBUG("tm3_4");
+      while (!sortie) 
+      {
+      	msgQReceive(msgq3,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur3.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[2] = controleur3.lire_position();
+      
+      	}
+      	else
+      	  taskDelete(tache_muscle_3);
       }
     }
   }
-  else  { 
+  else  
+  { 
+    ODEBUG("tm3_5");
     controleur3.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
-void trait_muscle4 (double * delta, double * vitesse) {
+
+void trait_muscle4 (double * delta, double * vitesse) 
+{
   double vit = *vitesse;
   char * buffer = new char[2 * sizeof(double) + 2];
   const char * buf = std::string("ok").c_str();
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  if (!fin) 
+  {
+    if (!tele_op) 
+    {
       double del = *delta;
       controleur4.initialisation_muscles(del,vit);
       msgQSend(msgq4,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq4,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur4.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[3] = controleur4.lire_position();
-	}
-	else 
-	  taskDelete(tache_muscle_4);
+    else 
+    {
+      while (!sortie) 
+      {
+      	msgQReceive(msgq4,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur4.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[3] = controleur4.lire_position();
+      	}
+      	else 
+      	  taskDelete(tache_muscle_4);
 				
       }
     }
   }
-  else  { 
+  else  
+  { 
     controleur4.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
-void trait_muscle5 (double * delta, double * vitesse) {
+
+void trait_muscle5 (double * delta, double * vitesse)
+{
   double vit = *vitesse;
   char * buffer = new char[2 * sizeof(double) + 2];
   const char * buf = std::string("ok").c_str();
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  if (!fin) 
+  {
+    if (!tele_op)
+    {
       double del = *delta;
       controleur5.initialisation_muscles(del,vit);
       msgQSend(msgq5,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq5,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur5.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[4] = controleur5.lire_position();
-	}
-	else
-	  taskDelete(tache_muscle_5);
+    else 
+    {
+      while (!sortie) 
+      {
+      	msgQReceive(msgq5,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur5.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[4] = controleur5.lire_position();
+      	}
+      	else
+      	  taskDelete(tache_muscle_5);
       }
     }
   }
-  else  { 
+  else  
+  { 
     controleur5.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
-void trait_muscle6 (double * delta, double * vitesse) {
+
+void trait_muscle6 (double * delta, double * vitesse) 
+{
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  if (!fin) 
+  {
+    if (!tele_op) 
+    {
       double del = *delta;
       controleur6.initialisation_muscles(del,vit);
       msgQSend(msgq6,buffer,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq6,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur6.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[5] = controleur6.lire_position();
-	}
-	else 
-	  taskDelete(tache_muscle_6);
+    else 
+    {
+      while (!sortie) 
+      {
+      	msgQReceive(msgq6,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur6.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[5] = controleur6.lire_position();
+      	}
+      	else 
+      	  taskDelete(tache_muscle_6);
       }
     }
   }
-  else  { 
+  else  
+  { 
     controleur6.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
 
-void trait_muscle7 (double * delta, double * vitesse) {
+void trait_muscle7 (double * delta, double * vitesse) 
+{
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) {
-    if (!tele_op) {
+  if (!fin) 
+  {
+    if (!tele_op) 
+    {
       double del = *delta;
       controleur7.initialisation_muscles(del,vit);
       msgQSend(msgq7,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }
-    else {
-      while (!sortie) {
-	msgQReceive(msgq7,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
-	if ((strncmp(buffer,"fin",3))) {
-	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-	  controleur7.controler (pos_joy,coef,VITESSE_ANGLE);
-	  angle[6] = controleur7.lire_position();
-	}
-	else 
-	  taskDelete(tache_muscle_7);
+    else 
+    {
+      while (!sortie) 
+      {
+      	msgQReceive(msgq7,buffer,2 * sizeof(double) + 2,WAIT_FOREVER);
+      	if ((strncmp(buffer,"fin",3))) 
+      	{
+      	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
+      	  controleur7.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  angle[6] = controleur7.lire_position();
+      	}
+      	else 
+      	  taskDelete(tache_muscle_7);
       }
     }		
   }
-  else  { 
+  else  
+  { 
     controleur7.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
@@ -513,7 +584,8 @@ void trait_muscle7 (double * delta, double * vitesse) {
  *							*
  ********************************************************/
  
-void init(){
+void init()
+{
   //Construction des cartes
   ciodac16 = new CIODAC16();
   ciodas64 = new CIODAS64();
@@ -521,7 +593,8 @@ void init(){
   // initialisation de la ciodas64
   ciodas64->initialisation();
   ciodac16 -> client_start();
-  for (int i = 0; i<7;i++) {
+  for (int i = 0; i<7;i++) 
+  {
     //construction des capteurs
     cap[i] = capteur_position(0,0);
 
@@ -547,13 +620,14 @@ void init(){
   joy2 = new joystick(ciodas64,VOIE_X_2,VOIE_Y_2,VOIE_Z_2,
 		      VOIE_BOUTTON_A_2,VOIE_INUTILISEE,VOIE_INUTILISEE,
 		      VOIE_INUTILISEE,VOIE_INUTILISEE,SEUIL_JOY);
-	printf("\n init()debug3 \n");
+  printf("\n init()debug3 \n");
 		      
   ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
   printf("\n init()debug4 \n");  
   for (int i = 0;i < 7;i++)
+  {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
-    
+  }  
   printf("\n init()debug5 \n");   	
   //Controleur de la pince
   controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
@@ -619,10 +693,13 @@ void init(){
  *							*
  ********************************************************/
 
-void init_capteurs () {
+void init_capteurs () 
+{
   printf("\n inside initdebug1 \n");
   for (int i = 0;i < 7;i++)
+  {
     cap[i].set_offset(cap[i].lire_position());
+  }
   printf("\n inside initdebug2 \n");
   controleur1.init_angles();
   printf("\n inside initdebug3 \n");
@@ -649,7 +726,8 @@ void init_capteurs () {
  ********************************************************/
 
 
-void lire_joy (void) {
+void lire_joy (void) 
+{
 	
   //Variables locales
   double pos1,pos2,pos3,pos4,pos5,pos6,pos7,coef_vitesse;
@@ -658,7 +736,8 @@ void lire_joy (void) {
  	
   taskSuspend(tache_joy);
 
-  while(!sortie) {
+  while(!sortie) 
+  {
  		
     //Lecture de la vitesse
     if (((joystick * )joy1)-> get_vitesse() == VITESSE_LENTE)
@@ -956,6 +1035,7 @@ void controler_pince (void)
  ********************************************************/
 void attente(){
   //Attente de saisie d'un caractere par l'utilisateur
+  printf("\n Input entry saisei in attente()");
   scanf("%d",&saisie);
 	
   //Mise  a vrai de la condition de sortie
@@ -1005,30 +1085,42 @@ void controler ()
   //Tache de scrutation des joysticks + prioritaire car on doit d'abord lire
   //les donnees joysticks puis controler les axes
   tache_joy = taskSpawn("lect_joy",94,0,22000,(FUNCPTR)lire_joy,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 13");
+  printf("\n jusqu'ici tout va bien 13 controler");
   //Suspension de tache_joy
   //taskSuspend(tache_joy);
             		
   //Lancement en parallele des taches de controle des axes
-  tache_muscle_1 = taskSpawn("t_muscle_1",94,0,22000,(FUNCPTR)trait_muscle1,(int)0,(int)0,0,0,0,0,0,0,0,0);
+  double delta_musc_0 = 0.0,speed_musc_0=0.0;
+  tache_muscle_1 = taskSpawn("t_muscle_1",94,0,22000,
+			     (FUNCPTR)trait_muscle1,
+			     (long int)(&delta_musc_0),
+			     (long int)(&speed_musc_0),
+			     0,0,0,0,0,0,0,0);
   printf("\n tache_muscle_1: %ld",tache_muscle_1);
 		
-  printf("\n jusqu'ici tout va bien 14");
+  printf("\n jusqu'ici tout va bien 14 controler");
   tache_muscle_2 = taskSpawn("t_muscle_2",94,0,22000,(FUNCPTR)trait_muscle2,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1");
+  printf("\n jusqu'ici tout va bien 1 control\n");
   tache_muscle_3 = taskSpawn("t_muscle_3",94,0,22000,(FUNCPTR)trait_muscle3,0,0,0,0,0,0,0,0,0,0);
+  printf("\n jusqu'ici tout va bien 1.1 control\n");
   tache_muscle_4 = taskSpawn("t_muscle_4",94,0,22000,(FUNCPTR)trait_muscle4,0,0,0,0,0,0,0,0,0,0);
+  printf("\n jusqu'ici tout va bien 1.2 control\n");
   tache_muscle_5 = taskSpawn("t_muscle_5",94,0,22000,(FUNCPTR)trait_muscle5,0,0,0,0,0,0,0,0,0,0);
+  printf("\n jusqu'ici tout va bien 1.3 control\n");
   tache_muscle_6 = taskSpawn("t_muscle_6",94,0,22000,(FUNCPTR)trait_muscle6,0,0,0,0,0,0,0,0,0,0);
+  printf("\n jusqu'ici tout va bien 1.4 control\n");
   tache_muscle_7 = taskSpawn("t_muscle_7",94,0,22000,(FUNCPTR)trait_muscle7,0,0,0,0,0,0,0,0,0,0);
 	
+  printf("\n jusqu'ici tout va bien 2 control\n");
   /**** ON LANCE LE WD ET ON SUSPEND LA TACHE  ****/
   WDOG_ID tempo = wdCreate();
+  //std::cout << "\n Wdog created" << endl;
   wdStart(tempo, (sysClkRateGet() * (int)P_ECHANT)/1000, 
-	  (wind_timer_t)taskResume((long)tache_controle_mvt), 0);	
+	  (wind_timer_t)taskResume((int)tache_controle_mvt), 0);	
+  //std::cout << "\n Wdog started" << endl;
   taskSuspend(tache_controle_mvt);
 	
-	
+  printf("\n jusqu'ici tout va bien 3 control\n");	
   while (!sortie) {
 
     //Rappel du watchdog  de facon a avoir un traitement periodique
@@ -1086,27 +1178,32 @@ void controler_robot()
   // tache_arret : pour les evenements clavier
   tache_arret=taskSpawn("tache_arret",90,0,22000,(FUNCPTR)attente,0,0,0,0,0,0,0,0,0,0);
 	
-  printf(" Pour arreter appuyez sur une touche puis validez\n\n");
+  printf(" To stop press a button and confirm Pour arreter appuyez sur une touche puis validez\n\n");
   printf( "\n\n capt1   capt2   capt3   capt4   capt5   capt6   capt7\n");
-  printf("\n jusqu'ici tout va bien 10");
+  printf("\n jusqu'ici tout va bien 10 controler_robot");
 	
   // tache_controle_mvt : controle des differnts axes du robot et acquisition des mesures
   tache_controle_mvt=taskSpawn("t_controle_mvt",95,0,22000,(FUNCPTR)controler,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 11");
+  printf("\n jusqu'ici tout va bien 11 controler_robot");
 	
   //tache_controle_outil : gestion de l'ouverture et de la fermeture de la pince
   tache_controle_outil = taskSpawn("t_controle_outil",95,0,22000,(FUNCPTR)controler_pince,0,0,0,0,0,0,0,0,0,0);
 	
   /*REMARQUE: tache arret + prioritaire que tache_controle_mvt pour permettre une sortie du 
     programme des qu'une saisie clavier a ete faite */
-  printf("\n jusqu'ici tout va bien 12");
+  printf("\n jusqu'ici tout va bien 12 controler_robot");
 	
+  //std::cout << &principal_task << " " << rt_task_self() << std::endl;
   //On suspend la tache courante pour que les taches de controle ,moins prioriaires, s'executent
-  taskSuspend (main1);
-  printf("\n jusqu'ici tout va bien 13");
+  int errno;
+  if (errno=rt_task_suspend(rt_task_self()))
+    {
+      perror("Did not succeed to suspend task:");
+    }
+  printf("\n jusqu'ici tout va bien 13 controler_robot");
   //suppression de la tache arret
   taskDelete(tache_arret);
-  printf("\n jusqu'ici tout va bien 14");
+  printf("\n jusqu'ici tout va bien 14 controler_robot");
   //Remise a faux de variables booleennes pour une autre execution consecutive	
   sortie = false;
 	
@@ -1123,7 +1220,7 @@ void controler_robot()
  *routine appelee par debut() apres 
  *l initialisation					*
  ********************************************************/
-void principale (void) 
+void principale (void * argv) 
 {
   //variables locales
   bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
@@ -1133,11 +1230,13 @@ void principale (void)
   char * cont1 = new char [1];
   char * tmp = new char [1];
   bool boucle=FERMEE;
-	//ciodac16 -> client_start();
-	//udppacket_control send_packet;
+  RTIME   TASK_PERIOD = 1000000;
+  //double t, time_start_loop, present_time; 
+  //ciodac16 -> client_start();
+  //udppacket_control send_packet;
 	
   //int i = 0;
-		
+  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));	
   printf("\n ..... initialisation of Electronics of muscles  .....");
 	
   //Appel a la fonction de gonflement des muscles
@@ -1145,106 +1244,112 @@ void principale (void)
 	
   printf(" \n APPLY THE PRESSURE   \n");
   while (!ok2) 
-  {
-    printf("\n Press c to continue or q to quit, then validate (ok2, cont1)  : ");
-    std:: cin >> cont1; //scanf("%s",cont1);
-    if (!strcmp(cont1,"c"))
     {
-      ok2 = true;
-      printf("\n ..... initialisation of parametres ...\n");
-      init_capteurs();
+      rt_task_wait_period(NULL);
+    
+      std::cout << "\n Press c to continue or q to quit, then validate "  << DBG_INFO << std::endl;
+      std:: cin >> cont1; //scanf("%s",cont1);
+      if (!strcmp(cont1,"c"))
+	{
+	  ok2 = true;
+	  printf("\n ..... initialisation of parametres ...\n");
+	  init_capteurs();
       
-      controleur_pince.initialiser();
+	  controleur_pince.initialiser();
       
         		
-      while (!ok3) 	
-      {
-        printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
+	  while (!ok3) 	
+	    {
+	      printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
 	      std::cin >> tmp; //scanf("%s",tmp);
+	     
+	      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
 	      if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}        				    
 	      else 
-	      {
-	        if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
-	        else ok3=false;
-	      }
-      }
-      //Controleurs en Boucle ouverte ou fermee
-      controleur1.set_boucle(boucle);
-      controleur2.set_boucle(boucle);
-      controleur3.set_boucle(boucle);
-      controleur4.set_boucle(boucle);
-      controleur5.set_boucle(boucle);
-      controleur6.set_boucle(boucle);
-      controleur7.set_boucle(boucle);
+		{
+		  if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
+		  else ok3=false;
+		}
+	    }
+	  //Controleurs en Boucle ouverte ou fermee
+	  controleur1.set_boucle(boucle);
+	  controleur2.set_boucle(boucle);
+	  controleur3.set_boucle(boucle);
+	  controleur4.set_boucle(boucle);
+	  controleur5.set_boucle(boucle);
+	  controleur6.set_boucle(boucle);
+	  controleur7.set_boucle(boucle);
 			     
-      while(!bonne_saisie) // bonne saisie = good entry
-      {	
+	  while(!bonne_saisie) // bonne saisie = good entry
+	    {	
 	      printf("\n Press c to start or q to quit, then validate (bonne_saisie, commencer)  :\n");
 	      std::cin >> commencer; //scanf("%s",commencer);
+	      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
 	      if (!strcmp (commencer,"c")) 
-	      {
+		{
 
-  	      bonne_saisie = true;
-  	      //controle des mouvements du robot
+		  bonne_saisie = true;
+		  //controle des mouvements du robot
           				
   			
-  	      //controler_robot();
+		  controler_robot();
        
      				
-  	      //sauvegarde des mesures
-  	      printf ("\n Enter the name of file (without the extension '.mat' \n");
+		  //sauvegarde des mesures
+		  std::cout << "\n Enter the name of file (without the extension '.mat')" << DBG_INFO <<std::endl;
+		  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
+		  std::cin >> fich; //scanf("%s",fich);
+  	        
+		  mon_modele.save_matlab(fich);
   					
-  	      std:: cin >> fich; //scanf("%s",fich);
-  	      //mon_modele.save_matlab(fich);
-  					
-  	      printf("\n REMOVE THE PRESSURE \n");
-  	      while(!ok1) 
-  	      {
+		  printf("\n REMOVE THE PR  ESSURE \n");
+		  while(!ok1) 
+		    {
   						
-  	        printf(" Press c to continue (ok1, cont2) \n");
-  	        std:: cin >> cont2; //scanf("%s",cont2);
+		      printf(" Press c to continue (ok1, cont2) \n");
+		      std:: cin >> cont2; //scanf("%s",cont2);
    						
-  	        if (!strcmp(cont2,"c")) 
-  	        {
-  	          ok1 = true;
-  	        }
-  	        else 
-  	        {
+		      if (!strcmp(cont2,"c")) 
+			{
+			  ok1 = true;
+			}
+		      else 
+			{
    								
-  	          printf ("\n Wrong input !!! \n");
-  	        }
-  	      }
-        }
+			  printf ("\n Wrong input !!! \n");
+			}
+		    }
+		}
 	      else 
-	      {
-	        if (!strcmp(commencer,"q")) 
-	        {
-	          bonne_saisie = true;
-	          fin = true;	 
-	        }
-	        else 
-	        {
-	          printf("\n Wrong input !!! \n");
-	        }
-        }	
-      }//while(bonne_sassie) finsih here
-    }// if ok2 finish
-    else 
-    {
-      if (!strcmp(cont1,"q")) 
-      {
+		{
+		  if (!strcmp(commencer,"q")) 
+		    {
+		      bonne_saisie = true;
+		      fin = true;	 
+		    }
+		  else 
+		    {
+		      printf("\n Wrong input !!! \n");
+		    }
+		}	
+	    }//while(bonne_sassie) finsih here
+	}// if ok2 finish
+      else 
+	{
+	  if (!strcmp(cont1,"q")) 
+	    {
 	      ok2 = true;
 	      fin = true;
-      }
-      else
+	    }
+	  else
 	    printf("\n Wrong input !!! \n");
-    }
-  } //while (ok2) finish
+	}
+    } //while (ok2) finish
 	
 	
   // terminaison
 
-  printf("\n .... ELectronics is reset ...\n");
+  
 	
   //Appel a la fonction de degonflement des muscles
   degonfler();
@@ -1254,7 +1359,7 @@ void principale (void)
   tele_op = false;
   sortie = false;
 	
-	//ciodac16 -> ~ClientUDP();
+  //ciodac16 -> ~ClientUDP();
 	
   //Destruction des controleurs d'axe	
   controleur1.~controleur_axe();
@@ -1287,11 +1392,11 @@ void principale (void)
     cap[i].~capteur_position();
 
   printf("\n    ====== PROGRAM FINISHED ======    \n\n");        
-
+  printf("\n .... ELectronics is reset ...\n");
 }
 
         
-        /*** SiGNAL catch  **/
+/*** SiGNAL catch  **/
          
 void catch_signal(int sig)
 {
@@ -1309,11 +1414,12 @@ void catch_signal(int sig)
 int main(void){
 
   // User feedback.
-  /*char lstart;
+  //char lstart;
+  int n;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
   
-  mlockall(MCL_CURRENT|MCL_FUTURE);*/
+  mlockall(MCL_CURRENT|MCL_FUTURE);
   
   // Round robin period
   //kernelTimeSlice(25);
@@ -1321,32 +1427,46 @@ int main(void){
   // Initializing objects and variables 
   init();
 
-  do
- {
-   
-    printf("\n");
-    printf("	*****************************************************************\n");
-    printf("	*								*\n");
-    printf("	*		        TELEOPERATION SOFTWARE  		*\n");
-    printf("	*                         for the 7 DOFs ARM			*\n");
-    printf("	*			  (depart function)         		*\n");
-    printf("	*****************************************************************\n");
-    printf("\n\n\n");
-    printf("Press any key then validate to initialize the muscles, or press q to quit \n");
+  printf("\n");
+  printf("	*****************************************************************\n");
+  printf("	*								*\n");
+  printf("	*		        TELEOPERATION SOFTWARE  		*\n");
+  printf("	*                         for the 7 DOFs ARM			*\n");
+  printf("	*			  (depart function)         		*\n");
+  printf("	*****************************************************************\n");
+  printf("\n\n\n");
+  //printf("Press any key then validate to initialize the muscles, or press q to quit \n");
 
-    //std::cin >> lstart;
-    //if (lstart != 'q') 
-    //{
-      // Launch the main task
-	    principale();
-    //}
-    /*else
-	  {
-	    printf("\n\n    ====== END ======    \n\n");
-	    exit(0);
-	  }*/
-  }
-  while(1);
+  n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
+  if (n!=0)
+    {
+      cout << "Failed @ RT Create" << endl;
+    }
+  else cout << "END of RT Create" << endl;
+  /*
+   * Arguments: &task,
+   *            task function,
+   *            function argument
+   */
+  n = rt_task_start(&principal_task, &principale, NULL);
+  if (n!=0)
+    {
+      cout << "Failed of RT STart" << endl;
+    }
+  else cout << "END of RT Start" << endl;
+  pause();
+
+  cout << "END of Pause" << endl;
+
+        
+  //rt_task_join(&principal_task);
+  n = rt_task_delete(&principal_task);
+  if(n!=0)cout << "Failed of RT Task delete" << endl;
+  else cout << "END of RT taslk delete";
+  //principale();
+  //main1 = taskSpawn("t_main",110,0,22000,(FUNCPTR)principale,0,0,0,0,0,0,0,0,0,0);
+  
+  
 }
 
 
@@ -1363,4 +1483,5 @@ int main(void){
   
   depart();
 
-}*/
+  }*/
+  

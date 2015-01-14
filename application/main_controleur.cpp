@@ -513,7 +513,8 @@ void trait_muscle7 (double * delta, double * vitesse) {
  *							*
  ********************************************************/
  
-void init(){
+void init()
+{
   //Construction des cartes
   ciodac16 = new CIODAC16();
   ciodas64 = new CIODAS64();
@@ -521,7 +522,8 @@ void init(){
   // initialisation de la ciodas64
   ciodas64->initialisation();
   ciodac16 -> client_start();
-  for (int i = 0; i<7;i++) {
+  for (int i = 0; i<7;i++) 
+  {
     //construction des capteurs
     cap[i] = capteur_position(0,0);
 
@@ -552,8 +554,9 @@ void init(){
   ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
   printf("\n init()debug4 \n");  
   for (int i = 0;i < 7;i++)
+  {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
-    
+  } 
   printf("\n init()debug5 \n");   	
   //Controleur de la pince
   controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
@@ -619,7 +622,8 @@ void init(){
  *							*
  ********************************************************/
 
-void init_capteurs () {
+void init_capteurs () 
+{
   printf("\n inside initdebug1 \n");
   for (int i = 0;i < 7;i++)
     cap[i].set_offset(cap[i].lire_position());
@@ -649,7 +653,8 @@ void init_capteurs () {
  ********************************************************/
 
 
-void lire_joy (void) {
+void lire_joy (void) 
+{
 	
   //Variables locales
   double pos1,pos2,pos3,pos4,pos5,pos6,pos7,coef_vitesse;
@@ -658,16 +663,17 @@ void lire_joy (void) {
  	
   taskSuspend(tache_joy);
 
-  while(!sortie) {
+  while(!sortie) 
+  {
  		
     //Lecture de la vitesse
     if (((joystick * )joy1)-> get_vitesse() == VITESSE_LENTE)
       coef_vitesse = COEF_LENT;
     else 
       if (((joystick * )joy1)->get_vitesse() == VITESSE_MOY)
-	coef_vitesse = COEF_MOYEN;
+	  coef_vitesse = COEF_MOYEN;
       else 
-	coef_vitesse = COEF_RAPIDE;
+	  coef_vitesse = COEF_RAPIDE;
 
     //Lecture des differentes voies des joysticks,
     //conversion des donnees en chaines de caracteres
@@ -701,11 +707,13 @@ void lire_joy (void) {
     sprintf(buffer_joy[6],"%f_%f",pos7,coef_vitesse);
     msgQSend(msgq7,buffer_joy[6],2 * sizeof(double) + 2,WAIT_FOREVER,MSG_PRI_NORMAL); 	
 		
-    if(((joystick * )joy2)->lire_bouton_A()) {
+    if(((joystick * )joy2)->lire_bouton_A()) 
+    {
       msgQSend(msgq_pince,"ouv",4,NO_WAIT,MSG_PRI_NORMAL);
     }
 		 
-    else  {  
+    else  
+    {  
       msgQSend(msgq_pince,"fer",4,NO_WAIT,MSG_PRI_NORMAL); 
 
     }		
@@ -741,7 +749,8 @@ void lire_joy (void) {
  *							*
  ********************************************************/
 
-void gonfler(void) {
+void gonfler(void) 
+{
  	
   //variables locales
  	    
@@ -819,7 +828,8 @@ void gonfler(void) {
  *							*
  ********************************************************/
 
-void degonfler(void) {
+void degonfler(void) 
+{
 	
   //Variables locales
   double  * vit;
@@ -898,28 +908,32 @@ void controler_pince (void)
   buffer_prec = new char [4];
   strcpy(buffer_prec,"fer");
 	
-  while(!sortie) {
+  while(!sortie) 
+  {
 	
     //Receptions des infos joystick
     msgQReceive(msgq_pince,buffer,4,WAIT_FOREVER);
 		
-    if (!impulsion){
+    if (!impulsion)
+    {
  		
       //si message == fermer et  que pince etait ouverte :
       //alors ouvrir pince
-      if (!(strcmp(buffer,"fer")) && strcmp(buffer,buffer_prec) ) {
-	impulsion = true;
-	increm_impulsion = increm;
-	controleur_pince.controler_pince(false);
+      if (!(strcmp(buffer,"fer")) && strcmp(buffer,buffer_prec) ) 
+      {
+	      impulsion = true;
+	      increm_impulsion = increm;
+	      controleur_pince.controler_pince(false);
 			
       }
 		
       //Si message == ouvrir et pince etait fermee	:
       //alors fermer pince
-      if(!(strcmp(buffer,"ouv")) && strcmp(buffer,buffer_prec)) {
-	impulsion = true;
-	increm_impulsion = increm;
-	controleur_pince.controler_pince(true);
+      if(!(strcmp(buffer,"ouv")) && strcmp(buffer,buffer_prec)) 
+      {
+	      impulsion = true;
+	      increm_impulsion = increm;
+	      controleur_pince.controler_pince(true);
       }		
 		
 		
@@ -928,22 +942,26 @@ void controler_pince (void)
     }
 		
     //Si on est dans l,impulsion
-    else     
+    else
+    {     
       //si l'impulsion a dure 75 centiemes 
-      if (increm == (increm_impulsion + (750/P_ECHANT))) {
-	if (!strcmp(buffer,"fer")) 
-	  controleur_pince.controler_pince(false);
+      if (increm == (increm_impulsion + (750/P_ECHANT))) 
+      {
+	      if (!strcmp(buffer,"fer")) 
+	        controleur_pince.controler_pince(false);
 				
-	if (!strcmp(buffer,"ouv")) 
-	  controleur_pince.controler_pince(true);
+	      if (!strcmp(buffer,"ouv")) 
+	        controleur_pince.controler_pince(true);
 				
-	impulsion = false;
+	      impulsion = false;
       }
 		
     //Si reception du message de fin alors destruction de la tache 
-    if (!(strcmp(buffer,"fin"))) {
+      if (!(strcmp(buffer,"fin"))) 
+      {
       taskDelete(tache_controle_outil);
-    }
+      }
+    }  
   }
 }	
 	
@@ -954,7 +972,8 @@ void controler_pince (void)
  *methode associee a la tache d'attente d'appuie clavier*
  *							*
  ********************************************************/
-void attente(){
+void attente()
+{
   //Attente de saisie d'un caractere par l'utilisateur
   scanf("%d",&saisie);
 	
@@ -1029,7 +1048,8 @@ void controler ()
   taskSuspend(tache_controle_mvt);
 	
 	
-  while (!sortie) {
+  while (!sortie) 
+  {
 
     //Rappel du watchdog  de facon a avoir un traitement periodique
     //time out = sysclkrateget * P_ECHANT (en ticks de CPU) correspond a 1 temps 
@@ -1043,7 +1063,8 @@ void controler ()
     //reprise de la tache joystick
     taskResume(tache_joy);
    		
-    if (!sortie) {
+    if (!sortie) 
+    {
       //Mise a jour du modele
       //if ((increm % 2) == 0) 
       //mon_modele.mettre_a_jour(temps);

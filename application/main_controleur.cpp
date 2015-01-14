@@ -273,13 +273,13 @@ char * buffer_joy[7];
 
 void init_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * delta, double * vitesse) 
 {
-  controleur_i->initialisation_muscles(*delta,*vitesse);
+  controleur_i -> initialisation_muscles(*delta,*vitesse);
   msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void reset_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * , double * vitesse)
 {
-  controleur_i->degonfle(*vitesse);
+  controleur_i -> degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
   msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }	
@@ -744,9 +744,9 @@ void lire_joy (void)
       coef_vitesse = COEF_LENT;
     else 
       if (((joystick * )joy1)->get_vitesse() == VITESSE_MOY)
-	coef_vitesse = COEF_MOYEN;
+	      coef_vitesse = COEF_MOYEN;
       else 
-	coef_vitesse = COEF_RAPIDE;
+	      coef_vitesse = COEF_RAPIDE;
 
     //Lecture des differentes voies des joysticks,
     //conversion des donnees en chaines de caracteres
@@ -780,11 +780,13 @@ void lire_joy (void)
     sprintf(buffer_joy[6],"%f_%f",pos7,coef_vitesse);
     msgQSend(msgq7,buffer_joy[6],2 * sizeof(double) + 2,WAIT_FOREVER,MSG_PRI_NORMAL); 	
 		
-    if(((joystick * )joy2)->lire_bouton_A()) {
+    if(((joystick * )joy2)->lire_bouton_A()) 
+    {
       msgQSend(msgq_pince,"ouv",4,NO_WAIT,MSG_PRI_NORMAL);
     }
 		 
-    else  {  
+    else  
+    {  
       msgQSend(msgq_pince,"fer",4,NO_WAIT,MSG_PRI_NORMAL); 
 
     }		
@@ -820,7 +822,8 @@ void lire_joy (void)
  *							*
  ********************************************************/
 
-void gonfler(void) {
+void gonfler(void) 
+{
  	
   //variables locales
  	    
@@ -898,7 +901,8 @@ void gonfler(void) {
  *							*
  ********************************************************/
 
-void degonfler(void) {
+void degonfler(void) 
+{
 	
   //Variables locales
   double  * vit;
@@ -977,28 +981,32 @@ void controler_pince (void)
   buffer_prec = new char [4];
   strcpy(buffer_prec,"fer");
 	
-  while(!sortie) {
+  while(!sortie) 
+  {
 	
     //Receptions des infos joystick
     msgQReceive(msgq_pince,buffer,4,WAIT_FOREVER);
 		
-    if (!impulsion){
+    if (!impulsion)
+    {
  		
       //si message == fermer et  que pince etait ouverte :
       //alors ouvrir pince
-      if (!(strcmp(buffer,"fer")) && strcmp(buffer,buffer_prec) ) {
-	impulsion = true;
-	increm_impulsion = increm;
-	controleur_pince.controler_pince(false);
+      if (!(strcmp(buffer,"fer")) && strcmp(buffer,buffer_prec) ) 
+      {
+      	impulsion = true;
+      	increm_impulsion = increm;
+      	controleur_pince.controler_pince(false);
 			
       }
 		
       //Si message == ouvrir et pince etait fermee	:
       //alors fermer pince
-      if(!(strcmp(buffer,"ouv")) && strcmp(buffer,buffer_prec)) {
-	impulsion = true;
-	increm_impulsion = increm;
-	controleur_pince.controler_pince(true);
+      if(!(strcmp(buffer,"ouv")) && strcmp(buffer,buffer_prec)) 
+      {
+      	impulsion = true;
+      	increm_impulsion = increm;
+      	controleur_pince.controler_pince(true);
       }		
 		
 		
@@ -1007,21 +1015,26 @@ void controler_pince (void)
     }
 		
     //Si on est dans l,impulsion
-    else     
+    else
+    {
       //si l'impulsion a dure 75 centiemes 
-      if (increm == (increm_impulsion + (750/P_ECHANT))) {
-	if (!strcmp(buffer,"fer")) 
-	  controleur_pince.controler_pince(false);
+      if (increm == (increm_impulsion + (750/P_ECHANT))) 
+      {
+	      if (!strcmp(buffer,"fer")) 
+	        controleur_pince.controler_pince(false);
 				
-	if (!strcmp(buffer,"ouv")) 
-	  controleur_pince.controler_pince(true);
+      	if (!strcmp(buffer,"ouv")) 
+      	  controleur_pince.controler_pince(true);
 				
-	impulsion = false;
+	      impulsion = false;
       }
 		
     //Si reception du message de fin alors destruction de la tache 
-    if (!(strcmp(buffer,"fin"))) {
-      taskDelete(tache_controle_outil);
+      if (!(strcmp(buffer,"fin"))) 
+      {
+        taskDelete(tache_controle_outil);
+      }
+    
     }
   }
 }	
@@ -1098,17 +1111,17 @@ void controler ()
 			     0,0,0,0,0,0,0,0);
   printf("\n tache_muscle_1: %ld",tache_muscle_1);
 		
-  printf("\n jusqu'ici tout va bien 14 controler");
+  printf("\n jusqu'ici tout va bien 14 controler()");
   tache_muscle_2 = taskSpawn("t_muscle_2",94,0,22000,(FUNCPTR)trait_muscle2,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1 control\n");
+  printf("\n jusqu'ici tout va bien 1 controler\n");
   tache_muscle_3 = taskSpawn("t_muscle_3",94,0,22000,(FUNCPTR)trait_muscle3,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1.1 control\n");
+  printf("\n jusqu'ici tout va bien 1.1 controler()\n");
   tache_muscle_4 = taskSpawn("t_muscle_4",94,0,22000,(FUNCPTR)trait_muscle4,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1.2 control\n");
+  printf("\n jusqu'ici tout va bien 1.2 controler()\n");
   tache_muscle_5 = taskSpawn("t_muscle_5",94,0,22000,(FUNCPTR)trait_muscle5,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1.3 control\n");
+  printf("\n jusqu'ici tout va bien 1.3 controler()\n");
   tache_muscle_6 = taskSpawn("t_muscle_6",94,0,22000,(FUNCPTR)trait_muscle6,0,0,0,0,0,0,0,0,0,0);
-  printf("\n jusqu'ici tout va bien 1.4 control\n");
+  printf("\n jusqu'ici tout va bien 1.4 controler()\n");
   tache_muscle_7 = taskSpawn("t_muscle_7",94,0,22000,(FUNCPTR)trait_muscle7,0,0,0,0,0,0,0,0,0,0);
 	
   printf("\n jusqu'ici tout va bien 2 control\n");
@@ -1220,7 +1233,7 @@ void controler_robot()
  *routine appelee par debut() apres 
  *l initialisation					*
  ********************************************************/
-void principale (void * argv) 
+void principale (void* ) 
 {
   //variables locales
   bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
@@ -1244,21 +1257,22 @@ void principale (void * argv)
 	
   printf(" \n APPLY THE PRESSURE   \n");
   while (!ok2) 
-    {
-      rt_task_wait_period(NULL);
+  {
+    rt_task_wait_period(NULL);
     
-      std::cout << "\n Press c to continue or q to quit, then validate "  << DBG_INFO << std::endl;
-      std:: cin >> cont1; //scanf("%s",cont1);
-      if (!strcmp(cont1,"c"))
-	{
-	  ok2 = true;
-	  printf("\n ..... initialisation of parametres ...\n");
-	  init_capteurs();
+    std::cout << "\n Press c to continue or q to quit, then validate "  << DBG_INFO << std::endl;
+    std:: cin >> cont1; //scanf("%s",cont1);
+    if (!strcmp(cont1,"c"))
+    {
+	  
+	    ok2 = true;
+	    printf("\n ..... initialisation of parametres ...\n");
+	    init_capteurs();
       
-	  controleur_pince.initialiser();
+	    controleur_pince.initialiser();
       
         		
-	  while (!ok3) 	
+	    while (!ok3) 	
 	    {
 	      printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
 	      std::cin >> tmp; //scanf("%s",tmp);
@@ -1266,85 +1280,84 @@ void principale (void * argv)
 	      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
 	      if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}        				    
 	      else 
-		{
-		  if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
-		  else ok3=false;
-		}
+		    {
+		      if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
+		      else ok3=false;
+		    }
 	    }
-	  //Controleurs en Boucle ouverte ou fermee
-	  controleur1.set_boucle(boucle);
-	  controleur2.set_boucle(boucle);
-	  controleur3.set_boucle(boucle);
-	  controleur4.set_boucle(boucle);
-	  controleur5.set_boucle(boucle);
-	  controleur6.set_boucle(boucle);
-	  controleur7.set_boucle(boucle);
+	    //Controleurs en Boucle ouverte ou fermee
+	    controleur1.set_boucle(boucle);
+	    controleur2.set_boucle(boucle);
+	    controleur3.set_boucle(boucle);
+	    controleur4.set_boucle(boucle);
+	    controleur5.set_boucle(boucle);
+	    controleur6.set_boucle(boucle);
+	    controleur7.set_boucle(boucle);
 			     
-	  while(!bonne_saisie) // bonne saisie = good entry
+	    while(!bonne_saisie) // bonne saisie = good entry
 	    {	
 	      printf("\n Press c to start or q to quit, then validate (bonne_saisie, commencer)  :\n");
 	      std::cin >> commencer; //scanf("%s",commencer);
 	      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
 	      if (!strcmp (commencer,"c")) 
-		{
+		    {
 
-		  bonne_saisie = true;
-		  //controle des mouvements du robot
+		      bonne_saisie = true;
+		      //controle des mouvements du robot
           				
   			
-		  controler_robot();
+		      controler_robot();
        
      				
-		  //sauvegarde des mesures
-		  std::cout << "\n Enter the name of file (without the extension '.mat')" << DBG_INFO <<std::endl;
-		  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
-		  std::cin >> fich; //scanf("%s",fich);
+		      //sauvegarde des mesures
+		      std::cout << "\n Enter the name of file (without the extension '.mat')" << DBG_INFO <<std::endl;
+		      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
+		      std::cin >> fich; //scanf("%s",fich);
   	        
-		  mon_modele.save_matlab(fich);
+		      mon_modele.save_matlab(fich);
   					
-		  printf("\n REMOVE THE PR  ESSURE \n");
-		  while(!ok1) 
-		    {
+		      printf("\n REMOVE THE PR  ESSURE \n");
+		      while(!ok1) 
+		      {
   						
-		      printf(" Press c to continue (ok1, cont2) \n");
-		      std:: cin >> cont2; //scanf("%s",cont2);
+		        printf(" Press c to continue (ok1, cont2) \n");
+		        std:: cin >> cont2; //scanf("%s",cont2);
    						
-		      if (!strcmp(cont2,"c")) 
-			{
-			  ok1 = true;
-			}
-		      else 
-			{
-   								
-			  printf ("\n Wrong input !!! \n");
-			}
+		        if (!strcmp(cont2,"c")) 
+			      {
+			        ok1 = true;
+			      }
+		        else 
+			      {
+   					  printf ("\n Wrong input !!! \n");
+			      }
+		      }
 		    }
-		}
 	      else 
-		{
-		  if (!strcmp(commencer,"q")) 
 		    {
-		      bonne_saisie = true;
-		      fin = true;	 
-		    }
-		  else 
-		    {
-		      printf("\n Wrong input !!! \n");
-		    }
-		}	
+		      if (!strcmp(commencer,"q")) 
+		      {
+		        bonne_saisie = true;
+		        fin = true;	 
+		      }
+		      else 
+		      {
+		        printf("\n Wrong input !!! \n");
+		      }
+		    }	
 	    }//while(bonne_sassie) finsih here
-	}// if ok2 finish
-      else 
-	{
-	  if (!strcmp(cont1,"q")) 
+    }// if ok2 finish
+    else 
+    {
+      if (!strcmp(cont1,"q")) 
 	    {
 	      ok2 = true;
 	      fin = true;
 	    }
-	  else
-	    printf("\n Wrong input !!! \n");
-	}
-    } //while (ok2) finish
+	    else
+	      printf("\n Wrong input !!! \n");
+    }
+  } //while (ok2) finish
 	
 	
   // terminaison
@@ -1393,7 +1406,7 @@ void principale (void * argv)
 
   printf("\n    ====== PROGRAM FINISHED ======    \n\n");        
   printf("\n .... ELectronics is reset ...\n");
-}
+} //principale finish
 
         
 /*** SiGNAL catch  **/
@@ -1411,7 +1424,8 @@ void catch_signal(int sig)
  *	tache init du programme				*
  *							*
  ********************************************************/
-int main(void){
+int main(void)
+{
 
   // User feedback.
   //char lstart;
@@ -1439,9 +1453,9 @@ int main(void){
 
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
-    {
-      cout << "Failed @ RT Create" << endl;
-    }
+  {
+    cout << "Failed @ RT Create" << endl;
+  }
   else cout << "END of RT Create" << endl;
   /*
    * Arguments: &task,
@@ -1450,16 +1464,16 @@ int main(void){
    */
   n = rt_task_start(&principal_task, &principale, NULL);
   if (n!=0)
-    {
-      cout << "Failed of RT STart" << endl;
-    }
+  {
+    cout << "Failed of RT STart" << endl;
+  }
   else cout << "END of RT Start" << endl;
   pause();
 
   cout << "END of Pause" << endl;
 
         
-  //rt_task_join(&principal_task);
+  rt_task_join(&principal_task);
   n = rt_task_delete(&principal_task);
   if(n!=0)cout << "Failed of RT Task delete" << endl;
   else cout << "END of RT taslk delete";

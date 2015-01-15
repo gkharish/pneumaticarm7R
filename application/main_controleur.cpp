@@ -1126,7 +1126,7 @@ void controler ()
 	
   printf("\n jusqu'ici tout va bien 2 control\n");
   /**** ON LANCE LE WD ET ON SUSPEND LA TACHE  ****/
-  WDOG_ID tempo = wdCreate();
+  //tempo = wdCreate();
   //std::cout << "\n Wdog created" << endl;
   wdStart(tempo, (sysClkRateGet() * (int)P_ECHANT)/1000, 
 	  (wind_timer_t)taskResume((int)tache_controle_mvt), 0);	
@@ -1210,9 +1210,9 @@ void controler_robot()
   //On suspend la tache courante pour que les taches de controle ,moins prioriaires, s'executent
   int errno;
   if (errno=rt_task_suspend(rt_task_self()))
-    {
-      perror("Did not succeed to suspend task:");
-    }
+  {
+    perror("Did not succeed to suspend task:");
+  }
   printf("\n jusqu'ici tout va bien 13 controler_robot");
   //suppression de la tache arret
   taskDelete(tache_arret);

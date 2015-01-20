@@ -202,9 +202,19 @@ using namespace std;
 /***** VARIABLES GLOBALES *****/
 
 RT_TASK principal_task;
+struct axisparam 
+{
+  long int li_delta;
+  long int li_speed;
+  control_axe * controleur_i;
+  long int tache_muscle_i;
+  int ang_num;
+}
 //Controleurs d'axes
 controleur_axe controleur1,controleur2,controleur3,
 						   controleur4,controleur5,controleur6,controleur7;
+						   
+axisparam axisparam1, axisparam2, axisparam3, axisparam4, axisparam5, axisparam6, axisparam7;
 
 //Controleur d'outil
 controleur_outil controleur_pince;
@@ -285,10 +295,17 @@ void reset_muscle_i (controleur_axe *controleur_i,MSG_Q_ID *msgq_i,double * , do
 }	
 
 
-void trait_muscle1 (long int li_delta, long int li_vitesse) 
+void trait_muscle_general(struct  axisparam *arg_axisparam)
+
+//void trait_muscle1 (long int li_delta, long int li_vitesse) 
 {
-  double * delta = (double *)li_delta; 
-  double * vitesse=(double *)li_vitesse;
+  double * delta = (double *)arg_axisparam -> li_delta; 
+  double * vitesse=(double *)arg_axisparam -> li_vitesse;
+  controleur_axe *controleur;
+  controleur = arg_axisparam;
+  long int tache_muscle = (long int *)arg_axisparam -> tache_muscle_i;
+  int i = arg_axisparam -> ang_num;
+  
   ODEBUG("tm1_0");
   //Variables locales
   double vit = *vitesse;
@@ -322,30 +339,30 @@ void trait_muscle1 (long int li_delta, long int li_vitesse)
       				
       	  //extraction des deux reels de la chaine de caracteres  
       	  sscanf(buffer,"%lf_%lf",&pos_joy,&coef);
-      	  controleur1.controler (pos_joy,coef,VITESSE_ANGLE);
-      	  controleur1.get_delta();
+      	  controleur.controler (pos_joy,coef,VITESSE_ANGLE);
+      	  controleur.get_delta();
       					
       	  //Enregistrement des donnees dans des tableaux
       	  //lecture de l'angle actuel de l'axe
-      	  angle[0] = controleur1.lire_position();
+      	  angle[i] = controleur.lire_position();
       	}
       			
       	else
-      	  taskDelete(tache_muscle_1);
+      	  taskDelete(tache_muscle);
       }
     }
   }
   else  
   { 
     ODEBUG("tm1_5");
-    controleur1.degonfle(vit);
+    controleur.degonfle(vit);
     //signale a la tache principale la fin du degonflement des muscles
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
 }
 
 
-void trait_muscle2 (double * delta, double * vitesse) 
+/*void trait_muscle2 (double * delta, double * vitesse) 
 {
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
@@ -573,7 +590,7 @@ void trait_muscle7 (double * delta, double * vitesse)
     controleur7.degonfle(vit);
     msgQSend(msgqfin,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
   }
-}
+}*/
 
 
 /********************************************************
@@ -827,21 +844,20 @@ void gonfler(void)
  	
   //variables locales
  	    
-  double  * vit,*d1;
-  //,*d2,*d3,*d4,*d5,*d6,*d7;
+  double  * vit,*d1,*d2,*d3,*d4,*d5,*d6,*d7;
   vit = new double (VITESSE_PRESSION);
   char * buffer;
   buffer = new char [10];
      	
-  /*
-    d1 = new double (DELTA_INIT_AXE_1);
-    d2 = new double (DELTA_INIT_AXE_2);
-    d3 = new double (DELTA_INIT_AXE_3);
-    d4 = new double (DELTA_INIT_AXE_4);
-    d5 = new double (DELTA_INIT_AXE_5);
-    d6 = new double (DELTA_INIT_AXE_6);
-    d7 = new double (DELTA_INIT_AXE_7);
-  */ 	
+  
+  d1 = new double (DELTA_INIT_AXE_1);
+  d2 = new double (DELTA_INIT_AXE_2);
+  d3 = new double (DELTA_INIT_AXE_3);
+  d4 = new double (DELTA_INIT_AXE_4);
+  d5 = new double (DELTA_INIT_AXE_5);
+  d6 = new double (DELTA_INIT_AXE_6);
+  d7 = new double (DELTA_INIT_AXE_7);
+  	
      	
   //Lancement en parallele des taches d'initialisation des muscles
      							
@@ -1049,7 +1065,9 @@ void controler_pince (void)
 void attente(){
   //Attente de saisie d'un caractere par l'utilisateur
   printf("\n Input entry saisei in attente()");
-  scanf("%d",&saisie);
+  std::cin >> saisie;//scanf("%d",&saisie);
+	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+ 
 	
   //Mise  a vrai de la condition de sortie
   sortie = true;
@@ -1067,7 +1085,12 @@ void attente(){
   taskDelete(tache_joy);
 	
   //On poursuit l'execution de la tache principale
-  taskResume(main1);
+  //taskResume(main1);
+  int errno1;
+  if (errno1=rt_task_resume(&principal_task))
+  {
+    perror("Did not succeed to resume task:");
+  }
 }
 
 /********************************************************
@@ -1104,12 +1127,16 @@ void controler ()
             		
   //Lancement en parallele des taches de controle des axes
   double delta_musc_0 = 0.0,speed_musc_0=0.0;
-  tache_muscle_1 = taskSpawn("t_muscle_1",94,0,22000,
+  for (int cnt = 0; cnt <7; cnt++)
+  {
+    trait_muscle_general();
+  }
+ /* tache_muscle_1 = taskSpawn("t_muscle_1",94,0,22000,
 			     (FUNCPTR)trait_muscle1,
 			     (long int)(&delta_musc_0),
 			     (long int)(&speed_musc_0),
 			     0,0,0,0,0,0,0,0);
-  printf("\n tache_muscle_1: %ld",tache_muscle_1);
+  printf("\n tache_muscle_1: %ld",trait_muscle1);
 		
   printf("\n jusqu'ici tout va bien 14 controler()");
   tache_muscle_2 = taskSpawn("t_muscle_2",94,0,22000,(FUNCPTR)trait_muscle2,0,0,0,0,0,0,0,0,0,0);
@@ -1123,7 +1150,7 @@ void controler ()
   tache_muscle_6 = taskSpawn("t_muscle_6",94,0,22000,(FUNCPTR)trait_muscle6,0,0,0,0,0,0,0,0,0,0);
   printf("\n jusqu'ici tout va bien 1.4 controler()\n");
   tache_muscle_7 = taskSpawn("t_muscle_7",94,0,22000,(FUNCPTR)trait_muscle7,0,0,0,0,0,0,0,0,0,0);
-	
+	*/
   printf("\n jusqu'ici tout va bien 2 control\n");
   /**** ON LANCE LE WD ET ON SUSPEND LA TACHE  ****/
   //tempo = wdCreate();

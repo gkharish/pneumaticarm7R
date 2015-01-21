@@ -300,6 +300,9 @@ double controleur_axe::get_angle_reel (void) {
 	return (angle_reel);
 }
 
+double controleur_axe::get_commande(void) {
+	return (commande);
+}
 
 
 /**********************************************************************
@@ -393,7 +396,7 @@ double controleur_axe::get_angle_reel (void) {
  		        else 
  		        	j = j + 2 * vitesse_pression;
  			
- 			pactionneur->recevoir_commande_decouple(i,j);
+ 			pactionneur -> recevoir_commande_decouple(i,j);
  			//for (int k = 0;k< 400000;k++) {}
 			taskDelay (sysClkRateGet ( ) / 32);
 

@@ -43,7 +43,8 @@
 #include "joystick.h"
 #include "capteur_position.h"
 #include "I_teleop.h"
-
+#include <stdlib.h>
+#include <stdio.h>
 using namespace std;
 
 class controleur_axe
@@ -56,43 +57,38 @@ class controleur_axe
 
   		actionneur * pactionneur;	//actionneur associe
   		
-        	I_teleop * pjoystick;     //joystick associe
+        I_teleop * pjoystick;     //joystick associe
 
-        	double zero_joy;		//position initiale du joystick
+        double zero_joy;		//position initiale du joystick
 
-        	capteur_position *pcapteur;   //capteur de position associe
+        capteur_position *pcapteur;   //capteur de position associe
 
-        	int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
+        int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
 
-        	int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression	
+        int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression	
 
-        	double angle_repos,angle_reel;
+        double angle_repos,angle_reel;
 		
-        	double delta_repos; //regle lors de l'initialisation des muscles
+        double delta_repos; //regle lors de l'initialisation des muscles
         		            //reste constant pendant la phase de controle			
-
-             	double offset_capteur;  //difference entre la valeur initiale lue
+		double offset_capteur;  //difference entre la valeur initiale lue
              				// par le capteur et l'angle au repos theorique
-
-             	double offset_lu; //valeur lue par le capteur a t =0
-
-             	double rapport;
-             	
-             	bool saturation_avant,saturation_arriere;
-             	
-             	int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
+		double offset_lu; //valeur lue par le capteur a t =0
+		double rapport;
+		bool saturation_avant,saturation_arriere;
+		int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
              	
              	//Donnees calcul commande  PID      
-             	double P;  			//coefficient du proportionnel
+        double P;  			//coefficient du proportionnel
 	  	double D;  			//coefficient de la derivee
   		double derivee_erreur;
   		double tab_erreur [10];		//sauvegarde des 10 dernieres erreurs
   		double commande;
   		double erreur, angle_th; 	//angle theorique
   		double angle_reel_prec,angle_filtre,angle_filtre_prec; //infos filtre
-        	void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
-        	void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
-        	void (controleur_axe::*pcalculer_commande)(); //Pointeur de methode qui servira pour 
+        void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
+        void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
+        void (controleur_axe::*pcalculer_commande)(); //Pointeur de methode qui servira pour 
         						  //pointer sur calculer_commande en BO ou BF
         	
 	public :

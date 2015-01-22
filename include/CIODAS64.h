@@ -129,6 +129,27 @@
 #include "carte.h"
 #include "clientudp3.h"
 #include "port.h"
+#include <stdlib.h>
+#define BUFLEN 2048
+using namespace std;
+struct udppacket_DAQ                        // serverheader = 'a';
+{
+    char SERVER_HEADER;
+    float data[32];
+}client_packet_DAQ;
+
+struct udppacket_COUNTER                    // serverheader = 'b';
+{
+    char SERVER_HEADER;
+    signed int data[12];
+}client_packet_COUNTER;  
+
+struct udppacket_error                      // serverheader = 'c';
+{
+    char SERVER_HEADER;
+    unsigned char data[4];
+}client_packet_error; 
+
 class CIODAS64 : public carte, public ClientUDP
 {
 	public :
@@ -137,6 +158,8 @@ class CIODAS64 : public carte, public ClientUDP
 		virtual void initialisation ();
 		virtual unsigned int adconv(int chan);
 	 	virtual unsigned char dread ();
+	 	char recv_buffer[BUFLEN];
+	 	udppacket_DAQ *recv_packet_DAQ;
 	
 };
 

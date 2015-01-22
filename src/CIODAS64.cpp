@@ -12,7 +12,7 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
 */
 
 #include "CIODAS64.h"
-#include "clientudp3.h"
+
 /****************************************************************************************
  * 											*
  * 			CONVERSION ANALOGIQUE -> NUMERIQUE				*
@@ -35,31 +35,24 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  ****************************************************************************************/
 unsigned int CIODAS64::adconv(int chan)
 {
-	//unsigned int mot;	// mot de 12 bits
+	unsigned int val;
+	double val1;
+	client_recv(recv_buffer, BUFLEN);
 	
-	/* select channel */	
-	//mot = (chan + 2) & 0xff;
-	//mot = (mot << 8);
-	//mot = (mot | chan )& 0xffff;
-	/*Ecriture des adresses*/
-	//sysOutWord (CHAN_LIMITS,mot); 
-		
-	/* start convertion */
-	/*Lecture du mot*/
-	//mot = sysInWord(AD_DATA_REG);
-	
-	/*Re-Ecriture du mot */
-	//sysOutWord (AD_DATA_REG, mot);
-	//sysDelay();
-	//sysDelay();
-	
-	/*Recuperation du mot*/
-	//mot = sysInWord (AD_DATA_REG);
-
-	//return (mot>>4);
-	
-	unsigned int val = 1;
-	return(val);
+	switch(recv_buffer[0])
+    {
+    		    
+		case 'a' :
+    	{
+    		        
+    		recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    		val1 = (*recv_packet_DAQ).data[0]; 
+    		val = (unsigned int ) val1;
+    		cout << "\n Previous state \n" << val1;
+    		
+			return(val);
+    	}
+    }
 }
 
 /*Permet une initialisation de la carte

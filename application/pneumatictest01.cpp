@@ -52,8 +52,8 @@ int main()
 	scanf("%c",&debut);
 	if(debut!='0')
 	{
-		main1 = taskSpawn("t_main",110,0,22000,(FUNCPTR)principale,0,0,0,0,0,0,0,0,0,0); 
-		//principale();
+		//main1 = taskSpawn("t_main",110,0,22000,(FUNCPTR)principale,0,0,0,0,0,0,0,0,0,0); 
+		principale();
 		//taskDelete(main1);
 	}
 	finProgramme();

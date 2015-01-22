@@ -236,7 +236,7 @@ capteur_position cap[7];
 //tableau de mesures d'angles
 double angle[7];
 double erreur[7];
-
+double angle_read;
 //watchdog
 WDOG_ID tempo;
 
@@ -333,7 +333,7 @@ void init()
   ciodas64 = new CIODAS64();
 
   // initialisation de la ciodas64
-  ciodas64->initialisation();
+  ciodas64 -> initialisation();
   ciodac16 -> client_start();
   for (int i = 0; i<7;i++) 
   {
@@ -535,12 +535,13 @@ void controler ()
   double  * vit;
   vit = new double (VITESSE_PRESSION);          		
   //Lancement en parallele des taches de controle des axes
-  double delta_musc_0 = 0.0,speed_musc_0=0.0;
+  
   
   controleur1.set_boucle(boucle);
   control_command = controleur1.get_commande(); 
+  angle_read = controleur1.get_angle_reel();
   trait_muscle_i(&controleur1, &control_command, vit);
-  
+  std:: cout << "\n Angle read position " << angle_read << endl;
  
   printf("\n jusqu'ici tout va bien 2 control\n");
   
@@ -607,7 +608,7 @@ void principale (void* )
   
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 1; /* time in seconds*/
+  int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
   
   RTIME   now, previous, TASK_PERIOD = 1000000;

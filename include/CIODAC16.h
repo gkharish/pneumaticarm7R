@@ -59,6 +59,7 @@ class CIODAC16 : public carte, public  ClientUDP
 		{}  // constructeur
 		virtual ~CIODAC16();
 		virtual void daconv(int chan ,unsigned int valeur);
+		char*  buffer_send;
 		udppacket_control send_packet;
 };
 

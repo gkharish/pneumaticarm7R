@@ -505,8 +505,8 @@ while(i>0||j>0)
 
 void controleur_axe::calculer_commande_BF (void) {
   //Lecture de l'angle reel mesure par la capteur 
-  angle_reel = (this ->lire_position());
-
+ angle_reel = (this ->lire_position());
+ //std::cout << "\n angle reel :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 

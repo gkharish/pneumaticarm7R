@@ -38,7 +38,7 @@
     for (int i = 0;i < 10;i++)
   	tab_erreur [i] = 0;
     
-    switch (numero) {
+    /*switch (numero) {
  	
  		case 1 : zero_joy = ((joystick *)pjoystick)->lire_position_x();
  			 break;
@@ -55,7 +55,7 @@
  	 	case 7 : zero_joy = ((joystick *)pjoystick)->lire_position_z();
  	 		 break; 
  		default    :;
-    }
+    }*/
  }
 
 
@@ -422,7 +422,7 @@ double controleur_axe::get_commande(void) {
  ********************************************************************/
 
  void controleur_axe::init_angles () {
- 	offset_lu = pcapteur->get_offset();
+ 	offset_lu = pcapteur-> get_offset();
  	offset_capteur = fabs(offset_lu - angle_repos);
  }
 

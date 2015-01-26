@@ -33,13 +33,26 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  *			il faut donc decaler tous les bits de 4 positions (>> 4)		*
  *
  ****************************************************************************************/
+CIODAS64::CIODAS64()
+{
+	
+}
+
+CIODAS64::~CIODAS64()
+{
+	
+}
+
 unsigned int CIODAS64::adconv(int chan)
 {
 	unsigned int val;
-	double val1;
-	client_recv(recv_buffer, BUFLEN);
-	
-	switch(recv_buffer[0])
+	float val1;
+	client_obj->client_recv(recv_buffer, BUFLEN);
+	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    val1 = (*recv_packet_DAQ).data[0]; 
+    val = (unsigned int ) val1;
+    cout << "\n Previous state " << val;
+	/*switch(recv_buffer[0])
     {
     		    
 		case 'a' :
@@ -49,10 +62,12 @@ unsigned int CIODAS64::adconv(int chan)
     		val1 = (*recv_packet_DAQ).data[0]; 
     		val = (unsigned int ) val1;
     		cout << "\n Previous state \n" << val1;
-    		
-			return(val);
+    		break;
+			
     	}
-    }
+    }*/
+    
+    return(val);
 }
 
 /*Permet une initialisation de la carte
@@ -112,6 +127,12 @@ void CIODAS64::initialisation ()
 unsigned char CIODAS64::dread ()
 {
 	//return (sysInByte (DIGITAL_REG));
+}
+
+
+void CIODAS64::get_client(ClientUDP* parent_client)
+{
+	client_obj = parent_client;
 }
 
 

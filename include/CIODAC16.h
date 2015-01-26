@@ -37,7 +37,13 @@
 //#include "sysLib.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
+#include <stdlib.h>
+#include <stdio.h>
+#define BUFLEN 2048
+#include <fstream>
+#include <sstream>
 
+using namespace std;
 
 /************************************************************************
  *									*
@@ -52,15 +58,27 @@ struct udppacket_control                    // clientheader = '0';
     unsigned int control_cmd;
 }client_packet_control;
 
-class CIODAC16 : public carte, public  ClientUDP
+std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
+{
+    // write obj to stream
+     os << " " << obj.CLIENT_HEADER 
+	<< " " << obj.control_cmd
+	;
+    return os; 
+} 
+
+class CIODAC16 : public carte//, public  ClientUDP
 {	 
 	public :
-		CIODAC16():  ClientUDP()
-		{}  // constructeur
+		CIODAC16();//:  ClientUDP()
+		//{}  // constructeur
 		virtual ~CIODAC16();
 		virtual void daconv(int chan ,unsigned int valeur);
 		char*  buffer_send;
 		udppacket_control send_packet;
+		
+		ClientUDP* client_obj;
+		void get_client(ClientUDP* parent_client);
 };
 
 #endif

@@ -23,17 +23,24 @@ Historique des modifications
  *	4 - Ecriture du mot de 8 bits dans BASE_1			*
  *									*
  ************************************************************************/
+CIODAC16::CIODAC16()
+{
+	
+//	ClientUDP::~ClientUDP();
+}
+
 CIODAC16::~CIODAC16()
 {
 	
 //	ClientUDP::~ClientUDP();
 }
+
 void CIODAC16::daconv(int chan ,unsigned int value)
 {
 	char* buffer_send;
 	//ClientUDP *client;
 	send_packet.CLIENT_HEADER = '0';
-    send_packet.control_cmd = value;//value;
+    send_packet.control_cmd = value*5/4095;//value;
     //client_start();
                 
     buffer_send = (char*)&send_packet;
@@ -50,5 +57,13 @@ void CIODAC16::daconv(int chan ,unsigned int value)
 	//printf("buffer of davconv %s", buffer);
 	//sysOutByte (BASE_1, buffer);
 	//client -> 
-	client_send(buffer_send, sizeof(send_packet));
+	client_obj->client_send(buffer_send, sizeof(send_packet));
+	struct udppacket_control *asp_control = &send_packet;
+    std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
+	 
+}
+
+void CIODAC16::get_client(ClientUDP* parent_client)
+{
+	client_obj = parent_client;
 }

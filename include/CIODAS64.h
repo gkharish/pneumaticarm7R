@@ -131,6 +131,10 @@
 #include "port.h"
 #include <stdlib.h>
 #define BUFLEN 2048
+
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 struct udppacket_DAQ                        // serverheader = 'a';
 {
@@ -150,17 +154,32 @@ struct udppacket_error                      // serverheader = 'c';
     unsigned char data[4];
 }client_packet_error; 
 
-class CIODAS64 : public carte, public ClientUDP
+std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
+{
+    // write obj to stream
+    os << " " << obj.SERVER_HEADER 
+    << " " << obj.data[0] 
+    << " " << obj.data[1] 
+    << " " << obj.data[2]
+    << " " << obj.data[3]
+    << " " << obj.data[4];
+    return os; 
+}  
+
+class CIODAS64 : public carte//, public ClientUDP
 {
 	public :
-		CIODAS64(): ClientUDP()
-		{}
+		CIODAS64();//: ClientUDP()
+		//{}
+		virtual ~CIODAS64();
 		virtual void initialisation ();
 		virtual unsigned int adconv(int chan);
 	 	virtual unsigned char dread ();
 	 	char recv_buffer[BUFLEN];
 	 	udppacket_DAQ *recv_packet_DAQ;
-	
+	 	
+		ClientUDP* client_obj;
+		void get_client(ClientUDP* parent_client);
 };
 
 #endif

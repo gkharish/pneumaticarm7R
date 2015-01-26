@@ -197,6 +197,7 @@
 #include "controleur_outil.h"
 #include "fichier.h"
 #include "modele.h"
+#include "clientudp3.h"
 
 using namespace std;
 /***** VARIABLES GLOBALES *****/
@@ -219,6 +220,8 @@ controleur_axe controleur1,controleur2,controleur3,
 
 //Controleur d'outil
 controleur_outil controleur_pince;
+
+ClientUDP *clientUDP;
 
 //cartes
 CIODAC16 *ciodac16;
@@ -314,7 +317,6 @@ void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vite
   else  
   { 
     controleur_i -> degonfle(vit);
-    
   }
 }
 
@@ -329,12 +331,18 @@ void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vite
 void init()
 {
   //Construction des cartes
+  clientUDP = new ClientUDP();
+  clientUDP -> client_start();
+  
   ciodac16 = new CIODAC16();
+  ciodac16->get_client(clientUDP);
+  
   ciodas64 = new CIODAS64();
+  ciodas64->get_client(clientUDP);
 
   // initialisation de la ciodas64
-  ciodas64 -> initialisation();
-  ciodac16 -> client_start();
+  //ciodas64 -> client_start();//initialisation();
+  
   for (int i = 0; i<7;i++) 
   {
     //construction des capteurs
@@ -370,10 +378,11 @@ void init()
   {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
   }  
-  printf("\n init()debug5 \n");   	
+  printf("\n init()debug5 \n");	
   //Controleur de la pince
-  controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
-  printf("\n jusqu'ici tout va bien 2");     
+  //controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
+  printf("\n jusqu'ici tout va bien 2");
+
   //controleurs d'axe
   controleur1 = controleur_axe(joy1,&a1,1,ANGLE_REPOS_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
   controleur2 = controleur_axe(joy1,&a2,2,ANGLE_REPOS_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
@@ -437,20 +446,21 @@ void init()
 
 void init_capteurs () 
 {
-  printf("\n inside initdebug1 \n");
+  printf("\n inside init_capteurs()1 \n");
   for (int i = 0;i < 7;i++)
   {
     cap[i].set_offset(cap[i].lire_position());
   }
-  printf("\n inside initdebug2 \n");
+  printf("\n inside init_capteurs()2 \n");
   controleur1.init_angles();
-  printf("\n inside initdebug3 \n");
+  printf("\n inside init_capteurs()3 \n");
   controleur2.init_angles();
   controleur3.init_angles();
   controleur4.init_angles();
   controleur5.init_angles();
   controleur6.init_angles();
   controleur7.init_angles();
+  printf("\n inside init_capteurs()4 \n");
 }
 
 /********************************************************
@@ -643,8 +653,9 @@ void principale (void* )
   while (FLAG) 
   {
     rt_task_wait_period(NULL);
+    
     init_capteurs();
-    controleur_pince.initialiser();
+    //controleur_pince.initialiser();
     
     now = rt_timer_read();
     present_time  = round(now/1.0e9);

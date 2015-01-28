@@ -35,12 +35,12 @@ CIODAC16::~CIODAC16()
 //	ClientUDP::~ClientUDP();
 }
 
-void CIODAC16::daconv(int chan ,unsigned int value)
+void CIODAC16::daconv(int chan , double value)
 {
 	char* buffer_send;
 	//ClientUDP *client;
 	send_packet.CLIENT_HEADER = '0';
-    send_packet.control_cmd = value*5/4095;//value;
+    send_packet.control_cmd = value;///4095;//value;
     //client_start();
                 
     buffer_send = (char*)&send_packet;

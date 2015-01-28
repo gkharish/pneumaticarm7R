@@ -8,11 +8,12 @@
 #ifndef CARTE_H
 #define CARTE_H
 
-class carte {
+class carte 
+{
 public :
-  virtual void daconv(int ,unsigned int ){}
+  virtual void daconv(int ,double ){}
   virtual void initialisation(){}
-  virtual unsigned int adconv(int ){ return 0;}
+  virtual float adconv(int ){ return 0;}
   virtual unsigned char dread(){ return 0;}
 };
 

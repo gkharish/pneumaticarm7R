@@ -43,7 +43,7 @@ CIODAS64::~CIODAS64()
 	
 }
 
-unsigned int CIODAS64::adconv(int chan)
+float CIODAS64::adconv(int chan)
 {
 	unsigned int val;
 	float val1;
@@ -51,7 +51,7 @@ unsigned int CIODAS64::adconv(int chan)
 	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
     val1 = (*recv_packet_DAQ).data[0]; 
     val = (unsigned int ) val1;
-    cout << "\n Previous state " << val;
+    cout << "\n Previous state " << val1;
 	/*switch(recv_buffer[0])
     {
     		    
@@ -67,7 +67,7 @@ unsigned int CIODAS64::adconv(int chan)
     	}
     }*/
     
-    return(val);
+    return(val1);
 }
 
 /*Permet une initialisation de la carte

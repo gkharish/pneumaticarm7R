@@ -173,7 +173,7 @@ class CIODAS64 : public carte//, public ClientUDP
 		//{}
 		virtual ~CIODAS64();
 		virtual void initialisation ();
-		virtual unsigned int adconv(int chan);
+		virtual float adconv(int chan);
 	 	virtual unsigned char dread ();
 	 	char recv_buffer[BUFLEN];
 	 	udppacket_DAQ *recv_packet_DAQ;

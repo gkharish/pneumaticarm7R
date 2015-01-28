@@ -4,6 +4,8 @@
  * cree le 17/07/2002  			*
  ****************************************/
  
+ 
+#include <iostream>
 #include "capteur_position.h"
  
 //sens du capteur
@@ -64,14 +66,16 @@
 
 	double angle=0;
 	unsigned int v=0;
+	float v1;
 	/* recup�ration de la tension */
 
-	v = pcarte->adconv(chanNumber);
+	v1 = pcarte->adconv(chanNumber);
 
+ std::cout << "Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
-	angle = ((double)v * 360)/4095;
+	angle = v1*180/3.14;//((double)v * 360)/4095;
 	
 	return (angle);
 

@@ -113,7 +113,7 @@ class controleur_axe
 		void set_boucle(int);
 				
 		//Controle de l'axe
-		void controler(double,double,double);
+		void controler();
 		
 		//Degonflement des muscles
 		void degonfle (double);

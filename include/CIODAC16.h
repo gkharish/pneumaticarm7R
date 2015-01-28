@@ -54,7 +54,7 @@ using namespace std;
 struct udppacket_control                    // clientheader = '0';
 {
     char CLIENT_HEADER;
-    //double control_cmd[3];
+    //double control_cmd;
     unsigned int control_cmd;
 }client_packet_control;
 
@@ -73,7 +73,7 @@ class CIODAC16 : public carte//, public  ClientUDP
 		CIODAC16();//:  ClientUDP()
 		//{}  // constructeur
 		virtual ~CIODAC16();
-		virtual void daconv(int chan ,unsigned int valeur);
+		virtual void daconv(int chan , double valeur);
 		char*  buffer_send;
 		udppacket_control send_packet;
 		

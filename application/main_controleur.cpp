@@ -306,12 +306,14 @@ void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vite
   double pos_joy,coef;
   if (!fin) 
   {
-    if (!tele_op) 
+    double del = *delta;
+    controleur_i -> controler();//initialisation_muscles(del,vit);
+    /*if (!tele_op) 
     {
       double del = *delta;
       controleur_i -> initialisation_muscles(del,vit);
       //msgQSend(msgq2,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
-    }
+    }*/
    
   }
   else  
@@ -364,15 +366,15 @@ void init()
   printf("\n init()debug2 \n");
   //construction des joysticks
   // -1 : pas de connection
-  joy1 = new joystick(ciodas64,VOIE_X_1,VOIE_Y_1,VOIE_Z_1,
+  /*joy1 = new joystick(ciodas64,VOIE_X_1,VOIE_Y_1,VOIE_Z_1,
 		      VOIE_INUTILISEE,VOIE_INUTILISEE,VOIE_INUTILISEE,
 		      VOIE_INUTILISEE,VOIE_VITESSE_1,SEUIL_JOY);
   joy2 = new joystick(ciodas64,VOIE_X_2,VOIE_Y_2,VOIE_Z_2,
 		      VOIE_BOUTTON_A_2,VOIE_INUTILISEE,VOIE_INUTILISEE,
-		      VOIE_INUTILISEE,VOIE_INUTILISEE,SEUIL_JOY);
+		      VOIE_INUTILISEE,VOIE_INUTILISEE,SEUIL_JOY);*/
   printf("\n init()debug3 \n");
 		      
-  ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
+  //ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
   printf("\n init()debug4 \n");  
   for (int i = 0;i < 7;i++)
   {
@@ -403,11 +405,11 @@ void init()
   controleur7.initialisation_carte();
 
   //creation du watchdog
-  tempo = wdCreate();
+  //tempo = wdCreate();
   printf("\n jusqu'ici tout va bien 3");
   //Creation des Messages Queues (sept : un par axe)
   //Utilite : echange d'information entre taches et aussi synchronisation
-  msgq1 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
+ /* msgq1 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgq2 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgq3 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgq4 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
@@ -415,7 +417,7 @@ void init()
   msgq6 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgq7 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgq_pince = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgqfin = 	msgQCreate(7,LONG_MAX_MSG,MSG_Q_FIFO);
+  msgqfin = 	msgQCreate(7,LONG_MAX_MSG,MSG_Q_FIFO);*/
 
   //Association des controleur aux capteurs correspondants	     
   controleur1.set_capteur(cap+4,RAP_MECA_CAP_1);
@@ -427,11 +429,11 @@ void init()
   controleur7.set_capteur(cap+5,RAP_MECA_CAP_7);
   printf("\n jusqu'ici tout va bien 4");
   //Construction du modele
-  mon_modele = modele(&controleur1,&controleur2,&controleur3,&controleur4,
+ /* mon_modele = modele(&controleur1,&controleur2,&controleur3,&controleur4,
 		      &controleur5,&controleur6,&controleur7,
 		      &controleur_pince,
 		      (palonnier *)ppalonnier,(joystick *)joy1,(joystick *)joy2);
-  printf("\n jusqu'ici tout va bien 5");
+  printf("\n jusqu'ici tout va bien 5");*/
      			 
 }
 
@@ -446,21 +448,21 @@ void init()
 
 void init_capteurs () 
 {
-  printf("\n inside init_capteurs()1 \n");
+  //printf("\n inside init_capteurs()1 \n");
   for (int i = 0;i < 7;i++)
   {
     cap[i].set_offset(cap[i].lire_position());
   }
-  printf("\n inside init_capteurs()2 \n");
+  //printf("\n inside init_capteurs()2 \n");
   controleur1.init_angles();
-  printf("\n inside init_capteurs()3 \n");
+  //printf("\n inside init_capteurs()3 \n");
   controleur2.init_angles();
   controleur3.init_angles();
   controleur4.init_angles();
   controleur5.init_angles();
   controleur6.init_angles();
   controleur7.init_angles();
-  printf("\n inside init_capteurs()4 \n");
+  printf("\n Done init_capteurs() \n");
 }
 
 /********************************************************
@@ -494,10 +496,10 @@ void gonfler(void)
      	
   //Lancement en parallele des taches d'initialisation des muscles
   init_muscle_i(&controleur1, d1, vit); 
-  init_muscle_i(&controleur2, d1, vit);
+  //init_muscle_i(&controleur2, d1, vit);
      							
 
-  tele_op = true;
+  //tele_op = true;
 
  	
 }
@@ -540,7 +542,7 @@ void controler ()
 {	
 	
   
-  printf("\n jusqu'ici tout va bien 13 controler");
+  //printf("\n jusqu'ici tout va bien 13 controler");
   
   double  * vit;
   vit = new double (VITESSE_PRESSION);          		
@@ -553,10 +555,10 @@ void controler ()
   trait_muscle_i(&controleur1, &control_command, vit);
   std:: cout << "\n Angle read position " << angle_read << endl;
  
-  printf("\n jusqu'ici tout va bien 2 control\n");
+  //printf("\n jusqu'ici tout va bien 2 control\n");
   
 	
-  printf("\n jusqu'ici tout va bien 3 control\n");	
+  printf("\n jusqu'ici tout va bien control\n");	
   
 }
 
@@ -574,25 +576,25 @@ void controler_robot()
   // tache_arret : pour les evenements clavier
   //tache_arret=taskSpawn("tache_arret",90,0,22000,(FUNCPTR)attente,0,0,0,0,0,0,0,0,0,0);
 	
-  printf(" To stop press a button and confirm Pour arreter appuyez sur une touche puis validez\n\n");
-  printf( "\n\n capt1   capt2   capt3   capt4   capt5   capt6   capt7\n");
-  printf("\n jusqu'ici tout va bien 10 controler_robot");
+  //printf(" To stop press a button and confirm Pour arreter appuyez sur une touche puis validez\n\n");
+  //printf( "\n\n capt1   capt2   capt3   capt4   capt5   capt6   capt7\n");
+  //printf("\n jusqu'ici tout va bien 10 controler_robot");
 	
   // tache_controle_mvt : controle des differnts axes du robot et acquisition des mesures
   //tache_controle_mvt=taskSpawn("t_controle_mvt",95,0,22000,(FUNCPTR)controler,0,0,0,0,0,0,0,0,0,0);
   controler();
-  printf("\n jusqu'ici tout va bien 11 controler_robot");
+  printf("\n jusqu'ici tout va bien controler_robot");
 	
   //tache_controle_outil : gestion de l'ouverture et de la fermeture de la pince
   //tache_controle_outil = taskSpawn("t_controle_outil",95,0,22000,(FUNCPTR)controler_pince,0,0,0,0,0,0,0,0,0,0);
 	
   
-  printf("\n jusqu'ici tout va bien 12 controler_robot");
+  //printf("\n jusqu'ici tout va bien 12 controler_robot");
 	
   
-  printf("\n jusqu'ici tout va bien 13 controler_robot");
+  //printf("\n jusqu'ici tout va bien 13 controler_robot");
   
-  printf("\n jusqu'ici tout va bien 14 controler_robot");
+  //printf("\n jusqu'ici tout va bien 14 controler_robot");
   //Remise a faux de variables booleennes pour une autre execution consecutive	
   	
 }
@@ -649,12 +651,12 @@ void principale (void* )
   
   now = rt_timer_read();
   time_start_loop  = round(now/1.0e9);
-  
+  init_capteurs();
   while (FLAG) 
   {
     rt_task_wait_period(NULL);
     
-    init_capteurs();
+    
     //controleur_pince.initialiser();
     
     now = rt_timer_read();
@@ -765,14 +767,14 @@ int main(void)
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {
-    cout << "Failed @ RT Create" << endl;
+    cout << "Failed @ RT Create" << n <<endl;
   }
   else cout << "END of RT Create" << endl;
   
   n = rt_task_start(&principal_task, &principale, NULL);
   if (n!=0)
   {
-    cout << "Failed of RT STart" << endl;
+    cout << "Failed of RT STart" <<n<< endl;
   }
   else cout << "END of RT Start" << endl;
   

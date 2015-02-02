@@ -18,7 +18,7 @@ public :
   //virtual float adconv(int ){ return 0;}
   virtual VectorXd adconv(int ){ }
   virtual unsigned char dread(){ return 0;}
-  virtual double read_sensors(int* ){return 0;}
+  virtual double read_sensors(int ){return 0;}
 };
 
 #endif

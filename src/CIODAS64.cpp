@@ -45,9 +45,11 @@ CIODAS64::~CIODAS64()
 
 VectorXd CIODAS64::adconv(int chan)
 {
+	cout << "\n ciodas64:adconv()debug1 " ;
 	unsigned int val;
 	float val1;
-	VectorXd recv_data;
+	VectorXd recv_data(7);
+	cout << "\n ciodas64;adconv()debug2 " ;
 	client_obj->client_recv(recv_buffer, BUFLEN);
 	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
 	recv_data(0) = (*recv_packet_DAQ).data[0];
@@ -74,15 +76,17 @@ VectorXd CIODAS64::adconv(int chan)
     return(recv_data);
 }
 
-double CIODAS64::read_sensors(int *axis_num)
+double CIODAS64::read_sensors(int axis_num)
 {
+	cout << "\n cioads64:read_sensors()0 ";
 	double val;
 	float val1;
-	int index = *axis_num;
+	int index = axis_num;
+	cout << "\n cioads64:read_sensors()1 " << index;
 	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-    val1 = (*recv_packet_DAQ).data[index]; 
+    val1 = (*recv_packet_DAQ).data[index -1]; 
     val = (double ) val1;
-    cout << "\n Previous state " << val1;
+    cout << "\n cioads64:read_sensors()2 " << val1;
 
     
     return(val);

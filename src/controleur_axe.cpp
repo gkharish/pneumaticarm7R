@@ -113,16 +113,20 @@ using namespace std;
 
  ********************************************************************/
 
- void controleur_axe::set_capteur (capteur_position *pcap, double rap)
+ void controleur_axe::set_capteur (capteur_position* pcap)
 
  {
-
-	pcapteur = pcap;
-	rapport=rap;
-	double var = pcapteur -> read_sensors_array(&numero);//lire_position();
-	double var1 = var - angle_repos;
-	double offset_capteur = fabs( var1); 
-	//cet offset est recalcule plus tard, inutile ?
+   cout << "\n stecapteur" << endl;
+   //printf("\n controleur_axe.setcapteur()1");
+   
+  	pcapteur = pcap;
+  	//rapport=rap;
+  	double var = pcapteur -> read_sensors_array(numero);//lire_position();
+  	cout << "\n controleur_axe.setcapteur()2";
+  	double var1 = var - angle_repos;
+  	double offset_capteur = fabs( var1); 
+  	printf("\n controleur_axe.setcapteur()3");
+  	//cet offset est recalcule plus tard, inutile ?
  }
 
  
@@ -151,7 +155,7 @@ using namespace std;
 
 	/* recup�ration de la tension */
 	//angle = pcapteur->lire_position();
-	angle = pcapteur->read_sensors_array(&numero);
+	angle = pcapteur->read_sensors_array(numero);
 
  std::cout << "Angle is :" << angle << std::endl;
 	//Calcul de l'angle theorique en fonction de l'angle lu par le capteur

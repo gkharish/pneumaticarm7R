@@ -383,7 +383,7 @@ void init()
   printf("\n init()debug5 \n");	
   //Controleur de la pince
   //controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
-  printf("\n jusqu'ici tout va bien 2");
+  printf("\n init()debug6 \n");
 
   //controleurs d'axe
   controleur1 = controleur_axe(joy1,&a1,1,ANGLE_REPOS_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
@@ -394,7 +394,7 @@ void init()
   controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
   controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
      
-     
+   printf("\n init()debug7 \n");  
   //Initialisation des controleurs 
   controleur1.initialisation_carte();
   controleur2.initialisation_carte();
@@ -406,7 +406,7 @@ void init()
 
   //creation du watchdog
   //tempo = wdCreate();
-  printf("\n jusqu'ici tout va bien 3");
+  printf("\n init()debug8 \n");
   //Creation des Messages Queues (sept : un par axe)
   //Utilite : echange d'information entre taches et aussi synchronisation
  /* msgq1 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
@@ -419,15 +419,20 @@ void init()
   msgq_pince = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
   msgqfin = 	msgQCreate(7,LONG_MAX_MSG,MSG_Q_FIFO);*/
 
-  //Association des controleur aux capteurs correspondants	     
-  controleur1.set_capteur(cap+4,RAP_MECA_CAP_1);
-  controleur2.set_capteur(cap+2,RAP_MECA_CAP_2);
-  controleur3.set_capteur(cap+6,RAP_MECA_CAP_3);
-  controleur4.set_capteur(cap,RAP_MECA_CAP_4);
-  controleur5.set_capteur(cap+1,RAP_MECA_CAP_5);
-  controleur6.set_capteur(cap+3,RAP_MECA_CAP_6);
-  controleur7.set_capteur(cap+5,RAP_MECA_CAP_7);
-  printf("\n jusqu'ici tout va bien 4");
+  //Association des controleur aux capteurs correspondants	
+  ciodas64 -> adconv(1);
+  printf("\n init()debug9 \n");
+  controleur1.set_capteur(cap+4);
+  printf("\n init()debug10 \n");
+  controleur2.set_capteur(cap+2);
+  printf("\n init()debug11 \n");
+  controleur3.set_capteur(cap+6);
+  printf("\n init()debug12 \n");
+  controleur4.set_capteur(cap);
+  controleur5.set_capteur(cap+1);
+  controleur6.set_capteur(cap+3);
+  controleur7.set_capteur(cap+5);
+  printf("\n init()debug13 \n");
   //Construction du modele
  /* mon_modele = modele(&controleur1,&controleur2,&controleur3,&controleur4,
 		      &controleur5,&controleur6,&controleur7,
@@ -449,9 +454,11 @@ void init()
 void init_capteurs () 
 {
   //printf("\n inside init_capteurs()1 \n");
-  for (int i = 0;i < 7;i++)
+  ciodas64 -> adconv(1);
+  
+  for (int i = 1;i < 8;i++)
   {
-    cap[i].set_offset(cap[i].lire_position());
+    cap[i-1].set_offset( cap[i-1].read_sensors_array(i) );
   }
   //printf("\n inside init_capteurs()2 \n");
   controleur1.init_angles();
@@ -663,7 +670,9 @@ void principale (void* )
   
   now = rt_timer_read();
   time_start_loop  = round(now/1.0e9);
+  
   init_capteurs();
+  
   while (FLAG) 
   {
     rt_task_wait_period(NULL);

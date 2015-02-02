@@ -98,7 +98,7 @@ class controleur_axe
 		controleur_axe (I_teleop*,actionneur *,int,double,int,int,double,double);
 		
 		//Fonction d'association du capteur au controleur d'axe
-		void set_capteur (capteur_position *,double);
+		void set_capteur (capteur_position*);
 		
 		//Lecture de l'angle
 		double lire_position(void);

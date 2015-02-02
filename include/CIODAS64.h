@@ -181,7 +181,7 @@ class CIODAS64 : public carte//, public ClientUDP
 	 	virtual unsigned char dread ();
 	 	char recv_buffer[BUFLEN];
 	 	udppacket_DAQ *recv_packet_DAQ;
-	 	double read_sensors(int* );
+	 	virtual double read_sensors(int);
 		ClientUDP* client_obj;
 		void get_client(ClientUDP* parent_client);
 };

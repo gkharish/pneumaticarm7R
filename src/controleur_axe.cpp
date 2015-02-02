@@ -119,7 +119,7 @@ using namespace std;
 
 	pcapteur = pcap;
 	rapport=rap;
-	double var = pcapteur -> lire_position();
+	double var = pcapteur -> read_sensors_array(&numero);//lire_position();
 	double var1 = var - angle_repos;
 	double offset_capteur = fabs( var1); 
 	//cet offset est recalcule plus tard, inutile ?
@@ -150,7 +150,8 @@ using namespace std;
 	double angle;
 
 	/* recup�ration de la tension */
-	angle = pcapteur->lire_position();
+	//angle = pcapteur->lire_position();
+	angle = pcapteur->read_sensors_array(&numero);
 
  std::cout << "Angle is :" << angle << std::endl;
 	//Calcul de l'angle theorique en fonction de l'angle lu par le capteur
@@ -515,7 +516,7 @@ while(i>0||j>0)
  ********************************************************************/
 
 
-void controleur_axe::calculer_commande_BF (void) {
+void controleur_axe::calculer_commande_BF () {
   //Lecture de l'angle reel mesure par la capteur 
  angle_reel = (this ->lire_position());
  std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
@@ -555,7 +556,7 @@ void controleur_axe::calculer_commande_BF (void) {
  ********************************************************************/
 
 
-void controleur_axe::calculer_commande_BO (void) {
+void controleur_axe::calculer_commande_BO () {
   //Lecture de l'angle reel mesure par la capteur 
   angle_reel = (this ->lire_position());
 

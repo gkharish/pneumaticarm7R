@@ -69,8 +69,29 @@
 	float v1;
 	/* recup�ration de la tension */
 
-	v1 = pcarte->adconv(chanNumber);
+	//v1 = pcarte->adconv(chanNumber);
+ //v1 = pcarte -> read_sensors(*axis_num);
+ std::cout << "Value read by the IO board:" << v1 << std::endl;
+	//printf("valeur lue au can %d \r",v);
+	/* calcul de l'angle */
 
+	angle = v1*180/3.14;//((double)v * 360)/4095;
+	
+	return (angle);
+
+ }
+ 
+ double capteur_position::read_sensors_array (int* ind)
+
+ {
+
+	double angle=0;
+	unsigned int v=0;
+	float v1;
+	/* recup�ration de la tension */
+
+	//v1 = pcarte->adconv(chanNumber);
+ v1 = pcarte -> read_sensors(ind);
  std::cout << "Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */

@@ -496,6 +496,12 @@ void gonfler(void)
      	
   //Lancement en parallele des taches d'initialisation des muscles
   init_muscle_i(&controleur1, d1, vit); 
+  init_muscle_i(&controleur2, d2, vit);
+  init_muscle_i(&controleur3, d3, vit);
+  init_muscle_i(&controleur4, d4, vit);
+  init_muscle_i(&controleur5, d5, vit);
+  init_muscle_i(&controleur6, d6, vit);
+  init_muscle_i(&controleur7, d7, vit);
   //init_muscle_i(&controleur2, d1, vit);
      							
 
@@ -523,7 +529,13 @@ void degonfler(void)
   buffer = new char [10];
      	
   //Lancement en parallele des taches de degonflement des muscles
-  reset_muscle_i(&controleur1, vit);	
+  reset_muscle_i(&controleur1, vit);
+  reset_muscle_i(&controleur2, vit);
+  reset_muscle_i(&controleur3, vit);
+  reset_muscle_i(&controleur4, vit);
+  reset_muscle_i(&controleur5, vit);
+  reset_muscle_i(&controleur6, vit);
+  reset_muscle_i(&controleur7, vit);
 
         
 }
@@ -785,6 +797,7 @@ int main(void)
   n = rt_task_delete(&principal_task);
   if(n!=0)cout << "Failed of RT Task delete" << endl;
   else cout << "END of RT taslk delete";
+  // try again nassim tab
   
   
   

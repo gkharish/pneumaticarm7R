@@ -9,6 +9,9 @@ Historique des modifications
 */
 #include "CIODAC16.h"
 #include <string.h>
+#include <Eigen/Core>
+#include <math.h>
+
 /************************************************************************
  *									*
  *		CONVERSION NUMERIQUE -> ANALOGIQUE			*

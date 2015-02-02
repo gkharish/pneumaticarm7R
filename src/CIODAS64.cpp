@@ -43,15 +43,18 @@ CIODAS64::~CIODAS64()
 	
 }
 
-float CIODAS64::adconv(int chan)
+VectorXd CIODAS64::adconv(int chan)
 {
 	unsigned int val;
 	float val1;
+	VectorXd recv_data;
 	client_obj->client_recv(recv_buffer, BUFLEN);
 	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+	recv_data(0) = (*recv_packet_DAQ).data[0];
+	recv_data(1) = (*recv_packet_DAQ).data[1];
     val1 = (*recv_packet_DAQ).data[0]; 
     val = (unsigned int ) val1;
-    cout << "\n Previous state " << val1;
+    cout << "\n Previous state " << recv_data;
 	/*switch(recv_buffer[0])
     {
     		    
@@ -67,9 +70,23 @@ float CIODAS64::adconv(int chan)
     	}
     }*/
     
-    return(val1);
+    //return(val1);
+    return(recv_data);
 }
 
+double CIODAS64::read_sensors(int *axis_num)
+{
+	double val;
+	float val1;
+	int index = *axis_num;
+	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    val1 = (*recv_packet_DAQ).data[index]; 
+    val = (double ) val1;
+    cout << "\n Previous state " << val1;
+
+    
+    return(val);
+}
 /*Permet une initialisation de la carte
  ****************************************************************************************
  * 	******* MODE ENHANCED *********							*

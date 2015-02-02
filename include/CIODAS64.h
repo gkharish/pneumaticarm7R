@@ -131,9 +131,13 @@
 #include "port.h"
 #include <stdlib.h>
 #define BUFLEN 2048
-
+#include <iostream>
 #include <fstream>
 #include <sstream>
+#include <Eigen/Core>
+#include <math.h>
+
+using namespace Eigen;
 
 using namespace std;
 struct udppacket_DAQ                        // serverheader = 'a';
@@ -173,11 +177,11 @@ class CIODAS64 : public carte//, public ClientUDP
 		//{}
 		virtual ~CIODAS64();
 		virtual void initialisation ();
-		virtual float adconv(int chan);
+		virtual VectorXd adconv(int chan);
 	 	virtual unsigned char dread ();
 	 	char recv_buffer[BUFLEN];
 	 	udppacket_DAQ *recv_packet_DAQ;
-	 	
+	 	double read_sensors(int* );
 		ClientUDP* client_obj;
 		void get_client(ClientUDP* parent_client);
 };

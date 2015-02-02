@@ -42,9 +42,10 @@
 #define BUFLEN 2048
 #include <fstream>
 #include <sstream>
-
+#include <Eigen/Core>
+#include <math.h>
 using namespace std;
-
+using namespace Eigen;
 /************************************************************************
  *									*
  *			CLASSE CIODAC16					*

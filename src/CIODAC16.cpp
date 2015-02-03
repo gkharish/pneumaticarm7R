@@ -9,8 +9,7 @@ Historique des modifications
 */
 #include "CIODAC16.h"
 #include <string.h>
-#include <Eigen/Core>
-#include <math.h>
+
 
 /************************************************************************
  *									*
@@ -38,32 +37,39 @@ CIODAC16::~CIODAC16()
 //	ClientUDP::~ClientUDP();
 }
 
-void CIODAC16::daconv(int chan , double value)
+void CIODAC16::daconv(int chan , char header)
 {
 	char* buffer_send;
 	//ClientUDP *client;
-	send_packet.CLIENT_HEADER = '0';
-    send_packet.control_cmd = value;///4095;//value;
+	send_packet.CLIENT_HEADER = header;//'0';
+	//value(14) = 0; // control value for the tool
+	send_array[14] = 0;
+	for(int loop =0; loop < 15; loop++)
+	{
+		send_packet.control_cmd[loop] = (unsigned int )send_array[loop];
+	}
+    ///4095;//value;
     //client_start();
                 
     buffer_send = (char*)&send_packet;
 	
-	// prise des 8 bits de poids fort de valeur
-	// filtrage pour n'avoir que les 4 bits de poids faible
 	
-	///buffer = (value>>8) & 0x000f;
-	// on r�cup�re les 4 bits de poids faible de chan (contenant l'info) 
-	// que l'on d�cale de 4 bits pour l'additionner avec buffer
-	///buffer = ((chan<<4) & 0x00f0) | buffer ;
-	// envoie des donn�es
-	//sysOutByte (BASE_0,(unsigned char) valeur);
-	//printf("buffer of davconv %s", buffer);
-	//sysOutByte (BASE_1, buffer);
-	//client -> 
 	client_obj->client_send(buffer_send, sizeof(send_packet));
 	struct udppacket_control *asp_control = &send_packet;
     std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
 	 
+}
+/*double get_send_array()
+{
+	return(send_array);
+}*/
+
+void CIODAC16:: send_command_array(int index, double control_value)
+{
+	//VectorXd 
+	
+	//send_packet.control_cmd[index] = control_value;
+	send_array[index] = control_value;
 }
 
 void CIODAC16::get_client(ClientUDP* parent_client)

@@ -403,6 +403,9 @@ void init()
   controleur5.initialisation_carte();
   controleur6.initialisation_carte();
   controleur7.initialisation_carte();
+  char header = '0';
+  
+  ciodac16 -> daconv(1, header);
 
   //creation du watchdog
   //tempo = wdCreate();
@@ -454,6 +457,9 @@ void init()
 void init_capteurs () 
 {
   //printf("\n inside init_capteurs()1 \n");
+  char header = '0';
+  
+  ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
   
   for (int i = 1;i < 8;i++)
@@ -573,6 +579,7 @@ void controler ()
   angle_read = controleur1.get_angle_reel();
   trait_muscle_i(&controleur1, &control_command, vit);
   std:: cout << "\n Angle read position " << angle_read << endl;
+  ciodac16 -> daconv(1, '0');
  
   //printf("\n jusqu'ici tout va bien 2 control\n");
   
@@ -639,7 +646,7 @@ void principale (void* )
   
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 10; /* time in seconds*/
+  int timeofsimulation_s = 1; /* time in seconds*/
   int FLAG = 1;
   
   RTIME   now, previous, TASK_PERIOD = 1000000;

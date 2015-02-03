@@ -459,7 +459,7 @@ double controleur_axe::get_commande(void) {
 
  void controleur_axe::initialisation_carte ()
  {	
-        	double i = 0;
+     double i = 0;
 	   	pactionneur->recevoir_commande_decouple(i,i);
  } 
  

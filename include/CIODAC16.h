@@ -56,7 +56,7 @@ struct udppacket_control                    // clientheader = '0';
 {
     char CLIENT_HEADER;
     //double control_cmd;
-    unsigned int control_cmd;
+    unsigned int control_cmd[15];
 }client_packet_control;
 
 std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
@@ -74,10 +74,14 @@ class CIODAC16 : public carte//, public  ClientUDP
 		CIODAC16();//:  ClientUDP()
 		//{}  // constructeur
 		virtual ~CIODAC16();
-		virtual void daconv(int chan , double valeur);
+		virtual void daconv(int chan , char header);
+		void send_command_array(int, double);
 		char*  buffer_send;
 		udppacket_control send_packet;
 		
+		//VectorXd send_array;
+		double send_array[15];
+		double get_send_array();
 		ClientUDP* client_obj;
 		void get_client(ClientUDP* parent_client);
 };

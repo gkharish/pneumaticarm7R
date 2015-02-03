@@ -603,9 +603,12 @@ printf("\n jusqu'ici tout va bien 5");
  *							*
  ********************************************************/
 
-void init_capteurs () {
+void init_capteurs () 
+{
 	for (int i = 0;i < 7;i++)
+	{
 		cap[i].set_offset(cap[i].lire_position());
+	}
 	controleur1.init_angles();
 	controleur2.init_angles();
 	controleur3.init_angles();
@@ -630,7 +633,8 @@ void init_capteurs () {
  ********************************************************/
 
 
-void lire_joy (void) {
+void lire_joy (void) 
+{
 	
 	//Variables locales
 	double pos1,pos2,pos3,pos4,pos5,pos6,pos7,coef_vitesse;
@@ -638,7 +642,8 @@ void lire_joy (void) {
  	
 	taskSuspend(tache_joy);
 
- 	while(!sortie) {
+ 	while(!sortie) 
+ 	{
  		
  		//Lecture de la vitesse
  		if (((joystick * )joy1)-> get_vitesse() == VITESSE_LENTE)

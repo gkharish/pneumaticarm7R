@@ -501,8 +501,8 @@ void gonfler(void)
      							
   char header = '0';
   
-  //ciodac16 -> daconv(1, header);
-  //ciodas64 -> adconv(1);
+  ciodac16 -> daconv(1, header);
+  ciodas64 -> adconv(1);
   //tele_op = true;
 
  	
@@ -536,8 +536,8 @@ void degonfler(void)
   reset_muscle_i(&controleur7, vit);
   char header = '0';
   
-  //ciodac16 -> daconv(1, header);
-  //ciodas64 -> adconv(1);
+  ciodac16 -> daconv(1, header);
+  ciodas64 -> adconv(1);
         
 }
 
@@ -567,6 +567,38 @@ void controler ()
   control_command = controleur1.get_commande(); 
   angle_read = controleur1.get_angle_reel();
   trait_muscle_i(&controleur1, &control_command, vit);
+  
+  controleur2.set_boucle(boucle);
+  control_command = controleur2.get_commande(); 
+  angle_read = controleur2.get_angle_reel();
+  trait_muscle_i(&controleur2, &control_command, vit);
+  
+  controleur3.set_boucle(boucle);
+  control_command = controleur3.get_commande(); 
+  angle_read = controleur3.get_angle_reel();
+  trait_muscle_i(&controleur3, &control_command, vit);
+  
+  controleur4.set_boucle(boucle);
+  control_command = controleur4.get_commande(); 
+  angle_read = controleur4.get_angle_reel();
+  trait_muscle_i(&controleur4, &control_command, vit);
+  
+  controleur5.set_boucle(boucle);
+  control_command = controleur5.get_commande(); 
+  angle_read = controleur5.get_angle_reel();
+  trait_muscle_i(&controleur5, &control_command, vit);
+  
+  controleur6.set_boucle(boucle);
+  control_command = controleur6.get_commande(); 
+  angle_read = controleur6.get_angle_reel();
+  trait_muscle_i(&controleur6, &control_command, vit);
+  
+  controleur7.set_boucle(boucle);
+  control_command = controleur7.get_commande(); 
+  angle_read = controleur7.get_angle_reel();
+  trait_muscle_i(&controleur7, &control_command, vit);
+  
+  
   //std:: cout << "\n Angle read position " << angle_read << endl;
   
   ciodac16 -> daconv(1, '0');

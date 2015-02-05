@@ -63,7 +63,22 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
 {
     // write obj to stream
      os << " " << obj.CLIENT_HEADER 
-	<< " " << obj.control_cmd
+	<< " " << obj.control_cmd[0]
+	<< " " << obj.control_cmd[1]
+	<< " " << obj.control_cmd[2]
+	<< " " << obj.control_cmd[3]
+	<< " " << obj.control_cmd[4]
+	<< " " << obj.control_cmd[5]
+	<< " " << obj.control_cmd[6]
+	<< " " << obj.control_cmd[7]
+	<< " " << obj.control_cmd[8]
+	<< " " << obj.control_cmd[9]
+	<< " " << obj.control_cmd[10]
+	<< " " << obj.control_cmd[11]
+	<< " " << obj.control_cmd[12]
+	<< " " << obj.control_cmd[13]
+	<< " " << obj.control_cmd[14]
+	
 	;
     return os; 
 } 

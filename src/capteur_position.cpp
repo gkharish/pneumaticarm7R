@@ -91,9 +91,9 @@
 	/* recup�ration de la tension */
 
 	//v1 = pcarte->adconv(chanNumber);
-	std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
+	//std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
  v1 = pcarte -> read_sensors(ind);
- std::cout << "Value read by the IO board:" << v1 << std::endl;
+ //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 

@@ -46,7 +46,7 @@ void CIODAC16::daconv(int chan , char header)
 	send_array[14] = 0;
 	for(int loop =0; loop < 15; loop++)
 	{
-		send_packet.control_cmd[loop] = (unsigned int )send_array[loop];
+		send_packet.control_cmd[loop] = send_array[loop];
 	}
     ///4095;//value;
     //client_start();

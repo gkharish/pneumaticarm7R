@@ -226,7 +226,7 @@ ClientUDP *clientUDP;
 //cartes
 CIODAC16 *ciodac16;
 CIODAS64 *ciodas64;
-
+VectorXd recving_Data(15);
 //actionneurs
 actionneur a1,a2,a3,a4,a5,a6,a7;
 
@@ -341,9 +341,6 @@ void init()
   
   ciodas64 = new CIODAS64();
   ciodas64->get_client(clientUDP);
-
-  // initialisation de la ciodas64
-  //ciodas64 -> client_start();//initialisation();
   
   for (int i = 0; i<7;i++) 
   {
@@ -364,22 +361,15 @@ void init()
   a6 = actionneur(VOIE_6_1,VOIE_6_2,ciodac16);
   a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16);
   printf("\n init()debug2 \n");
-  //construction des joysticks
-  // -1 : pas de connection
-  /*joy1 = new joystick(ciodas64,VOIE_X_1,VOIE_Y_1,VOIE_Z_1,
-		      VOIE_INUTILISEE,VOIE_INUTILISEE,VOIE_INUTILISEE,
-		      VOIE_INUTILISEE,VOIE_VITESSE_1,SEUIL_JOY);
-  joy2 = new joystick(ciodas64,VOIE_X_2,VOIE_Y_2,VOIE_Z_2,
-		      VOIE_BOUTTON_A_2,VOIE_INUTILISEE,VOIE_INUTILISEE,
-		      VOIE_INUTILISEE,VOIE_INUTILISEE,SEUIL_JOY);*/
+  
   printf("\n init()debug3 \n");
 		      
   //ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
   printf("\n init()debug4 \n");  
-  for (int i = 0;i < 7;i++)
+  /*for (int i = 0;i < 7;i++)
   {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
-  }  
+  } */
   printf("\n init()debug5 \n");	
   //Controleur de la pince
   //controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
@@ -407,23 +397,13 @@ void init()
   
   ciodac16 -> daconv(1, header);
 
-  //creation du watchdog
-  //tempo = wdCreate();
+  
   printf("\n init()debug8 \n");
-  //Creation des Messages Queues (sept : un par axe)
-  //Utilite : echange d'information entre taches et aussi synchronisation
- /* msgq1 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq2 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq3 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq4 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq5 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq6 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq7 = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgq_pince = msgQCreate(NB_MAX_MSG,LONG_MAX_MSG,MSG_Q_FIFO);
-  msgqfin = 	msgQCreate(7,LONG_MAX_MSG,MSG_Q_FIFO);*/
+  
 
   //Association des controleur aux capteurs correspondants	
-  ciodas64 -> adconv(1);
+  recving_Data = ciodas64 -> adconv(1);
+  cout << "/n init() recv data:adconv:" << recving_Data << endl;
   printf("\n init()debug9 \n");
   controleur1.set_capteur(cap+4);
   printf("\n init()debug10 \n");
@@ -476,6 +456,8 @@ void init_capteurs ()
   controleur6.init_angles();
   controleur7.init_angles();
   printf("\n Done init_capteurs() \n");
+  
+  ciodac16 -> daconv(1, header);
 }
 
 /********************************************************
@@ -517,7 +499,10 @@ void gonfler(void)
   init_muscle_i(&controleur7, d7, vit);
   //init_muscle_i(&controleur2, d1, vit);
      							
-
+  char header = '0';
+  
+  //ciodac16 -> daconv(1, header);
+  //ciodas64 -> adconv(1);
   //tele_op = true;
 
  	
@@ -549,7 +534,10 @@ void degonfler(void)
   reset_muscle_i(&controleur5, vit);
   reset_muscle_i(&controleur6, vit);
   reset_muscle_i(&controleur7, vit);
-
+  char header = '0';
+  
+  //ciodac16 -> daconv(1, header);
+  //ciodas64 -> adconv(1);
         
 }
 
@@ -573,18 +561,21 @@ void controler ()
   vit = new double (VITESSE_PRESSION);          		
   //Lancement en parallele des taches de controle des axes
   
-  
+  ciodas64 -> adconv(1);
+  /*Add here all 7 axis control*/
   controleur1.set_boucle(boucle);
   control_command = controleur1.get_commande(); 
   angle_read = controleur1.get_angle_reel();
   trait_muscle_i(&controleur1, &control_command, vit);
-  std:: cout << "\n Angle read position " << angle_read << endl;
+  //std:: cout << "\n Angle read position " << angle_read << endl;
+  
   ciodac16 -> daconv(1, '0');
+  
  
   //printf("\n jusqu'ici tout va bien 2 control\n");
   
 	
-  printf("\n jusqu'ici tout va bien control\n");	
+  //printf("\n jusqu'ici tout va bien control\n");	
   
 }
 
@@ -646,7 +637,7 @@ void principale (void* )
   
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 1; /* time in seconds*/
+  int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
   
   RTIME   now, previous, TASK_PERIOD = 1000000;

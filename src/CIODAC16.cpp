@@ -41,22 +41,57 @@ void CIODAC16::daconv(int chan , char header)
 {
 	char* buffer_send;
 	//ClientUDP *client;
-	send_packet.CLIENT_HEADER = header;//'0';
+	//'0';
 	//value(14) = 0; // control value for the tool
-	send_array[14] = 0;
-	for(int loop =0; loop < 15; loop++)
+	if(header == '1')
 	{
-		send_packet.control_cmd[loop] = send_array[loop];
-	}
-    ///4095;//value;
-    //client_start();
+		send_packet.CLIENT_HEADER = header;
+		send_array[14] = 0;
+		send_array[15] = 0;
+		for(int loop =0; loop < 16; loop++)
+		{
+			send_packet.control_cmd[loop] = send_array[loop];
+		}
                 
-    buffer_send = (char*)&send_packet;
+    	buffer_send = (char*)&send_packet;
 	
 	
-	client_obj->client_send(buffer_send, sizeof(send_packet));
-	struct udppacket_control *asp_control = &send_packet;
-    std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
+		client_obj->client_send(buffer_send, sizeof(send_packet));
+		struct udppacket_control *asp_control = &send_packet;
+    	std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
+	}
+	
+	else if(header == '0')
+	{
+		send_packet_init.CLIENT_HEADER = header;
+		send_packet_init.ADC = '31';
+		send_packet_init.counters = '11';
+		send_packet_init.errors = '3';
+		send_packet_init.sampling_period = 1;
+		buffer_send = (char*)&send_packet_init;
+		std::cout << "\n  BEfore CIODAC16 message send is unsigned int control: " ;
+		client_obj->client_send(buffer_send, sizeof(send_packet_init));
+		struct udppacket_init *asp_control1 = &send_packet_init;
+    	std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control1 << std::endl;
+	
+	}
+	
+	else if(header == '2')
+	{
+		send_packet_countersreset.CLIENT_HEADER = header;
+		send_packet_countersreset.data = true;
+		buffer_send = (char*)&send_packet_countersreset;
+		client_obj->client_send(buffer_send, sizeof(send_packet_countersreset));
+		
+	}
+	else if(header == '3')
+	{
+		send_packet_digitaloutputcontrol.CLIENT_HEADER = header;
+		send_packet_countersreset.data = true;
+		buffer_send = (char*)&send_packet_digitaloutputcontrol;
+		client_obj -> client_send(buffer_send, sizeof(send_packet_digitaloutputcontrol));
+		
+	}
 	 
 }
 /*double get_send_array()

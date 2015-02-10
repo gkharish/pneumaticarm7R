@@ -17,7 +17,7 @@ public :
   virtual void send_command_array(int, double){}
   virtual void initialisation(){}
   //virtual float adconv(int ){ return 0;}
-  virtual VectorXd adconv(int ){ }
+  virtual void adconv(int ){ }
   virtual unsigned char dread(){ return 0;}
   virtual double read_sensors(int ){return 0;}
 };

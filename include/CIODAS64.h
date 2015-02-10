@@ -158,6 +158,8 @@ struct udppacket_error                      // serverheader = 'c';
     unsigned char data[4];
 }client_packet_error; 
 
+
+
 std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
 {
     // write obj to stream
@@ -166,10 +168,11 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
     << " " << obj.data[1] 
     << " " << obj.data[2]
     << " " << obj.data[3]
-    << " " << obj.data[4];
+    << " " << obj.data[4]
+    << " " << obj.data[5]
+    << " " << obj.data[6];
     return os; 
 }  
-
 class CIODAS64 : public carte//, public ClientUDP
 {
 	public :
@@ -177,10 +180,12 @@ class CIODAS64 : public carte//, public ClientUDP
 		//{}
 		virtual ~CIODAS64();
 		virtual void initialisation ();
-		virtual VectorXd adconv(int chan);
+		virtual void adconv(int chan);
 	 	virtual unsigned char dread ();
 	 	char recv_buffer[BUFLEN];
 	 	udppacket_DAQ *recv_packet_DAQ;
+	 	udppacket_COUNTER *recv_packet_COUNTER;
+	 	udppacket_error *recv_packet_error;
 	 	virtual double read_sensors(int);
 		ClientUDP* client_obj;
 		void get_client(ClientUDP* parent_client);

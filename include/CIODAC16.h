@@ -52,12 +52,28 @@ using namespace Eigen;
  *									*
  ************************************************************************/
 
-struct udppacket_control                    // clientheader = '0';
+struct udppacket_init                    // clientheader = '0';
 {
     char CLIENT_HEADER;
     //double control_cmd;
-    unsigned int control_cmd[15];
+    unsigned char ADC;
+    unsigned char counters;
+    unsigned char errors;
+    unsigned short sampling_period;
+}client_packet_init;
+
+struct udppacket_control                    // clientheader = '0';
+{
+    char CLIENT_HEADER;
+    //double control_cmd[3];
+    unsigned int control_cmd[16];
 }client_packet_control;
+    
+struct udppacket_countersreset              // clientheader = '1';
+{
+    char CLIENT_HEADER;
+    bool data;
+}client_packet_countersreset;
 
 std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
 {
@@ -83,6 +99,18 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
     return os; 
 } 
 
+std::ostream& operator<<(std::ostream& os, const struct udppacket_init & obj)
+{
+    // write obj to stream
+    os << " " << obj.CLIENT_HEADER 
+    << " " << obj.ADC 
+    << " " << obj.counters 
+    << " " << obj.errors
+    << " " << obj.sampling_period;
+    
+    return os; 
+}  
+
 class CIODAC16 : public carte//, public  ClientUDP
 {	 
 	public :
@@ -93,6 +121,8 @@ class CIODAC16 : public carte//, public  ClientUDP
 		void send_command_array(int, double);
 		char*  buffer_send;
 		udppacket_control send_packet;
+		udppacket_countersreset send_packet_countersreset, send_packet_digitaloutputcontrol;
+		udppacket_init send_packet_init;
 		
 		//VectorXd send_array;
 		double send_array[15];

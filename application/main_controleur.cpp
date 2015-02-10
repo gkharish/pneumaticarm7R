@@ -336,6 +336,7 @@ void init()
   clientUDP = new ClientUDP();
   clientUDP -> client_start();
   
+  
   ciodac16 = new CIODAC16();
   ciodac16->get_client(clientUDP);
   
@@ -393,17 +394,24 @@ void init()
   controleur5.initialisation_carte();
   controleur6.initialisation_carte();
   controleur7.initialisation_carte();
-  char header = '0';
+  printf("\n init()debug8 \n");
+  ciodac16 -> daconv(1, '0'); //start the NI module to send data
+  printf("\n init()debug8.1 \n");
+ 
+  ciodas64 -> adconv(1);
+
+  //cout << "/n init() recv data:adconv:" << recving_Data << endl;
+  char header = '1';
   
-  ciodac16 -> daconv(1, header);
+  ciodac16 -> daconv(1, '1');
 
   
-  printf("\n init()debug8 \n");
+  
   
 
   //Association des controleur aux capteurs correspondants	
-  recving_Data = ciodas64 -> adconv(1);
-  cout << "/n init() recv data:adconv:" << recving_Data << endl;
+  ciodas64 -> adconv(1);
+  //cout << "/n init() recv data:adconv:" << recving_Data << endl;
   printf("\n init()debug9 \n");
   controleur1.set_capteur(cap+4);
   printf("\n init()debug10 \n");
@@ -437,7 +445,7 @@ void init()
 void init_capteurs () 
 {
   //printf("\n inside init_capteurs()1 \n");
-  char header = '0';
+  char header = '1';
   
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
@@ -499,7 +507,7 @@ void gonfler(void)
   init_muscle_i(&controleur7, d7, vit);
   //init_muscle_i(&controleur2, d1, vit);
      							
-  char header = '0';
+  char header = '1';
   
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
@@ -534,7 +542,7 @@ void degonfler(void)
   reset_muscle_i(&controleur5, vit);
   reset_muscle_i(&controleur6, vit);
   reset_muscle_i(&controleur7, vit);
-  char header = '0';
+  char header = '1';
   
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
@@ -601,7 +609,7 @@ void controler ()
   
   //std:: cout << "\n Angle read position " << angle_read << endl;
   
-  ciodac16 -> daconv(1, '0');
+  ciodac16 -> daconv(1, '1');
   
  
   //printf("\n jusqu'ici tout va bien 2 control\n");

@@ -15,7 +15,7 @@ ClientUDP::~ClientUDP()
     
 bool ClientUDP::client_start()
 {
-    server = "127.0.0.1"; // 169.254.7.183 // 192.168.101.2 //127.0.0.0
+    server = "192.168.101.2"; //"127.0.0.1"; // 169.254.7.183 // 192.168.101.2 //127.0.0.0
     if ((fd=socket(AF_INET, SOCK_DGRAM, 0))==-1)
     {
         perror("socket created failed");

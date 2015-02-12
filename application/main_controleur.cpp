@@ -64,8 +64,8 @@
 #define VOIE_Z_1          3
 #define VOIE_VITESSE_1    2
 #define VOIE_X_2	  7
-#define VOIE_Y_2	  6
-#define VOIE_Z_2	  4
+#define VOIE_Y_2	  6I
+#define VOIE_Z_2	  45
 #define VOIE_BOUTTON_A_2  5
 #define VOIE_PALONNIER   23 
 #define VOIE_INUTILISEE  -1
@@ -308,7 +308,7 @@ void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vite
   {
     double del = *delta;
     controleur_i -> controler();//initialisation_muscles(del,vit);
-    /*if (!tele_op) 
+    /*if (!tele_op)  
     {
       double del = *delta;
       controleur_i -> initialisation_muscles(del,vit);
@@ -399,7 +399,7 @@ void init()
   printf("\n init()debug8.1 \n");
  
   ciodas64 -> adconv(1);
-
+  printf("\n init()debug8.2\n");
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
   char header = '1';
   
@@ -453,7 +453,8 @@ void init_capteurs ()
   for (int i = 1;i < 8;i++)
   {
     cap[i-1].set_offset( cap[i-1].read_sensors_array(i) );
-  }
+  } 
+//  typing is difficult 
   //printf("\n inside init_capteurs()2 \n");
   controleur1.init_angles();
   //printf("\n inside init_capteurs()3 \n");
@@ -471,7 +472,7 @@ void init_capteurs ()
 /********************************************************
  *							*
  *	 gonfler()					*
- *							*
+ **
  *	fonction de					*
  *	gonflement simultane des muscles		*
  *							*

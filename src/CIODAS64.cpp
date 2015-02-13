@@ -52,12 +52,14 @@ void CIODAS64::adconv(int chan)
 	
 	cout << "\n ciodas64:adconv()debug2 " ;
 	client_obj->client_recv(recv_buffer, BUFLEN);
+	cout << "\n ciodas64:adconv()debug3" ;
 	
 	
     
     if(recv_buffer[0] == 'a')
     {
     	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    	cout << (*recv_packet_DAQ).data[0];
     	/*recv_data(0) = (*recv_packet_DAQ).data[0];
 		recv_data(1) = (*recv_packet_DAQ).data[1];
     	val1 = (*recv_packet_DAQ).data[0]; 

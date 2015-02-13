@@ -16,7 +16,7 @@
 
 #include <iostream>
 #define BUFLEN 2048
-#define MSGS 5	/* number of messages to send */
+
 
 
 using namespace std;
@@ -37,14 +37,15 @@ class ClientUDP
                   
     private:
                 
-            int _sFd, n;          // Socket 
+            int n;          // Socket 
         
-            struct sockaddr_in myaddr, remaddr;
-            int fd, i;
+            
+            int fd_recv_, fd_send_, i;
             //char buf[BUFLEN];	/* message buffer */
-            socklen_t slen;
+            socklen_t slen, addrlen;
             int recvlen;		/* # bytes in acknowledgement message */
             char* server;	/* change this to use a different server */
+            struct sockaddr_in myaddr_send, myaddr_recv, remaddr_send, remaddr_recv;
 
 };
 

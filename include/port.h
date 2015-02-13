@@ -4,4 +4,5 @@
  * digits of your id + 1024
  */
 
-#define SERVICE_PORT	8008	/* hard-coded port number */
+#define SERVICE_PORT_send	8010	/* hard-coded port number */
+#define SERVICE_PORT_recv	8008

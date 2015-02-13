@@ -66,7 +66,8 @@ struct udppacket_control                    // clientheader = '0';
 {
     char CLIENT_HEADER;
     //double control_cmd[3];
-    unsigned int control_cmd[16];
+    //unsigned int control_cmd[16];
+    unsigned short control_cmd[16];
 }client_packet_control;
     
 struct udppacket_countersreset              // clientheader = '1';
@@ -125,7 +126,7 @@ class CIODAC16 : public carte//, public  ClientUDP
 		udppacket_init send_packet_init;
 		
 		//VectorXd send_array;
-		double send_array[15];
+		double send_array[16];
 		double get_send_array();
 		ClientUDP* client_obj;
 		void get_client(ClientUDP* parent_client);

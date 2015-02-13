@@ -395,17 +395,17 @@ void init()
   controleur6.initialisation_carte();
   controleur7.initialisation_carte();
   printf("\n init()debug8 \n");
-  ciodac16 -> daconv(1, '0'); //start the NI module to send data
+  ciodac16 -> daconv(1, '1'); //start the NI module to send data
   printf("\n init()debug8.1 \n");
  
   ciodas64 -> adconv(1);
   printf("\n init()debug8.2\n");
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
-  char header = '1';
+  //char header = '1';
   
-  ciodac16 -> daconv(1, '1');
+  ciodac16 -> daconv(1, '0');
 
-  
+  printf("\n init()debug8.3\n");
   
   
 

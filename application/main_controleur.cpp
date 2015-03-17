@@ -183,7 +183,9 @@
 #include <time.h>
 //#include <string.h>
 #include <sstream>
+#include <fstream>
 #include <math.h>
+#include <string.h>
 
 #include "carte.h"
 #include "CIODAC16.h"
@@ -227,6 +229,7 @@ ClientUDP *clientUDP;
 CIODAC16 *ciodac16;
 CIODAS64 *ciodas64;
 VectorXd recving_Data(15);
+VectorXd CTRL_FLAG(7);
 //actionneurs
 actionneur a1,a2,a3,a4,a5,a6,a7;
 
@@ -816,7 +819,10 @@ void catch_signal(int sig)
  ********************************************************/
 int main(void)
 {
-  int n;
+  int n, num;
+  int index;
+  int flag_num = 1;
+  string line;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
   
@@ -831,13 +837,35 @@ int main(void)
   printf("\n");
   printf("	*****************************************************************\n");
   printf("	*								*\n");
-  printf("	*		        TELEOPERATION SOFTWARE  		*\n");
+  printf("	*		        CONTORL SOFTWARE  		*\n");
   printf("	*                         for the 7 DOFs ARM			*\n");
   printf("	*			  (depart function)         		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
   
-
+  while(flag_num)
+  {
+    cout << "\n Please enter the number of joints you want to control between 1 to 7:" << endl;
+    getline(cin,num);
+    if(num>=7 || num < 0)
+    {
+      cout << "\n Invalid input is entered, please try again:" << endl;
+      flag_num = 1;
+    }
+    flag_num = 0;
+  }
+  cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
+  getline(cin, line);
+  std::istringstream stream(line);
+  
+    for(i= 0; i<=num;i++)
+  {
+    //cout << "Please enter the" <<i<< joint's number you want to control
+    //getline(cin, index);
+    stream >> index;
+    CTRL_FLAG(index-1) = 1;
+  }
+  cout<< "Control flag: "<<CTRL_FLAG(1) << endl;
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

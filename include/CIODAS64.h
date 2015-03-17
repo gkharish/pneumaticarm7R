@@ -143,19 +143,19 @@ using namespace std;
 struct udppacket_DAQ                        // serverheader = 'a';
 {
     char SERVER_HEADER;
-    float data[32];
+    float data[7];
 }client_packet_DAQ;
 
 struct udppacket_COUNTER                    // serverheader = 'b';
 {
     char SERVER_HEADER;
-    signed int data[12];
+    signed int data[1];
 }client_packet_COUNTER;  
 
 struct udppacket_error                      // serverheader = 'c';
 {
     char SERVER_HEADER;
-    unsigned char data[4];
+    unsigned char data[3];
 }client_packet_error; 
 
 

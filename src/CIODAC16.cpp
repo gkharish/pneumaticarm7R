@@ -43,7 +43,7 @@ void CIODAC16::daconv(int chan , char header)
 	//ClientUDP *client;
 	//'0';
 	//value(14) = 0; // control value for the tool
-	if(header == '0')
+	if(header == '1')
 	{	
 		std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
 		send_packet.CLIENT_HEADER = '1';
@@ -62,15 +62,15 @@ void CIODAC16::daconv(int chan , char header)
     	std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
 	}
 	
-	else if(header == '1')
+	else if(header == '0')
 	{
 		send_packet_init.CLIENT_HEADER = '0';
 		send_packet_init.ADC = 0x7;
-		send_packet_init.counters = 0x8;
+		send_packet_init.counters = 0x1;
 		send_packet_init.errors = 0x3;
 		send_packet_init.sampling_period = 1;
 		buffer_send = (char*)&send_packet_init;
-		std::cout << "\n  Before CIODAC16 message send is unsigned int control: " ;
+		std::cout << "\n  Before CIODAC16 message send is unsigned int control: " << endl;
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));
 		struct udppacket_init *asp_control1 = &send_packet_init;
     	std::cout << "\n  CIODAC16 message send is init_packet: " << *asp_control1 << std::endl;

@@ -165,7 +165,8 @@
 //#include "wdLib.h"
 #include <iostream>
 #include <limits>
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "string.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
@@ -184,8 +185,9 @@
 //#include <string.h>
 #include <sstream>
 #include <fstream>
+#include <istream>
 #include <math.h>
-#include <string.h>
+
 
 #include "carte.h"
 #include "CIODAC16.h"
@@ -846,7 +848,8 @@ int main(void)
   while(flag_num)
   {
     cout << "\n Please enter the number of joints you want to control between 1 to 7:" << endl;
-    getline(cin,num);
+    //getline(cin,num);
+    scanf("%d", &num);
     if(num>=7 || num < 0)
     {
       cout << "\n Invalid input is entered, please try again:" << endl;
@@ -854,15 +857,16 @@ int main(void)
     }
     flag_num = 0;
   }
-  cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
-  getline(cin, line);
-  std::istringstream stream(line);
+  //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
+  //getline(cin, line);
+  //std::istringstream stream(line);
   
-    for(i= 0; i<=num;i++)
+  for(int i= 0; i<num;i++)
   {
-    //cout << "Please enter the" <<i<< joint's number you want to control
+    cout << "Please enter the" <<i<< "joint's number you want to control" << endl;
     //getline(cin, index);
-    stream >> index;
+    //stream >> index;
+    scanf("%d", &index);
     CTRL_FLAG(index-1) = 1;
   }
   cout<< "Control flag: "<<CTRL_FLAG(1) << endl;

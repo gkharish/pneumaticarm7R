@@ -356,30 +356,30 @@ void init()
     //Association des capteurs aux ports de la carte d'acquisition
     cap[i].set_association(ciodas64,i+16);
   }
-  printf("\n jusqu'ici tout va bien 1");
+  //printf("\n jusqu'ici tout va bien 1");
   //Actionneurs
   a1 = actionneur(VOIE_1_1,VOIE_1_2,ciodac16);
-  printf("\n init()debug1 \n");
+  //printf("\n init()debug1 \n");
   a2 = actionneur(VOIE_2_1,VOIE_2_2,ciodac16);
   a3 = actionneur(VOIE_3_1,VOIE_3_2,ciodac16);
   a4 = actionneur(VOIE_4_1,VOIE_4_2,ciodac16);
   a5 = actionneur(VOIE_5_1,VOIE_5_2,ciodac16);
   a6 = actionneur(VOIE_6_1,VOIE_6_2,ciodac16);
   a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16);
-  printf("\n init()debug2 \n");
+  //printf("\n init()debug2 \n");
   
-  printf("\n init()debug3 \n");
+  //printf("\n init()debug3 \n");
 		      
   //ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
-  printf("\n init()debug4 \n");  
+  //printf("\n init()debug4 \n");  
   /*for (int i = 0;i < 7;i++)
   {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
   } */
-  printf("\n init()debug5 \n");	
+  //printf("\n init()debug5 \n");	
   //Controleur de la pince
   //controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
-  printf("\n init()debug6 \n");
+  //printf("\n init()debug6 \n");
 
   //controleurs d'axe
   controleur1 = controleur_axe(joy1,&a1,1,ANGLE_REPOS_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
@@ -390,7 +390,7 @@ void init()
   controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
   controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
      
-   printf("\n init()debug7 \n");  
+   //printf("\n init()debug7 \n");  
   //Initialisation des controleurs 
   controleur1.initialisation_carte();
   controleur2.initialisation_carte();
@@ -399,36 +399,36 @@ void init()
   controleur5.initialisation_carte();
   controleur6.initialisation_carte();
   controleur7.initialisation_carte();
-  printf("\n init()debug8 \n");
+  //printf("\n init()debug8 \n");
   ciodac16 -> daconv(1, '0'); //start the NI module to send data
-  printf("\n init()debug8.1 \n");
+  //printf("\n init()debug8.1 \n");
  
   ciodas64 -> adconv(1);
-  printf("\n init()debug8.2\n");
+  //printf("\n init()debug8.2\n");
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
   //char header = '1';
   
   ciodac16 -> daconv(1, '1');
 
-  printf("\n init()debug8.3\n");
+  //printf("\n init()debug8.3\n");
   
   
 
   //Association des controleur aux capteurs correspondants	
   ciodas64 -> adconv(1);
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
-  printf("\n init()debug9 \n");
+  //printf("\n init()debug9 \n");
   controleur1.set_capteur(cap+4);
-  printf("\n init()debug10 \n");
+  //printf("\n init()debug10 \n");
   controleur2.set_capteur(cap+2);
-  printf("\n init()debug11 \n");
+  //printf("\n init()debug11 \n");
   controleur3.set_capteur(cap+6);
-  printf("\n init()debug12 \n");
+  //printf("\n init()debug12 \n");
   controleur4.set_capteur(cap);
   controleur5.set_capteur(cap+1);
   controleur6.set_capteur(cap+3);
   controleur7.set_capteur(cap+5);
-  printf("\n init()debug13 \n");
+  //printf("\n init()debug13 \n");
   //Construction du modele
  /* mon_modele = modele(&controleur1,&controleur2,&controleur3,&controleur4,
 		      &controleur5,&controleur6,&controleur7,
@@ -660,7 +660,7 @@ void controler_robot()
   // tache_controle_mvt : controle des differnts axes du robot et acquisition des mesures
   //tache_controle_mvt=taskSpawn("t_controle_mvt",95,0,22000,(FUNCPTR)controler,0,0,0,0,0,0,0,0,0,0);
   controler();
-  printf("\n jusqu'ici tout va bien controler_robot");
+  //printf("\n jusqu'ici tout va bien controler_robot");
 	
   //tache_controle_outil : gestion de l'ouverture et de la fermeture de la pince
   //tache_controle_outil = taskSpawn("t_controle_outil",95,0,22000,(FUNCPTR)controler_pince,0,0,0,0,0,0,0,0,0,0);
@@ -707,11 +707,15 @@ void principale (void* )
 	
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));	
-  printf("\n ..... initialisation of Electronics of muscles  .....");
+  printf("\n ..... INFLATING THE MUSCLES   .....");
 	
   //Appel a la fonction de gonflement des muscles
   gonfler();
 	
+	sleep(5);
+	printf("\n ..... INFLATING should be completed  .....");
+	
+	printf("\n ..... CONTROL MODE Begins   .....");
 	
 	printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
 	std::cin >> tmp; //scanf("%s",tmp);
@@ -758,10 +762,13 @@ void principale (void* )
   // terminaison
 
   cout << "outside while loop ok2" << endl ;
+	printf("\n ..... DEFLATING THE MUSCLES   .....");
 	
+	degonfler();
+	sleep(5);
+	printf("\n ..... DEFLATING should be completed  .....");
   //Appel a la fonction de degonflement des muscles
-  degonfler();
-	
+  
   //Remise a faux de variables booleennes 	
   fin = false;
   tele_op = false;
@@ -838,16 +845,16 @@ int main(void)
 
   printf("\n");
   printf("	*****************************************************************\n");
-  printf("	*								*\n");
-  printf("	*		        CONTORL SOFTWARE  		*\n");
-  printf("	*                         for the 7 DOFs ARM			*\n");
-  printf("	*			  (depart function)         		*\n");
+  printf("*								                      *\n");
+  printf("	*		        CONTORL SOFTWARE  		  *\n");
+  printf("	*               for the 7 DOFs ARM			                      *\n");
+  printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
   
   while(flag_num)
   {
-    cout << "\n Please enter the number of joints you want to control between 1 to 7:" << endl;
+    cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
     //getline(cin,num);
     scanf("%d", &num);
     if(num>=7 || num < 0)
@@ -863,13 +870,13 @@ int main(void)
   
   for(int i= 0; i<num;i++)
   {
-    cout << "Please enter the" <<i<< "joint's number you want to control" << endl;
+    cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
     //getline(cin, index);
     //stream >> index;
     scanf("%d", &index);
     CTRL_FLAG(index-1) = 1;
   }
-  cout<< "Control flag: "<<CTRL_FLAG(1) << endl;
+  cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

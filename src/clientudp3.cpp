@@ -92,15 +92,15 @@ bool ClientUDP::client_start()
 bool ClientUDP::client_send(char* buf, int size)
 {
     
-    std::cout << "size:" << size << std::endl;
-    std::cout << "fd_send_: " << fd_send_  << std::endl;
+    //std::cout << "size:" << size << std::endl;
+    //std::cout << "fd_send_: " << fd_send_  << std::endl;
 	if (sendto(fd_send_, buf, size, 0, (struct sockaddr *)&remaddr_recv, slen)==-1) 
 	{
 		perror("sendto");
 		std::cerr << "Problem when sending to " << std::endl;
 		//exit(-1);
 	}
-	std::cout << "I did send data !" << std::endl;
+	//std::cout << "I did send data !" << std::endl;
     
 }
     
@@ -114,7 +114,7 @@ bool ClientUDP::client_recv(char* buf, int size)
         buf[recvlen] = 0;	/* expect a printable string - terminate it */
         
     }
-    std::cout << "Received " << recvlen << "bytes" << std::endl;
+    //std::cout << "Received " << recvlen << "bytes" << std::endl;
             
     
     return true;

@@ -45,21 +45,23 @@ CIODAS64::~CIODAS64()
 
 void CIODAS64::adconv(int chan)
 {
-	cout << "\n ciodas64:adconv()debug1 " ;
+	//cout << "\n ciodas64:adconv()debug1 " ;
 	unsigned int val;
 	float val1;
-	cout << "\n ciodas64:adconv()debug1.2 " ;
+	//cout << "\n ciodas64:adconv()debug1.2 " ;
 	
-	cout << "\n ciodas64:adconv()debug2 " ;
+
 	client_obj->client_recv(recv_buffer, BUFLEN);
-	cout << "\n ciodas64:adconv()debug3" ;
-	
-	
+
     
     if(recv_buffer[0] == 'a')
     {
     	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-    	cout << (*recv_packet_DAQ).data[0];
+    	cout << "\n Sensor's data: " <<(*recv_packet_DAQ);
+    	printf("%x %x ", (*recv_packet_DAQ).label, (*recv_packet_DAQ).data[0]);
+    	//cout << (*recv_packet_DAQ).data[0];
+    	//struct udppacket_DAQ daq = recv_packet_DAQ;
+    	//std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;
     	/*recv_data(0) = (*recv_packet_DAQ).data[0];
 		recv_data(1) = (*recv_packet_DAQ).data[1];
     	val1 = (*recv_packet_DAQ).data[0]; 

@@ -143,18 +143,21 @@ using namespace std;
 struct udppacket_DAQ                        // serverheader = 'a';
 {
     char SERVER_HEADER;
+    unsigned int label;
     float data[7];
 }client_packet_DAQ;
 
 struct udppacket_COUNTER                    // serverheader = 'b';
 {
     char SERVER_HEADER;
+    unsigned int label;
     signed int data[1];
 }client_packet_COUNTER;  
 
 struct udppacket_error                      // serverheader = 'c';
 {
     char SERVER_HEADER;
+    unsigned int label;
     unsigned char data[3];
 }client_packet_error; 
 
@@ -164,6 +167,7 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
 {
     // write obj to stream
     os << " " << obj.SERVER_HEADER 
+    << " " << obj.label
     << " " << obj.data[0] 
     << " " << obj.data[1] 
     << " " << obj.data[2]

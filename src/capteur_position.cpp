@@ -4,6 +4,8 @@
  * cree le 17/07/2002  			*
  ****************************************/
  
+ 
+#include <iostream>
 #include "capteur_position.h"
  
 //sens du capteur
@@ -64,14 +66,38 @@
 
 	double angle=0;
 	unsigned int v=0;
+	float v1;
 	/* recup�ration de la tension */
 
-	v = pcarte->adconv(chanNumber);
-
+	//v1 = pcarte->adconv(chanNumber);
+ //v1 = pcarte -> read_sensors(*axis_num);
+ std::cout << "Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
-	angle = ((double)v * 360)/4095;
+	angle = v1*180/3.14;//((double)v * 360)/4095;
+	
+	return (angle);
+
+ }
+ 
+ double capteur_position::read_sensors_array (int ind)
+
+ {
+
+	double angle=0;
+	unsigned int v=0;
+	double v1;
+	/* recup�ration de la tension */
+
+	//v1 = pcarte->adconv(chanNumber);
+	//std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
+ v1 = pcarte -> read_sensors(ind);
+ //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
+	//printf("valeur lue au can %d \r",v);
+	/* calcul de l'angle */
+
+	angle = v1*180/3.14;//((double)v * 360)/4095;
 	
 	return (angle);
 

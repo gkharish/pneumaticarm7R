@@ -129,15 +129,66 @@
 #include "carte.h"
 #include "clientudp3.h"
 #include "port.h"
-class CIODAS64 : public carte, public ClientUDP
+#include <stdlib.h>
+#define BUFLEN 2048
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <Eigen/Core>
+#include <math.h>
+
+using namespace Eigen;
+
+using namespace std;
+struct udppacket_DAQ                        // serverheader = 'a';
+{
+    char SERVER_HEADER;
+    float data[32];
+}client_packet_DAQ;
+
+struct udppacket_COUNTER                    // serverheader = 'b';
+{
+    char SERVER_HEADER;
+    signed int data[12];
+}client_packet_COUNTER;  
+
+struct udppacket_error                      // serverheader = 'c';
+{
+    char SERVER_HEADER;
+    unsigned char data[4];
+}client_packet_error; 
+
+
+
+std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
+{
+    // write obj to stream
+    os << " " << obj.SERVER_HEADER 
+    << " " << obj.data[0] 
+    << " " << obj.data[1] 
+    << " " << obj.data[2]
+    << " " << obj.data[3]
+    << " " << obj.data[4]
+    << " " << obj.data[5]
+    << " " << obj.data[6];
+    return os; 
+}  
+class CIODAS64 : public carte//, public ClientUDP
 {
 	public :
-		CIODAS64(): ClientUDP()
-		{}
+		CIODAS64();//: ClientUDP()
+		//{}
+		virtual ~CIODAS64();
 		virtual void initialisation ();
-		virtual unsigned int adconv(int chan);
+		virtual void adconv(int chan);
 	 	virtual unsigned char dread ();
-	
+	 	char recv_buffer[BUFLEN];
+	 	udppacket_DAQ *recv_packet_DAQ;
+	 	udppacket_COUNTER *recv_packet_COUNTER;
+	 	udppacket_error *recv_packet_error;
+	 	virtual double read_sensors(int);
+		ClientUDP* client_obj;
+		void get_client(ClientUDP* parent_client);
 };
 
 #endif

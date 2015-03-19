@@ -9,6 +9,8 @@ Historique des modifications
 */
 #include "CIODAC16.h"
 #include <string.h>
+
+
 /************************************************************************
  *									*
  *		CONVERSION NUMERIQUE -> ANALOGIQUE			*
@@ -23,32 +25,90 @@ Historique des modifications
  *	4 - Ecriture du mot de 8 bits dans BASE_1			*
  *									*
  ************************************************************************/
+CIODAC16::CIODAC16()
+{
+	
+//	ClientUDP::~ClientUDP();
+}
+
 CIODAC16::~CIODAC16()
 {
 	
 //	ClientUDP::~ClientUDP();
 }
-void CIODAC16::daconv(int chan ,unsigned int value)
+
+void CIODAC16::daconv(int chan , char header)
 {
 	char* buffer_send;
 	//ClientUDP *client;
-	send_packet.CLIENT_HEADER = '0';
-    send_packet.control_cmd = 1;//value;
-    
-                
-    buffer_send = (char*)&send_packet;
+	//'0';
+	//value(14) = 0; // control value for the tool
+	if(header == '0')
+	{	
+		std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
+		send_packet.CLIENT_HEADER = '1';
+		send_array[14] = 0;
+		send_array[15] = 0;
+		for(int loop =0; loop < 16; loop++)
+		{
+			send_packet.control_cmd[loop] = send_array[loop];
+		}
+        cout << "CIOD16:daconv:header=1: error2"  <<std::endl;       
+    	buffer_send = (char*)&send_packet;
+    	cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
+		client_obj->client_send(buffer_send, sizeof(send_packet));
+		cout << "CIOD16:daconv:header=1: error4" ;
+		struct udppacket_control *asp_control = &send_packet;
+    	std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
+	}
 	
-	// prise des 8 bits de poids fort de valeur
-	// filtrage pour n'avoir que les 4 bits de poids faible
+	else if(header == '1')
+	{
+		send_packet_init.CLIENT_HEADER = '0';
+		send_packet_init.ADC = 0x7;
+		send_packet_init.counters = 0x8;
+		send_packet_init.errors = 0x3;
+		send_packet_init.sampling_period = 1;
+		buffer_send = (char*)&send_packet_init;
+		std::cout << "\n  Before CIODAC16 message send is unsigned int control: " ;
+		client_obj->client_send(buffer_send, sizeof(send_packet_init));
+		struct udppacket_init *asp_control1 = &send_packet_init;
+    	std::cout << "\n  CIODAC16 message send is init_packet: " << *asp_control1 << std::endl;
 	
-	///buffer = (value>>8) & 0x000f;
-	// on r�cup�re les 4 bits de poids faible de chan (contenant l'info) 
-	// que l'on d�cale de 4 bits pour l'additionner avec buffer
-	///buffer = ((chan<<4) & 0x00f0) | buffer ;
-	// envoie des donn�es
-	//sysOutByte (BASE_0,(unsigned char) valeur);
-	//printf("buffer of davconv %s", buffer);
-	//sysOutByte (BASE_1, buffer);
-	//client -> 
-	client_send(buffer_send, sizeof(send_packet));
+	}
+	
+	else if(header == '2')
+	{
+		send_packet_countersreset.CLIENT_HEADER = header;
+		send_packet_countersreset.data = true;
+		buffer_send = (char*)&send_packet_countersreset;
+		client_obj->client_send(buffer_send, sizeof(send_packet_countersreset));
+		
+	}
+	else if(header == '3')
+	{
+		send_packet_digitaloutputcontrol.CLIENT_HEADER = header;
+		send_packet_countersreset.data = true;
+		buffer_send = (char*)&send_packet_digitaloutputcontrol;
+		client_obj -> client_send(buffer_send, sizeof(send_packet_digitaloutputcontrol));
+		
+	}
+	 
+}
+/*double get_send_array()
+{
+	return(send_array);
+}*/
+
+void CIODAC16:: send_command_array(int index, double control_value)
+{
+	//VectorXd 
+	
+	//send_packet.control_cmd[index] = control_value;
+	send_array[index] = control_value;
+}
+
+void CIODAC16::get_client(ClientUDP* parent_client)
+{
+	client_obj = parent_client;
 }

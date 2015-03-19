@@ -12,7 +12,7 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
 */
 
 #include "CIODAS64.h"
-#include "clientudp3.h"
+
 /****************************************************************************************
  * 											*
  * 			CONVERSION ANALOGIQUE -> NUMERIQUE				*
@@ -33,35 +33,71 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  *			il faut donc decaler tous les bits de 4 positions (>> 4)		*
  *
  ****************************************************************************************/
-unsigned int CIODAS64::adconv(int chan)
+CIODAS64::CIODAS64()
 {
-	//unsigned int mot;	// mot de 12 bits
 	
-	/* select channel */	
-	//mot = (chan + 2) & 0xff;
-	//mot = (mot << 8);
-	//mot = (mot | chan )& 0xffff;
-	/*Ecriture des adresses*/
-	//sysOutWord (CHAN_LIMITS,mot); 
-		
-	/* start convertion */
-	/*Lecture du mot*/
-	//mot = sysInWord(AD_DATA_REG);
-	
-	/*Re-Ecriture du mot */
-	//sysOutWord (AD_DATA_REG, mot);
-	//sysDelay();
-	//sysDelay();
-	
-	/*Recuperation du mot*/
-	//mot = sysInWord (AD_DATA_REG);
-
-	//return (mot>>4);
-	
-	unsigned int val = 1;
-	return(val);
 }
 
+CIODAS64::~CIODAS64()
+{
+	
+}
+
+void CIODAS64::adconv(int chan)
+{
+	cout << "\n ciodas64:adconv()debug1 " ;
+	unsigned int val;
+	float val1;
+	cout << "\n ciodas64:adconv()debug1.2 " ;
+	
+	cout << "\n ciodas64:adconv()debug2 " ;
+	client_obj->client_recv(recv_buffer, BUFLEN);
+	cout << "\n ciodas64:adconv()debug3" ;
+	
+	
+    
+    if(recv_buffer[0] == 'a')
+    {
+    	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    	cout << (*recv_packet_DAQ).data[0];
+    	/*recv_data(0) = (*recv_packet_DAQ).data[0];
+		recv_data(1) = (*recv_packet_DAQ).data[1];
+    	val1 = (*recv_packet_DAQ).data[0]; 
+    	val = (unsigned int ) val1;*/
+   	}
+    		    
+    		    
+    else if	(recv_buffer[0] == 'b')	    
+    {
+		recv_packet_COUNTER = (udppacket_COUNTER *)recv_buffer;
+    	//recv_data(0) = 0;
+    }
+    
+    else if(recv_buffer[0] == 'c')        
+	{
+		recv_packet_error = (udppacket_error *)recv_buffer;
+		//recv_data(0) = 0;
+	}
+    		    
+
+    //return(recv_data);
+}
+
+double CIODAS64::read_sensors(int axis_num)
+{
+	//cout << "\n cioads64:read_sensors()0 ";
+	double val;
+	float val1;
+	int index = axis_num;
+	//cout << "\n cioads64:read_sensors()1 " << index;
+	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    val1 = (*recv_packet_DAQ).data[index -1]; 
+    val = (double ) val1;
+    //cout << "\n cioads64:read_sensors()2 " << val1;
+
+    
+    return(val);
+}
 /*Permet une initialisation de la carte
  ****************************************************************************************
  * 	******* MODE ENHANCED *********							*
@@ -119,6 +155,12 @@ void CIODAS64::initialisation ()
 unsigned char CIODAS64::dread ()
 {
 	//return (sysInByte (DIGITAL_REG));
+}
+
+
+void CIODAS64::get_client(ClientUDP* parent_client)
+{
+	client_obj = parent_client;
 }
 
 

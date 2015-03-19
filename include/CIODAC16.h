@@ -95,6 +95,7 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
 	<< " " << obj.control_cmd[12]
 	<< " " << obj.control_cmd[13]
 	<< " " << obj.control_cmd[14]
+	<< " " << obj.control_cmd[15]
 	
 	;
     return os; 

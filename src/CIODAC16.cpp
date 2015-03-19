@@ -43,9 +43,9 @@ void CIODAC16::daconv(int chan , char header)
 	//ClientUDP *client;
 	//'0';
 	//value(14) = 0; // control value for the tool
-	if(header == '0')
+	if(header == '1')
 	{	
-		std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
+		//std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
 		send_packet.CLIENT_HEADER = '1';
 		send_array[14] = 0;
 		send_array[15] = 0;
@@ -53,27 +53,27 @@ void CIODAC16::daconv(int chan , char header)
 		{
 			send_packet.control_cmd[loop] = send_array[loop];
 		}
-        cout << "CIOD16:daconv:header=1: error2"  <<std::endl;       
+        //cout << "CIOD16:daconv:header=1: error2"  <<std::endl;       
     	buffer_send = (char*)&send_packet;
-    	cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
+    	//cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
 		client_obj->client_send(buffer_send, sizeof(send_packet));
-		cout << "CIOD16:daconv:header=1: error4" ;
+		//cout << "CIOD16:daconv:header=1: error4" ;
 		struct udppacket_control *asp_control = &send_packet;
-    	std::cout << "\n  CIODAC16 message send is unsigned int control: " << *asp_control << std::endl;
+    	std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 	}
 	
-	else if(header == '1')
+	else if(header == '0')
 	{
 		send_packet_init.CLIENT_HEADER = '0';
 		send_packet_init.ADC = 0x7;
-		send_packet_init.counters = 0x8;
-		send_packet_init.errors = 0x3;
-		send_packet_init.sampling_period = 1;
+		send_packet_init.counters = 0x0;
+		send_packet_init.errors = 0x0;
+		send_packet_init.sampling_period = 100;
 		buffer_send = (char*)&send_packet_init;
-		std::cout << "\n  Before CIODAC16 message send is unsigned int control: " ;
+		
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));
 		struct udppacket_init *asp_control1 = &send_packet_init;
-    	std::cout << "\n  CIODAC16 message send is init_packet: " << *asp_control1 << std::endl;
+    	std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
 	
 	}
 	

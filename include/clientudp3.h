@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 #include "port.h"
 
@@ -23,23 +24,23 @@ using namespace std;
 
 class ClientUDP
 {
-    public: 
+    public:
             //ClientUDP();
             ClientUDP();
             virtual ~ClientUDP();
-                
-                
+
+
             bool client_start();
             bool client_send(char* buf, int size);
             bool client_recv(char* buf, int size);
-                
-                
-                  
+
+
+
     private:
-                
-            int n;          // Socket 
-        
-            
+
+            int n;          // Socket
+
+
             int fd_recv_, fd_send_, i;
             //char buf[BUFLEN];	/* message buffer */
             socklen_t slen, addrlen;
@@ -50,4 +51,3 @@ class ClientUDP
 };
 
 #endif
-

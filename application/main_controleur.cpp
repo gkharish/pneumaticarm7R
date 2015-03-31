@@ -137,7 +137,7 @@
 
 #define BOUCLE_OUVERTE  0
 #define BOUCLE_FERMEE  1
-
+//#define BOUCLE_PRESCMD 2
 //Infos PID
 #define P_AXE_1 (0.0139) *1.5 // ancien : 1.0
 #define P_AXE_2 (0.0139) *1.75
@@ -205,9 +205,10 @@
 
 using namespace std;
 /***** VARIABLES GLOBALES *****/
-bool boucle=FERMEE;
+int boucle;
 double control_command;
 RT_TASK principal_task;
+int BOUCLE_PRESCMD = 2;
 /*struct axisparam
 {
   long int li_delta;
@@ -232,6 +233,9 @@ CIODAC16 *ciodac16;
 CIODAS64 *ciodas64;
 VectorXd recving_Data(15);
 VectorXd CTRL_FLAG(7);
+VectorXd pressure_command_array(7);
+int num_joints;
+//pressure_command_array(7) << 0,0,0,0,0,0,0;
 //actionneurs
 actionneur a1,a2,a3,a4,a5,a6,a7;
 
@@ -580,14 +584,25 @@ void controler ()
   if(CTRL_FLAG(0)==1)
   {
     controleur1.set_boucle(boucle);
-    control_command = controleur1.get_commande();
+		cout <<  "\n boucle" << boucle << endl;
+		if(boucle == 2)
+		{
+			controleur1.set_userpressure(pressure_command_array(0));
+			cout << "inside boucle  = 2" << endl;
+		}
+	 	control_command = controleur1.get_commande();
     angle_read = controleur1.get_angle_reel();
-		cout << "\n angle read :" << angle_read << endl;
+		cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
     trait_muscle_i(&controleur1, &control_command, vit);
   }
   if(CTRL_FLAG(1)==1)
   {
     controleur2.set_boucle(boucle);
+		if(boucle == 2)
+		{
+			controleur2.set_userpressure(pressure_command_array(1));
+		}
+
     control_command = controleur2.get_commande();
     angle_read = controleur2.get_angle_reel();
     trait_muscle_i(&controleur2, &control_command, vit);
@@ -595,6 +610,11 @@ void controler ()
   if(CTRL_FLAG(2)==1)
   {
     controleur3.set_boucle(boucle);
+		if(boucle == 2)
+		{
+			controleur3.set_userpressure(pressure_command_array(2));
+		}
+
     control_command = controleur3.get_commande();
     angle_read = controleur3.get_angle_reel();
     trait_muscle_i(&controleur3, &control_command, vit);
@@ -602,6 +622,10 @@ void controler ()
   if(CTRL_FLAG(3)==1)
   {
     controleur4.set_boucle(boucle);
+		if(boucle == 2)
+		{
+			controleur4.set_userpressure(pressure_command_array(3));
+		}
     control_command = controleur4.get_commande();
     angle_read = controleur4.get_angle_reel();
     trait_muscle_i(&controleur4, &control_command, vit);
@@ -609,21 +633,33 @@ void controler ()
   if(CTRL_FLAG(4)==1)
   {
     controleur5.set_boucle(boucle);
-    control_command = controleur5.get_commande();
+		if(boucle == 2)
+		{
+			controleur5.set_userpressure(pressure_command_array(4));
+		}
+		control_command = controleur5.get_commande();
     angle_read = controleur5.get_angle_reel();
     trait_muscle_i(&controleur5, &control_command, vit);
   }
   if(CTRL_FLAG(5)==1)
   {
     controleur6.set_boucle(boucle);
-    control_command = controleur6.get_commande();
+		if(boucle == 2)
+		{
+			controleur6.set_userpressure(pressure_command_array(5));
+		}
+		control_command = controleur6.get_commande();
     angle_read = controleur6.get_angle_reel();
     trait_muscle_i(&controleur6, &control_command, vit);
   }
   if(CTRL_FLAG(6)==1)
   {
     controleur7.set_boucle(boucle);
-    control_command = controleur7.get_commande();
+		if(boucle == 2)
+		{
+			controleur7.set_userpressure(pressure_command_array(6));
+		}
+		control_command = controleur7.get_commande();
     angle_read = controleur7.get_angle_reel();
     trait_muscle_i(&controleur7, &control_command, vit);
   }
@@ -695,6 +731,7 @@ void principale (void* )
   char * cont2 = new char [1];
   char * cont1 = new char [1];
   char * tmp = new char [1];
+	float user_pressure;
 
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
@@ -716,18 +753,27 @@ void principale (void* )
 	sleep(5);
 	printf("\n ..... INFLATING should be completed  .....");
 
+	//printf("\n ..... OPENLOOP PRESSURE COMMAND  .....");
+	//printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrolm, or p for open loop pressure command and confirm (ok3, tmp) : ");
 	printf("\n ..... CONTROL MODE Begins   .....");
 
-	printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
+	printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol, or p for open loop pressure command and confirm (ok3, tmp) : ");
 	std::cin >> tmp; //scanf("%s",tmp);
 
 	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
 	if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}
-	else
+	if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
+	if (strcmp(tmp,"p")==0)  {boucle=BOUCLE_PRESCMD; cout << "boucle pressure is set :"  << boucle;ok3=true;}
+	/*/else
 	{
-	  if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
+		if (strcmp(tmp,"p")==0)
+		{
+			boucle=BOUCLE_PRESCMD;
+			ok3=true;
+		}
 		else ok3=false;
-	}
+	}*/
+
 
   printf(" \n APPLY THE PRESSURE   \n");
 
@@ -811,7 +857,6 @@ void principale (void* )
   printf("\n .... ELectronics is reset ...\n");
 } //principale finish
 
-
 /*** SiGNAL catch  **/
 
 void catch_signal(int sig)
@@ -826,16 +871,18 @@ void catch_signal(int sig)
  *							*
  *	tache init du programme				*
  *							*
- ********************************************************/
+ ****************************************************** */
+
 int main(void)
 {
-  int n, num;
+  int n;
   int index;
   int flag_num = 1;
   string line;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
-
+	int man_pres;
+	int user_pressure;
   mlockall(MCL_CURRENT|MCL_FUTURE);
 
   // Round robin period
@@ -857,8 +904,8 @@ int main(void)
   {
     cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
     //getline(cin,num);
-    scanf("%d", &num);
-    if(num>=7 || num < 0)
+    scanf("%d", &num_joints);
+    if(num_joints>=7 || num_joints < 0)
     {
       cout << "\n Invalid input is entered, please try again:" << endl;
       flag_num = 1;
@@ -868,16 +915,28 @@ int main(void)
   //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
   //getline(cin, line);
   //std::istringstream stream(line);
+	cout << "\n  Do you want to manually pressurize the muscles? (Type 1 for YES and 0 for NO): " << endl;
+	scanf("%d", &man_pres);
 
-  for(int i= 0; i<num;i++)
+  for(int i= 0; i<num_joints;i++)
   {
     cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
     //getline(cin, index);
     //stream >> index;
     scanf("%d", &index);
     CTRL_FLAG(index-1) = 1;
+		if(man_pres == 1)
+		{
+			cout << "\n Please enter the delta pressure value between 0 to 2.5 for "<<i+1<<"th " << "joint's" << endl;
+			std::cin >> user_pressure; //scanf("%s",tmp);
+
+			std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
+			cout <<  "\n input userpressure: " << user_pressure << endl;
+			pressure_command_array(index-1) = user_pressure;
+		}
   }
   cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
+	cout << "Presuure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

@@ -18,7 +18,7 @@ using namespace std;
  ***********************************************************/
  controleur_axe::controleur_axe (I_teleop* pjoy,actionneur *paction,int num,double angle_init,int s_cap,int s_pre,double p,double d)
  {
-    boucle=FERMEE; //par defaut on est en boucle fermee
+    //boucle=FERMEE; //par defaut on est en boucle fermee
     numero = num;
     pactionneur = paction;
     pjoystick = pjoy;
@@ -71,8 +71,9 @@ using namespace std;
  {
 
 	if (_boucle==OUVERTE) pcalculer_commande=&controleur_axe::calculer_commande_BO;
-	if (_boucle==FERMEE) pcalculer_commande=&controleur_axe::calculer_commande_BF;
-	else pcalculer_commande=&controleur_axe::calculer_commande_BF;
+	if (_boucle==FERMEE)  pcalculer_commande=&controleur_axe::calculer_commande_BF;
+	if (_boucle==PRESCMD) pcalculer_commande=&controleur_axe::pressure_commande;
+  //else pcalculer_commande=&controleur_axe::pressure_commande;
  }
 
 
@@ -112,7 +113,11 @@ using namespace std;
   	//cet offset est recalcule plus tard, inutile ?
  }
 
-
+void controleur_axe::set_userpressure(double pres)
+{
+  user_pressure = pres;
+  cout << "\n set userpressure: " << user_pressure << endl;
+}
 
 /********************************************************************
 
@@ -290,11 +295,13 @@ double controleur_axe::get_angle_filtre (void) {
  ********************************************************************/
 
 
-double controleur_axe::get_angle_reel (void) {
+double controleur_axe::get_angle_reel (void)
+{
 	return (angle_reel);
 }
 
-double controleur_axe::get_commande(void) {
+double controleur_axe::get_commande(void)
+{
 	return (commande);
 }
 
@@ -504,7 +511,8 @@ while(i>0||j>0)
  ********************************************************************/
 
 
-void controleur_axe::calculer_commande_BF () {
+void controleur_axe::calculer_commande_BF ()
+{
   //Lecture de l'angle reel mesure par la capteur
   angle_reel = (this ->lire_position());
   std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
@@ -544,10 +552,11 @@ void controleur_axe::calculer_commande_BF () {
  ********************************************************************/
 
 
-void controleur_axe::calculer_commande_BO () {
+void controleur_axe::calculer_commande_BO ()
+{
   //Lecture de l'angle reel mesure par la capteur
   angle_reel = (this ->lire_position());
-
+  cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 
@@ -557,4 +566,14 @@ void controleur_axe::calculer_commande_BO () {
 
   angle_filtre_prec = angle_filtre;
   angle_reel_prec = angle_reel;
+}
+
+void controleur_axe::pressure_commande ()
+{
+
+
+  //scanf("%f", user_pressure);
+  commande = user_pressure;
+  cout << "\n pressure commande: " << commande << endl;
+
 }

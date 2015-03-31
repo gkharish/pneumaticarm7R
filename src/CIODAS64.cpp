@@ -98,7 +98,7 @@ double CIODAS64::read_sensors(int axis_num)
     //cout << "\n cioads64:read_sensors()2 " << val1;
 
     float val2 = rand() % 10;
-		cout << "\n random  value in read_sensors: " << val2/10 << endl;
+		//cout << "\n random  value in read_sensors: " << val2/10 << endl;
     return(val2/10);
 }
 /*Permet une initialisation de la carte

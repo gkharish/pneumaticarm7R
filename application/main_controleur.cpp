@@ -6,16 +6,16 @@
  * Date     : 02/07/2002 				    *
  * Derniere modification de M.Seffar: 20/09/2002
  * REPRIS PAR J. GUIOCHET le 15/12/2002			    *
- * VERSION  	    
+ * VERSION
  ************************************************************/
 
-/*MODIFICATIONS 
+/*MODIFICATIONS
   17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES CAPTEURS DE POSITION
   20/12/2002: AJOUT Du choix boucle ouverte boucle fermee
 */
 
 
-#define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__ 
+#define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__
 #define ODEBUG(x) std::cerr << x << DBG_INFO << std::endl
 
 /***** DEFINITION DE L'ADRESSAGE DES CARTES *****/
@@ -26,7 +26,7 @@
 #define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
-#define VOIE_PINCE_1        14   // sorties de la carte de commande 
+#define VOIE_PINCE_1        14   // sorties de la carte de commande
 #define VOIE_PINCE_2        15   // reliees a la pince
 
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
@@ -37,10 +37,10 @@
 #define DELTA_INIT_AXE_1 -1.4
 #define DELTA_INIT_AXE_2 -2.5
 #define DELTA_INIT_AXE_3  0.0
-#define DELTA_INIT_AXE_4  1.8 
+#define DELTA_INIT_AXE_4  1.8
 #define DELTA_INIT_AXE_5  0.2
 #define DELTA_INIT_AXE_6 -0.6
-#define DELTA_INIT_AXE_7 -0.2 
+#define DELTA_INIT_AXE_7 -0.2
 
 //Ports de sorties des actionneurs sur la carte de commande (CIODAC16)
 #define VOIE_1_1  2
@@ -67,7 +67,7 @@
 #define VOIE_Y_2	  6I
 #define VOIE_Z_2	  45
 #define VOIE_BOUTTON_A_2  5
-#define VOIE_PALONNIER   23 
+#define VOIE_PALONNIER   23
 #define VOIE_INUTILISEE  -1
 
 //seuil de prise en compte des mouvements du joystick et du palonnier
@@ -75,13 +75,13 @@
 #define SEUIL_PAL  0.25
 
 //Informations concernant la vitesse du mouvement
-#define COEF_LENT        0.5    //coefficients de rapidite du 
+#define COEF_LENT        0.5    //coefficients de rapidite du
 #define COEF_MOYEN       1 	// mouvement
 #define COEF_RAPIDE      2
 
 #define VITESSE_LENTE    0
 #define VITESSE_MOY      1
-#define VITESSE_RAPIDE   2 
+#define VITESSE_RAPIDE   2
 
 #define PRESSION_BASE     2.5
 #define DEMI_TRAJET     180.0
@@ -145,7 +145,7 @@
 #define P_AXE_4 (0.0139) *1.25 //ancien: 1.25
 #define P_AXE_5 (0.0139) *1.5
 #define P_AXE_6 (0.0139) *1.75
-#define P_AXE_7 (0.0139) 
+#define P_AXE_7 (0.0139)
 
 //CONSTANTE POUR LA BOUCLE OUVERTE
 #define K_BOUCLE_OUVERTE (2.5/180)
@@ -208,7 +208,7 @@ using namespace std;
 bool boucle=FERMEE;
 double control_command;
 RT_TASK principal_task;
-/*struct axisparam 
+/*struct axisparam
 {
   long int li_delta;
   long int li_speed;
@@ -219,7 +219,7 @@ RT_TASK principal_task;
 //Controleurs d'axes
 controleur_axe controleur1,controleur2,controleur3,
 						   controleur4,controleur5,controleur6,controleur7;
-						   
+
 //axisparam axisparam1, axisparam2, axisparam3, axisparam4, axisparam5, axisparam6, axisparam7;
 
 //Controleur d'outil
@@ -290,7 +290,7 @@ char * buffer_joy[7];
  *	trois etapes.			                *
  ********************************************************/
 
-void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse) 
+void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
 {
   controleur_i -> initialisation_muscles(*delta,*vitesse);
   //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
@@ -301,28 +301,28 @@ void reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
   controleur_i -> degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
   //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
-}	
+}
 
-void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse) 
+void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
 {
   double vit = *vitesse;
   const char * buf = std::string("ok").c_str();
   char * buffer = new char[2 * sizeof(double) + 2];
   double pos_joy,coef;
-  if (!fin) 
+  if (!fin)
   {
     double del = *delta;
     controleur_i -> controler();//initialisation_muscles(del,vit);
-    /*if (!tele_op)  
+    /*if (!tele_op)
     {
       double del = *delta;
       controleur_i -> initialisation_muscles(del,vit);
       //msgQSend(msgq2,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
     }*/
-   
+
   }
-  else  
-  { 
+  else
+  {
     controleur_i -> degonfle(vit);
   }
 }
@@ -334,21 +334,21 @@ void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vite
  *	permet l'initialisation de tous les objets	*
  *							*
  ********************************************************/
- 
+
 void init()
 {
   //Construction des cartes
   clientUDP = new ClientUDP();
   clientUDP -> client_start();
-  
-  
+
+
   ciodac16 = new CIODAC16();
   ciodac16->get_client(clientUDP);
-  
+
   ciodas64 = new CIODAS64();
   ciodas64->get_client(clientUDP);
-  
-  for (int i = 0; i<7;i++) 
+
+  for (int i = 0; i<7;i++)
   {
     //construction des capteurs
     cap[i] = capteur_position(0,0);
@@ -367,16 +367,16 @@ void init()
   a6 = actionneur(VOIE_6_1,VOIE_6_2,ciodac16);
   a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16);
   //printf("\n init()debug2 \n");
-  
+
   //printf("\n init()debug3 \n");
-		      
+
   //ppalonnier = new palonnier(ciodas64,VOIE_PALONNIER,SEUIL_PAL);
-  //printf("\n init()debug4 \n");  
+  //printf("\n init()debug4 \n");
   /*for (int i = 0;i < 7;i++)
   {
     buffer_joy[i] = new char [2 * sizeof(double) + 2];
   } */
-  //printf("\n init()debug5 \n");	
+  //printf("\n init()debug5 \n");
   //Controleur de la pince
   //controleur_pince = controleur_outil(ciodac16,VOIE_PINCE_1,VOIE_PINCE_2);
   //printf("\n init()debug6 \n");
@@ -389,9 +389,9 @@ void init()
   controleur5 = controleur_axe(ppalonnier,&a5,5,ANGLE_REPOS_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
   controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
   controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
-     
-   //printf("\n init()debug7 \n");  
-  //Initialisation des controleurs 
+
+   //printf("\n init()debug7 \n");
+  //Initialisation des controleurs
   controleur1.initialisation_carte();
   controleur2.initialisation_carte();
   controleur3.initialisation_carte();
@@ -402,19 +402,19 @@ void init()
   //printf("\n init()debug8 \n");
   ciodac16 -> daconv(1, '0'); //start the NI module to send data
   //printf("\n init()debug8.1 \n");
- 
+
   ciodas64 -> adconv(1);
   //printf("\n init()debug8.2\n");
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
   //char header = '1';
-  
+
   ciodac16 -> daconv(1, '1');
 
   //printf("\n init()debug8.3\n");
-  
-  
 
-  //Association des controleur aux capteurs correspondants	
+
+
+  //Association des controleur aux capteurs correspondants
   ciodas64 -> adconv(1);
   //cout << "/n init() recv data:adconv:" << recving_Data << endl;
   //printf("\n init()debug9 \n");
@@ -435,7 +435,7 @@ void init()
 		      &controleur_pince,
 		      (palonnier *)ppalonnier,(joystick *)joy1,(joystick *)joy2);
   printf("\n jusqu'ici tout va bien 5");*/
-     			 
+
 }
 
 /********************************************************
@@ -447,19 +447,19 @@ void init()
  *							*
  ********************************************************/
 
-void init_capteurs () 
+void init_capteurs ()
 {
   //printf("\n inside init_capteurs()1 \n");
   char header = '1';
-  
+
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
-  
+
   for (int i = 1;i < 8;i++)
   {
     cap[i-1].set_offset( cap[i-1].read_sensors_array(i) );
-  } 
-//  typing is difficult 
+  }
+//  typing is difficult
   //printf("\n inside init_capteurs()2 \n");
   controleur1.init_angles();
   //printf("\n inside init_capteurs()3 \n");
@@ -470,7 +470,7 @@ void init_capteurs ()
   controleur6.init_angles();
   controleur7.init_angles();
   printf("\n Done init_capteurs() \n");
-  
+
   ciodac16 -> daconv(1, header);
 }
 
@@ -483,17 +483,17 @@ void init_capteurs ()
  *							*
  ********************************************************/
 
-void gonfler(void) 
+void gonfler(void)
 {
- 	
+
   //variables locales
- 	    
+
   double  * vit,*d1,*d2,*d3,*d4,*d5,*d6,*d7;
   vit = new double (VITESSE_PRESSION);
   char * buffer;
   buffer = new char [10];
-     	
-  
+
+
   d1 = new double (DELTA_INIT_AXE_1);
   d2 = new double (DELTA_INIT_AXE_2);
   d3 = new double (DELTA_INIT_AXE_3);
@@ -501,10 +501,10 @@ void gonfler(void)
   d5 = new double (DELTA_INIT_AXE_5);
   d6 = new double (DELTA_INIT_AXE_6);
   d7 = new double (DELTA_INIT_AXE_7);
-  	
-     	
+
+
   //Lancement en parallele des taches d'initialisation des muscles
-  init_muscle_i(&controleur1, d1, vit); 
+  init_muscle_i(&controleur1, d1, vit);
   init_muscle_i(&controleur2, d2, vit);
   init_muscle_i(&controleur3, d3, vit);
   init_muscle_i(&controleur4, d4, vit);
@@ -512,14 +512,14 @@ void gonfler(void)
   init_muscle_i(&controleur6, d6, vit);
   init_muscle_i(&controleur7, d7, vit);
   //init_muscle_i(&controleur2, d1, vit);
-     							
+
   char header = '1';
-  
+
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
   //tele_op = true;
 
- 	
+
 }
 
 /********************************************************
@@ -531,15 +531,15 @@ void gonfler(void)
  *							*
  ********************************************************/
 
-void degonfler(void) 
+void degonfler(void)
 {
-	
+
   //Variables locales
   double  * vit;
   vit = new double (VITESSE_PRESSION);
   char * buffer;
   buffer = new char [10];
-     	
+
   //Lancement en parallele des taches de degonflement des muscles
   reset_muscle_i(&controleur1, vit);
   reset_muscle_i(&controleur2, vit);
@@ -549,10 +549,10 @@ void degonfler(void)
   reset_muscle_i(&controleur6, vit);
   reset_muscle_i(&controleur7, vit);
   char header = '1';
-  
+
   ciodac16 -> daconv(1, header);
   ciodas64 -> adconv(1);
-        
+
 }
 
 
@@ -566,77 +566,78 @@ void degonfler(void)
  ********************************************************/
 
 void controler ()
-{	
-	
-  
+{
+
+
   //printf("\n jusqu'ici tout va bien 13 controler");
-  
+
   double  * vit;
-  vit = new double (VITESSE_PRESSION);          		
+  vit = new double (VITESSE_PRESSION);
   //Lancement en parallele des taches de controle des axes
-  
+
   ciodas64 -> adconv(1);
   /*Add here all 7 axis control*/
   if(CTRL_FLAG(0)==1)
   {
     controleur1.set_boucle(boucle);
-    control_command = controleur1.get_commande(); 
+    control_command = controleur1.get_commande();
     angle_read = controleur1.get_angle_reel();
+		cout << "\n angle read :" << angle_read << endl;
     trait_muscle_i(&controleur1, &control_command, vit);
   }
   if(CTRL_FLAG(1)==1)
   {
     controleur2.set_boucle(boucle);
-    control_command = controleur2.get_commande(); 
+    control_command = controleur2.get_commande();
     angle_read = controleur2.get_angle_reel();
     trait_muscle_i(&controleur2, &control_command, vit);
   }
   if(CTRL_FLAG(2)==1)
   {
     controleur3.set_boucle(boucle);
-    control_command = controleur3.get_commande(); 
+    control_command = controleur3.get_commande();
     angle_read = controleur3.get_angle_reel();
     trait_muscle_i(&controleur3, &control_command, vit);
   }
   if(CTRL_FLAG(3)==1)
   {
     controleur4.set_boucle(boucle);
-    control_command = controleur4.get_commande(); 
+    control_command = controleur4.get_commande();
     angle_read = controleur4.get_angle_reel();
     trait_muscle_i(&controleur4, &control_command, vit);
   }
   if(CTRL_FLAG(4)==1)
   {
     controleur5.set_boucle(boucle);
-    control_command = controleur5.get_commande(); 
+    control_command = controleur5.get_commande();
     angle_read = controleur5.get_angle_reel();
     trait_muscle_i(&controleur5, &control_command, vit);
   }
   if(CTRL_FLAG(5)==1)
   {
     controleur6.set_boucle(boucle);
-    control_command = controleur6.get_commande(); 
+    control_command = controleur6.get_commande();
     angle_read = controleur6.get_angle_reel();
     trait_muscle_i(&controleur6, &control_command, vit);
   }
   if(CTRL_FLAG(6)==1)
   {
     controleur7.set_boucle(boucle);
-    control_command = controleur7.get_commande(); 
+    control_command = controleur7.get_commande();
     angle_read = controleur7.get_angle_reel();
     trait_muscle_i(&controleur7, &control_command, vit);
   }
-  
+
   //std:: cout << "\n Angle read position " << angle_read << endl;
-  
+
   ciodac16 -> daconv(1, '1');
-  
- 
+
+
   //printf("\n jusqu'ici tout va bien 2 control\n");
-  
-	
-  //printf("\n jusqu'ici tout va bien control\n");	
-  
+
+
+  //printf("\n jusqu'ici tout va bien control\n");
+
 }
 
 
@@ -648,32 +649,32 @@ void controler ()
  *les deux taches de controle et d'attente clavier	*
  ********************************************************/
 void controler_robot()
-{	
-	
+{
+
   // tache_arret : pour les evenements clavier
   //tache_arret=taskSpawn("tache_arret",90,0,22000,(FUNCPTR)attente,0,0,0,0,0,0,0,0,0,0);
-	
+
   //printf(" To stop press a button and confirm Pour arreter appuyez sur une touche puis validez\n\n");
   //printf( "\n\n capt1   capt2   capt3   capt4   capt5   capt6   capt7\n");
   //printf("\n jusqu'ici tout va bien 10 controler_robot");
-	
+
   // tache_controle_mvt : controle des differnts axes du robot et acquisition des mesures
   //tache_controle_mvt=taskSpawn("t_controle_mvt",95,0,22000,(FUNCPTR)controler,0,0,0,0,0,0,0,0,0,0);
   controler();
   //printf("\n jusqu'ici tout va bien controler_robot");
-	
+
   //tache_controle_outil : gestion de l'ouverture et de la fermeture de la pince
   //tache_controle_outil = taskSpawn("t_controle_outil",95,0,22000,(FUNCPTR)controler_pince,0,0,0,0,0,0,0,0,0,0);
-	
-  
+
+
   //printf("\n jusqu'ici tout va bien 12 controler_robot");
-	
-  
+
+
   //printf("\n jusqu'ici tout va bien 13 controler_robot");
-  
+
   //printf("\n jusqu'ici tout va bien 14 controler_robot");
-  //Remise a faux de variables booleennes pour une autre execution consecutive	
-  	
+  //Remise a faux de variables booleennes pour une autre execution consecutive
+
 }
 
 
@@ -682,72 +683,72 @@ void controler_robot()
  *							*
  *	principale () = tache principale		*
  *							*
- *routine appelee par debut() apres 
+ *routine appelee par debut() apres
  *l initialisation					*
  ********************************************************/
-void principale (void* ) 
+void principale (void* )
 {
   //variables locales
   bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
   char * fich = new char [40];
   char * commencer = new char [1];
-  char * cont2 = new char [1]; 
+  char * cont2 = new char [1];
   char * cont1 = new char [1];
   char * tmp = new char [1];
-  
+
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
   int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
-  
+
   RTIME   now, previous, TASK_PERIOD = 1000000;
-  double t, time_start_loop, present_time; 
+  double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
-	
+
   //int i = 0;
-  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));	
+  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   printf("\n ..... INFLATING THE MUSCLES   .....");
-	
+
   //Appel a la fonction de gonflement des muscles
   gonfler();
-	
+
 	sleep(5);
 	printf("\n ..... INFLATING should be completed  .....");
-	
+
 	printf("\n ..... CONTROL MODE Begins   .....");
-	
+
 	printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol and confirm (ok3, tmp) : ");
 	std::cin >> tmp; //scanf("%s",tmp);
-	     
-	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n'); 	
-	if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}        				    
-	else 
+
+	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+	if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}
+	else
 	{
 	  if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
 		else ok3=false;
 	}
-	
+
   printf(" \n APPLY THE PRESSURE   \n");
-  
+
   now = rt_timer_read();
   time_start_loop  = round(now/1.0e9);
-  
+
   init_capteurs();
-  
-  while (FLAG) 
+
+  while (FLAG)
   {
     rt_task_wait_period(NULL);
-    
-    
+
+
     //controleur_pince.initialiser();
-    
+
     now = rt_timer_read();
     present_time  = round(now/1.0e9);
     t = present_time - time_start_loop;
-	    
+
 	  controler_robot();
-   
+
     cout << "\n the time past is : " << t;
     if(t >= timeofsimulation_s)
     {
@@ -757,26 +758,26 @@ void principale (void* )
 
     }
   } //while (ok2) finish
-	
-	
+
+
   // terminaison
 
   cout << "outside while loop ok2" << endl ;
 	printf("\n ..... DEFLATING THE MUSCLES   .....");
-	
+
 	degonfler();
 	sleep(5);
 	printf("\n ..... DEFLATING should be completed  .....");
   //Appel a la fonction de degonflement des muscles
-  
-  //Remise a faux de variables booleennes 	
+
+  //Remise a faux de variables booleennes
   fin = false;
   tele_op = false;
   sortie = false;
-	
+
   //ciodac16 -> ~ClientUDP();
-	
-  //Destruction des controleurs d'axe	
+
+  //Destruction des controleurs d'axe
   controleur1.~controleur_axe();
   controleur2.~controleur_axe();
   controleur3.~controleur_axe();
@@ -784,7 +785,7 @@ void principale (void* )
   controleur5.~controleur_axe();
   controleur6.~controleur_axe();
   controleur7.~controleur_axe();
-     	
+
   a1.~actionneur();
   a2.~actionneur();
   a3.~actionneur();
@@ -792,33 +793,33 @@ void principale (void* )
   a5.~actionneur();
   a6.~actionneur();
   a7.~actionneur();
-     	
+
   controleur_pince.~controleur_outil();
-     	
+
   joy1->~I_teleop();
   joy2->~I_teleop();
   ppalonnier->~I_teleop();
-	
+
   ciodac16->~CIODAC16();
   ciodas64->~CIODAS64();
-	
-	
+
+
   for (int i = 0; i < 7;i++)
     cap[i].~capteur_position();
 
-  printf("\n    ====== PROGRAM FINISHED ======    \n\n");        
+  printf("\n    ====== PROGRAM FINISHED ======    \n\n");
   printf("\n .... ELectronics is reset ...\n");
 } //principale finish
 
-        
+
 /*** SiGNAL catch  **/
-         
+
 void catch_signal(int sig)
 {
-        
+
 }
-     
-	
+
+
 /********************************************************
  *							*
  *	depart ()					*
@@ -834,13 +835,13 @@ int main(void)
   string line;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
-  
+
   mlockall(MCL_CURRENT|MCL_FUTURE);
-  
+
   // Round robin period
   //kernelTimeSlice(25);
-	
-  // Initializing objects and variables 
+
+  // Initializing objects and variables
   init();
 
   printf("\n");
@@ -851,7 +852,7 @@ int main(void)
   printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
-  
+
   while(flag_num)
   {
     cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
@@ -867,7 +868,7 @@ int main(void)
   //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
   //getline(cin, line);
   //std::istringstream stream(line);
-  
+
   for(int i= 0; i<num;i++)
   {
     cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
@@ -883,14 +884,14 @@ int main(void)
     cout << "Failed @ RT Create" << n <<endl;
   }
   else cout << "END of RT Create" << endl;
-  
+
   n = rt_task_start(&principal_task, &principale, NULL);
   if (n!=0)
   {
     cout << "Failed of RT STart" <<n<< endl;
   }
   else cout << "END of RT Start" << endl;
-  
+
   pause();
 
   cout << "END of Pause" << endl;
@@ -899,9 +900,7 @@ int main(void)
   if(n!=0)cout << "Failed of RT Task delete" << endl;
   else cout << "END of RT taslk delete";
   // try again nassim tab
-  
-  
-  
+
+
+
 }
-
-

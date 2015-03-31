@@ -27,7 +27,7 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  * 			3 - Reecriture pour la conversion				*
  * 			4 - Delai d'attente pour la conversion				*
  * 			5 - Recuperation de la valeur lue				*
- * 			6 - Decalage de la valeur lue :					* 
+ * 			6 - Decalage de la valeur lue :					*
  * 											*
  *		les quatres bits de poids faible ne serve pas avec la carte 12 bits	*
  *			il faut donc decaler tous les bits de 4 positions (>> 4)		*
@@ -35,12 +35,12 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  ****************************************************************************************/
 CIODAS64::CIODAS64()
 {
-	
+
 }
 
 CIODAS64::~CIODAS64()
 {
-	
+
 }
 
 void CIODAS64::adconv(int chan)
@@ -49,11 +49,11 @@ void CIODAS64::adconv(int chan)
 	unsigned int val;
 	float val1;
 	//cout << "\n ciodas64:adconv()debug1.2 " ;
-	
+
 
 	client_obj->client_recv(recv_buffer, BUFLEN);
 
-    
+
     if(recv_buffer[0] == 'a')
     {
     	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
@@ -64,23 +64,23 @@ void CIODAS64::adconv(int chan)
     	//std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;
     	/*recv_data(0) = (*recv_packet_DAQ).data[0];
 		recv_data(1) = (*recv_packet_DAQ).data[1];
-    	val1 = (*recv_packet_DAQ).data[0]; 
+    	val1 = (*recv_packet_DAQ).data[0];
     	val = (unsigned int ) val1;*/
    	}
-    		    
-    		    
-    else if	(recv_buffer[0] == 'b')	    
+
+
+    else if	(recv_buffer[0] == 'b')
     {
 		recv_packet_COUNTER = (udppacket_COUNTER *)recv_buffer;
     	//recv_data(0) = 0;
     }
-    
-    else if(recv_buffer[0] == 'c')        
+
+    else if(recv_buffer[0] == 'c')
 	{
 		recv_packet_error = (udppacket_error *)recv_buffer;
 		//recv_data(0) = 0;
 	}
-    		    
+
 
     //return(recv_data);
 }
@@ -93,12 +93,13 @@ double CIODAS64::read_sensors(int axis_num)
 	int index = axis_num;
 	//cout << "\n cioads64:read_sensors()1 " << index;
 	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-    val1 = (*recv_packet_DAQ).data[index -1]; 
+    val1 = (*recv_packet_DAQ).data[index -1];
     val = (double ) val1;
     //cout << "\n cioads64:read_sensors()2 " << val1;
 
-    
-    return(val);
+    float val2 = rand() % 10;
+		cout << "\n random  value in read_sensors: " << val2/10 << endl;
+    return(val2/10);
 }
 /*Permet une initialisation de la carte
  ****************************************************************************************
@@ -130,7 +131,7 @@ void CIODAS64::initialisation ()
 	//sysOutByte (COMP_CNTRL,ENHANCED_MODE);
 	//sysDelay();
 	//sysOutByte (COMP_CNTRL,(unsigned char)(ENHANCED_MODE|SE_MODE|UNIPOLAR_RANGE|IN_5V));
-   	   	
+
 	/** configuration du registre des status ****/
 	// passage en mode EXTEND
 	//sysOutByte (STATUS_REG,EXTEND);
@@ -139,7 +140,7 @@ void CIODAS64::initialisation ()
 	// lib�ration des Msb ( 0 sur EXTEND)
 	//sysOutByte (STATUS_REG,0x00);
 	/******** Fin de configuration du registre des status *****/
-	
+
 	/******** Configuration du registre d'interruption et de control des Pacers */
 	// Configuration sans interruption, sans bruste mode, avec une conversion A/D en sofware
 	//sysOutByte (PACER_CNTRL,NO_INTERRUPT);
@@ -164,7 +165,3 @@ void CIODAS64::get_client(ClientUDP* parent_client)
 {
 	client_obj = parent_client;
 }
-
-
-
-	

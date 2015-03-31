@@ -39,8 +39,8 @@ using namespace std;
     commande = 0;
     for (int i = 0;i < 10;i++)
   	tab_erreur [i] = 0;
-    
-    
+
+
  }
 
 
@@ -101,19 +101,19 @@ using namespace std;
  {
    //cout << "\n stecapteur" << endl;
    //printf("\n controleur_axe.setcapteur()1");
-   
+
   	pcapteur = pcap;
   	//rapport=rap;
   	double var = pcapteur -> read_sensors_array(numero);//lire_position();
-  	//cout << "\n controleur_axe.setcapteur()2";
+  	cout << "\n controleur_axe.setcapteur read sensors array: " << var << endl;
   	double var1 = var - angle_repos;
-  	double offset_capteur = fabs( var1); 
+  	double offset_capteur = fabs( var1);
   	//printf("\n controleur_axe.setcapteur()3");
   	//cet offset est recalcule plus tard, inutile ?
  }
 
- 
- 
+
+
 /********************************************************************
 
  *                Lecture de la position du capteur                 *
@@ -142,32 +142,33 @@ using namespace std;
 
  //std::cout << "Angle is :" << angle << std::endl;
 	//Calcul de l'angle theorique en fonction de l'angle lu par le capteur
-	
-	//Calcul different selon le sens de rotation du capteur 
-	
-	if (sens_capteur == 1) 
+
+	//Calcul different selon le sens de rotation du capteur
+
+	if (sens_capteur == 1)
 	{
-		
+
 		if (angle_repos > offset_lu)
 			angle =  angle + offset_capteur ;
 		else
 			angle =  angle - offset_capteur ;
 	}
-	else  
+	else
 	{
 		if (angle_repos > offset_lu)
 			angle = 360 - ( angle + offset_capteur );
 		else
-			angle = 360 - ( angle - offset_capteur );	
+			angle = 360 - ( angle - offset_capteur );
 	}
 	//angle =  fmod( angle ,360);
-	
+
 	//Pour avoir un intervalle -180->180
 	if (angle <= 360 && angle > 180)
 		angle = - (360 - angle);
-	
-	//std::cout << "Angle controleur_axe:lireposition and rapport :" << offset_capteur<<","<<offset_lu<< ","<<angle_repos<<","<<sens_capteur <<angle << rapport << std::endl;
-	return ( rapport*angle);
+
+	std::cout << "Angle controleur_axe:lireposition and rapport :" << offset_capteur<<","<<offset_lu<< ","<<angle_repos<<","<<sens_capteur <<","<<angle <<","<< rapport <<","<< std::endl;
+	cout << "rapport" << rapport << endl;
+  return ( angle);
 
  }
 
@@ -213,7 +214,7 @@ using namespace std;
  {
  	return(rapport);
  }
- 
+
 /********************************************************************
 
  *                   	     get_delta    		            *
@@ -233,7 +234,7 @@ using namespace std;
  double controleur_axe::get_delta(void)
  {
  	return(delta_repos+commande);
- } 
+ }
 
 
 /********************************************************************
@@ -249,7 +250,7 @@ using namespace std;
  *                                                                  *
 
  ********************************************************************/
- 
+
  double controleur_axe::get_angle_desire(void) {
  	return angle_th;
  }
@@ -267,7 +268,7 @@ using namespace std;
  *                                                                  *
 
  ********************************************************************/
- 
+
 
 double controleur_axe::get_angle_filtre (void) {
 	return (angle_filtre);
@@ -287,7 +288,7 @@ double controleur_axe::get_angle_filtre (void) {
  *                                                                  *
 
  ********************************************************************/
- 
+
 
 double controleur_axe::get_angle_reel (void) {
 	return (angle_reel);
@@ -315,50 +316,50 @@ double controleur_axe::get_commande(void) {
  *			vitesse_angle : vitesse angulaire du mouvement*
  **********************************************************************/
 
- void controleur_axe::controler () 
- {	
- 	
- 	// on ne modifie la commande que si le seuil de prise en compte du 
- 	//mouvement du joystick a ete depasse	
-		
- 	/*if (pos_joy > zero_joy+ pjoystick->get_seuil()) 
+ void controleur_axe::controler ()
+ {
+
+ 	// on ne modifie la commande que si le seuil de prise en compte du
+ 	//mouvement du joystick a ete depasse
+
+ 	/*if (pos_joy > zero_joy+ pjoystick->get_seuil())
  	{
 		//On n'actualise l'angle theorique que si l'on n'a pas
-		//atteint la pression maximale 	
- 		if (!saturation_avant)	
- 			angle_th = angle_th + sens_pression * (coef_vitesse * vitesse_angle);		
+		//atteint la pression maximale
+ 		if (!saturation_avant)
+ 			angle_th = angle_th + sens_pression * (coef_vitesse * vitesse_angle);
 	 }
 	 else
- 		if (pos_joy < zero_joy - pjoystick->get_seuil()) 
+ 		if (pos_joy < zero_joy - pjoystick->get_seuil())
  		{
  			if (!saturation_arriere)
 	 			angle_th = angle_th - sens_pression * (coef_vitesse * vitesse_angle);
  		}*/
- 		
+
  	//cout << "inside controleur.controler()debug1" << endl;
-	//On calcule la commande correspondant a l'angle theorique actuel 	
+	//On calcule la commande correspondant a l'angle theorique actuel
  	(this->*pcalculer_commande)();
 	//cout << "inside controleur.controler()debug2" << endl;
 	//On verifie que delta_repos ne depasse pas les limite
 	//delta_repos = pression reglee lors de l'initialisation des muscles en position de repos
 	//a tout instant le couple de muscle recoit PRESSION_BASE (+/-) delta_repos + commande
-	
-	if (((delta_repos + commande)<= PRESSION_BASE) && ((delta_repos + commande) >=-PRESSION_BASE)) 
+
+	if (((delta_repos + commande)<= PRESSION_BASE) && ((delta_repos + commande) >=-PRESSION_BASE))
 	{
  		if (saturation_avant) saturation_avant = false;
- 		if (saturation_arriere) saturation_arriere = false; 
+ 		if (saturation_arriere) saturation_arriere = false;
 	 	pactionneur->recevoir_commande(delta_repos+commande);
  	}
- 	else 
- 	{	
+ 	else
+ 	{
  		if ((delta_repos+commande) > PRESSION_BASE)
  			saturation_avant = true;
- 				
- 		else	
+
+ 		else
  			saturation_arriere = true;
  	}
  //cout << "inside controleur.controler()debug3" << delta_repos<<endl;
-} 
+}
 
 /********************************************************************
 
@@ -376,36 +377,36 @@ double controleur_axe::get_commande(void) {
  *			delta_init : delta correspondant a la       *
  *				position de repos de l'axe          *
  *			vitesse_pression: incrementation du delta a *
- *				chaque pas                     
+ *				chaque pas
     *
  ********************************************************************/
 
  void controleur_axe::initialisation_muscles (double delta_init,double vitesse_pression)
- {	
- 		
+ {
+
  		double i = 0.0,j = 0.0;
- 		while (i < (PRESSION_BASE + delta_init ) || j < (PRESSION_BASE - delta_init )) 
+ 		while (i < (PRESSION_BASE + delta_init ) || j < (PRESSION_BASE - delta_init ))
  		{
-    if (i >=PRESSION_BASE + delta_init) 
+    if (i >=PRESSION_BASE + delta_init)
  				i = PRESSION_BASE + delta_init;
- 			else 
- 				i = i + 2 * vitesse_pression;	
+ 			else
+ 				i = i + 2 * vitesse_pression;
  		 if (j >=PRESSION_BASE - delta_init)
  		  j = PRESSION_BASE - delta_init;
- 		 else 
+ 		 else
  		  j = j + 2 * vitesse_pression;
- 			
+
  			pactionneur -> recevoir_commande_decouple(i,j);
  			//for (int k = 0;k< 400000;k++) {}
 			taskDelay (sysClkRateGet ( ) / 32);
 
- 			
+
  		}
  		delta_repos = delta_init;
- 		
- 	
+
+
  }
- 
+
 /********************************************************************
 
  *                   	   init_angles		    	            *
@@ -420,7 +421,7 @@ double controleur_axe::get_commande(void) {
 
  ********************************************************************/
 
- void controleur_axe::init_angles () 
+ void controleur_axe::init_angles ()
  {
  	offset_lu = pcapteur-> get_offset();
  	offset_capteur = fabs(offset_lu - angle_repos);
@@ -441,12 +442,12 @@ double controleur_axe::get_commande(void) {
  ********************************************************************/
 
  void controleur_axe::initialisation_carte ()
- {	
+ {
      double i = 0;
 	   	pactionneur->recevoir_commande_decouple(i,i);
- } 
- 
- 
+ }
+
+
 
 /********************************************************************
 
@@ -465,7 +466,7 @@ double controleur_axe::get_commande(void) {
  *		   		      chaque pas		    *
  ********************************************************************/
 
- 
+
 void controleur_axe::degonfle (double vitesse_pression)
 {
 double i,j;
@@ -483,7 +484,7 @@ while(i>0||j>0)
   pactionneur->recevoir_commande_decouple(i,j);
   taskDelay (sysClkRateGet ( ) / 32);
 //for (int t=0;t<100000;t++){}
- }	
+ }
 }
 
 
@@ -504,21 +505,21 @@ while(i>0||j>0)
 
 
 void controleur_axe::calculer_commande_BF () {
-  //Lecture de l'angle reel mesure par la capteur 
- angle_reel = (this ->lire_position());
- //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
+  //Lecture de l'angle reel mesure par la capteur
+  angle_reel = (this ->lire_position());
+  std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
-  //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
+  std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
   erreur = angle_th - angle_filtre;
-  //std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
-  //Calcul de la derivee de l'erreur	
+  std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
+  //Calcul de la derivee de l'erreur
   derivee_erreur = (erreur - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;
   //Calcul de la commande
-  commande  = numero;//sens_pression * (P * erreur  +D * derivee_erreur);
-  //std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
+  commande  = sens_pression * (P * erreur  +D * derivee_erreur); //numero
+  std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
   //Actualisation du tableau d'erreurs
   for (int i = 1; i < 10;i++)
   	tab_erreur [i] = tab_erreur[i-1];
@@ -544,16 +545,16 @@ void controleur_axe::calculer_commande_BF () {
 
 
 void controleur_axe::calculer_commande_BO () {
-  //Lecture de l'angle reel mesure par la capteur 
+  //Lecture de l'angle reel mesure par la capteur
   angle_reel = (this ->lire_position());
 
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 
-  
+
   //Calcul de la commande
   commande  = sens_pression * K_BOUCLE_OUVERTE*angle_th;
-  
+
   angle_filtre_prec = angle_filtre;
   angle_reel_prec = angle_reel;
 }

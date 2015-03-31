@@ -3,11 +3,11 @@
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
- 
- 
+
+
 #include <iostream>
 #include "capteur_position.h"
- 
+
 //sens du capteur
 #define POSITIF  1
 #define NEGATIF -1
@@ -43,7 +43,7 @@
 	pente = pen;
  }
 
- 
+
 /********************************************************************
 
  *                Lecture de la position du capteur                 *
@@ -76,11 +76,11 @@
 	/* calcul de l'angle */
 
 	angle = v1*180/3.14;//((double)v * 360)/4095;
-	
+
 	return (angle);
 
  }
- 
+
  double capteur_position::read_sensors_array (int ind)
 
  {
@@ -92,18 +92,18 @@
 
 	//v1 = pcarte->adconv(chanNumber);
 	//std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
- v1 = pcarte -> read_sensors(ind);
- //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
+  v1 = pcarte -> read_sensors(ind);
+  std::cout << "\n Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
 	angle = v1*180/3.14;//((double)v * 360)/4095;
-	
+
 	return (angle);
 
  }
 
- 
+
 /********************************************************************
 
  *                   	     get_offset       		            *
@@ -144,8 +144,8 @@
  {
  	offset = off;
  }
- 	
- 
+
+
 /********************************************************************
 
  *                   	     get_pente       		            *

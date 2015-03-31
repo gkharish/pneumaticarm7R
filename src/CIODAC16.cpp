@@ -51,7 +51,7 @@ void CIODAC16::daconv(int chan , char header)
 		send_array[15] = 0;
 		for(int loop =0; loop < 16; loop++)
 		{
-			send_packet.control_cmd[loop] = send_array[loop];
+			send_packet.control_cmd[loop] = 13107*send_array[loop];
 		}
         //cout << "CIOD16:daconv:header=1: error2"  <<std::endl;
     	buffer_send = (char*)&send_packet;
@@ -65,7 +65,7 @@ void CIODAC16::daconv(int chan , char header)
 	else if(header == '0')
 	{
 		send_packet_init.CLIENT_HEADER = '0';
-		send_packet_init.ADC = 0x7;
+		send_packet_init.ADC = 0x8;
 		send_packet_init.counters = 0x0;
 		send_packet_init.errors = 0x0;
 		send_packet_init.sampling_period = 10;
@@ -73,7 +73,7 @@ void CIODAC16::daconv(int chan , char header)
 
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));
 		struct udppacket_init *asp_control1 = &send_packet_init;
-    	std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
+    std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
 
 	}
 
@@ -100,7 +100,7 @@ void CIODAC16::daconv(int chan , char header)
 	return(send_array);
 }*/
 
-void CIODAC16:: send_command_array(int index, double control_value)
+void CIODAC16::send_command_array(int index, double control_value)
 {
 	//VectorXd
 

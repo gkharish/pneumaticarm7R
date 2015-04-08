@@ -57,40 +57,61 @@ void CIODAS64::adconv(int chan)
 	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
 
 	int lind=0;
-	printf("Sensor raw packet \n");
+	//printf("Sensor raw packet \n");
 	{
 	  unsigned char auc=recv_buffer[lind++];
 	  printf("0x%02x ",auc);
   }
 
 	{
-	  printf("( 0x%02x%02x%02x%02x , %d) ",
+	  unsigned int TheTrueLabel;
+		char * cTheTrueLabel= (char *)&TheTrueLabel;
+
+		cTheTrueLabel[0]=recv_buffer[4];
+		cTheTrueLabel[1]=recv_buffer[3];
+		cTheTrueLabel[2]=recv_buffer[2];
+		cTheTrueLabel[3]=recv_buffer[1];
+
+	  printf("( 0x%02x%02x%02x%02x , %d, %d) ",
 		  (unsigned char)recv_buffer[lind++],
 			(unsigned char)recv_buffer[lind++],
 			(unsigned char)recv_buffer[lind++],
 			(unsigned char)recv_buffer[lind++],
-			(*recv_packet_DAQ).label);
+			(*recv_packet_DAQ).label,
+			TheTrueLabel);
   }
-	for(int lp =0; lp < 4; lp++  )
+	for(int lp =0; lp < 7; lp++  )
 	{
-		printf("\t0x%02x%02x%02x%02x ",
+		float TheTrueFloat;
+		char * cTheTrueFloat= (char *)&TheTrueFloat;
+
+		cTheTrueFloat[0]=recv_buffer[lind+3];
+		cTheTrueFloat[1]=recv_buffer[lind+2];
+		cTheTrueFloat[2]=recv_buffer[lind+1];
+		cTheTrueFloat[3]=recv_buffer[lind];
+
+		//printf("\t( 0x%02x%02x%02x%02x, %f )",
+		printf("\t%f",
 		  (unsigned char)recv_buffer[lind++],
 			(unsigned char)recv_buffer[lind++],
 			(unsigned char)recv_buffer[lind++],
-			(unsigned char)recv_buffer[lind++]);
+			(unsigned char)recv_buffer[lind++],
+			TheTrueFloat);
 	}
   printf("\n");
 
     if(recv_buffer[0] == 'a')
     {
     	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+			/*
     	cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
     	printf(" %x %x %x %x %x %x %x %x \n ",
 				(*recv_packet_DAQ).label, (*recv_packet_DAQ).data[0],
 				(*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],
 				(*recv_packet_DAQ).data[3], (*recv_packet_DAQ).data[4],
 				(*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6]);
-    	//cout << (*recv_packet_DAQ).data[0];
+    	*/
+			//cout << (*recv_packet_DAQ).data[0];
     	//struct udppacket_DAQ daq = recv_packet_DAQ;
     	//std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;
     	/*recv_data(0) = (*recv_packet_DAQ).data[0];

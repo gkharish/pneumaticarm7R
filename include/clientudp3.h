@@ -35,7 +35,8 @@ class ClientUDP
             bool client_recv(char* buf, int size);
 
 
-
+            int get_recvlen()
+              { return recvlen;}
     private:
 
             int n;          // Socket

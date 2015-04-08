@@ -116,7 +116,7 @@ using namespace std;
 void controleur_axe::set_userpressure(double pres)
 {
   user_pressure = pres;
-  cout << "\n set userpressure: " << user_pressure << endl;
+  //cout << "\n set userpressure: " << user_pressure << endl;
 }
 
 /********************************************************************
@@ -515,19 +515,19 @@ void controleur_axe::calculer_commande_BF ()
 {
   //Lecture de l'angle reel mesure par la capteur
   angle_reel = (this ->lire_position());
-  std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
+  //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
-  std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
+  //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
   erreur = angle_th - angle_filtre;
-  std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
+  //std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
   //Calcul de la derivee de l'erreur
   derivee_erreur = (erreur - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;
   //Calcul de la commande
   commande  = sens_pression * (P * erreur  +D * derivee_erreur); //numero
-  std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
+  //std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
   //Actualisation du tableau d'erreurs
   for (int i = 1; i < 10;i++)
   	tab_erreur [i] = tab_erreur[i-1];
@@ -556,7 +556,7 @@ void controleur_axe::calculer_commande_BO ()
 {
   //Lecture de l'angle reel mesure par la capteur
   angle_reel = (this ->lire_position());
-  cout << "\n angle read in openloop: " << angle_reel << endl;
+  //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 
@@ -574,6 +574,6 @@ void controleur_axe::pressure_commande ()
 
   //scanf("%f", user_pressure);
   commande = user_pressure;
-  cout << "\n pressure commande: " << commande << endl;
+  //cout << "\n pressure commande: " << commande << endl;
 
 }

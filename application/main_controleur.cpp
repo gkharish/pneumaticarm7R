@@ -584,15 +584,15 @@ void controler ()
   if(CTRL_FLAG(0)==1)
   {
     controleur1.set_boucle(boucle);
-		cout <<  "\n boucle" << boucle << endl;
+		//cout <<  "\n boucle" << boucle << endl;
 		if(boucle == 2)
 		{
 			controleur1.set_userpressure(pressure_command_array(0));
-			cout << "inside boucle  = 2" << endl;
+			//cout << "inside boucle  = 2" << endl;
 		}
 	 	control_command = controleur1.get_commande();
     angle_read = controleur1.get_angle_reel();
-		cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
+		//cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
     trait_muscle_i(&controleur1, &control_command, vit);
   }
   if(CTRL_FLAG(1)==1)
@@ -616,7 +616,7 @@ void controler ()
 		}
 
     control_command = controleur3.get_commande();
-    angle_read = controleur3.get_angle_reel();
+    //angle_read = controleur3.get_angle_reel();
     trait_muscle_i(&controleur3, &control_command, vit);
   }
   if(CTRL_FLAG(3)==1)
@@ -666,7 +666,7 @@ void controler ()
 
   //std:: cout << "\n Angle read position " << angle_read << endl;
 
-  ciodac16 -> daconv(1, '1');
+  //ciodac16 -> daconv(1, '1');
 
 
   //printf("\n jusqu'ici tout va bien 2 control\n");
@@ -738,7 +738,7 @@ void principale (void* )
   int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous, TASK_PERIOD = 1000000;
+  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1000000;
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
@@ -792,10 +792,11 @@ void principale (void* )
     now = rt_timer_read();
     present_time  = round(now/1.0e9);
     t = present_time - time_start_loop;
-
+		time_diff = now - previous;
+		cout << "\n time difference :" << time_diff/10e6 << endl;
 	  controler_robot();
-
-    cout << "\n the time past is : " << t;
+		previous = now;
+    //cout << "\n the time past is : " << t;
     if(t >= timeofsimulation_s)
     {
       FLAG = 0;

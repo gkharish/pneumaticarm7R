@@ -59,22 +59,30 @@ void CIODAC16::daconv(int chan , char header)
 		client_obj->client_send(buffer_send, sizeof(send_packet));
 		//cout << "CIOD16:daconv:header=1: error4" ;
 		struct udppacket_control *asp_control = &send_packet;
-    	std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
+    //std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 	}
 
 	else if(header == '0')
 	{
 		send_packet_init.CLIENT_HEADER = '0';
-		send_packet_init.ADC = 0x8;
+		send_packet_init.ADC = 0x7;
 		send_packet_init.counters = 0x0;
 		send_packet_init.errors = 0x0;
-		send_packet_init.sampling_period = 10;
+		send_packet_init.sampling_period = 0x0A00;
 		buffer_send = (char*)&send_packet_init;
 
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));
 		struct udppacket_init *asp_control1 = &send_packet_init;
-    std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
-
+    //std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
+		printf("command raw packet \n");
+		for(int lp =0; lp < sizeof(send_packet_init); lp++  )
+		{
+			unsigned char auc=buffer_send[lp];
+			printf("0x%02x ",auc);
+			if (lp%4==3)
+				printf("\t");
+		}
+		printf("\n");
 	}
 
 	else if(header == '2')

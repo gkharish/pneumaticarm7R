@@ -9,9 +9,8 @@
 
 class carte {
 public :
-virtual void daconv(int chan,unsigned int valeur){}
+virtual void daconv(int chan, char valeur){}
 virtual void initialisation(){}
 virtual unsigned int adconv(int chan){}
 virtual unsigned char dread(){}
 };
-

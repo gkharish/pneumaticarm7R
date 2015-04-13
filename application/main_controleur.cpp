@@ -666,7 +666,7 @@ void controler ()
 
   //std:: cout << "\n Angle read position " << angle_read << endl;
 
-  //ciodac16 -> daconv(1, '1');
+  ciodac16 -> daconv(1, '1');
 
 
   //printf("\n jusqu'ici tout va bien 2 control\n");
@@ -738,13 +738,14 @@ void principale (void* )
   int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1000000;
+  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e6;//1000000;
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
 
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
+
   printf("\n ..... INFLATING THE MUSCLES   .....");
 
   //Appel a la fonction de gonflement des muscles
@@ -793,7 +794,7 @@ void principale (void* )
     present_time  = round(now/1.0e9);
     t = present_time - time_start_loop;
 		time_diff = now - previous;
-		cout << "\n time difference :" << time_diff/10e6 << endl;
+		cout << "\n time difference :" << time_diff/1.0e6 << endl;
 	  controler_robot();
 		previous = now;
     //cout << "\n the time past is : " << t;

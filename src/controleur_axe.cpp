@@ -3,7 +3,7 @@
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
-#define P_ECHANT         10.0  //periode d echantillonnage en ms
+#define P_ECHANT         20.0  //periode d echantillonnage en ms
 #define P_ECHANT_S	 1/P_ECHANT
 #define PRESSION_BASE     2.5
 #define K_BOUCLE_OUVERTE (2.5/180)
@@ -405,6 +405,7 @@ double controleur_axe::get_commande(void)
 
  			pactionneur -> recevoir_commande_decouple(i,j);
  			//for (int k = 0;k< 400000;k++) {}
+      // cout << "sysclkrateget value :" << sysClkRateGet ( ) << endl;
 			taskDelay (sysClkRateGet ( ) / 32);
 
 

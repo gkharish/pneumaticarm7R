@@ -43,23 +43,40 @@ void CIODAC16::daconv(int chan , char header)
 	//ClientUDP *client;
 	//'0';
 	//value(14) = 0; // control value for the tool
+	char test_cmdarray[33];
+	test_cmdarray[0]= 0x31;
+	for(int lp =1; lp <33; lp++)
+	{
+		test_cmdarray[lp]=0xff;
+	}
+
 	if(header == '1')
 	{
 		//std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
-		send_packet.CLIENT_HEADER = '1';
+		send_packet.CLIENT_HEADER = 0x31;
 		send_array[14] = 0;
 		send_array[15] = 0;
 		for(int loop =0; loop < 16; loop++)
 		{
-			send_packet.control_cmd[loop] = 13107*send_array[loop];
+			send_packet.control_cmd[loop] = 65535;//13107*send_array[loop];
 		}
         //cout << "CIOD16:daconv:header=1: error2"  <<std::endl;
-    	buffer_send = (char*)&send_packet;
+    	//buffer_send = (char*)&send_packet;
     	//cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
-		client_obj->client_send(buffer_send, sizeof(send_packet));
+			buffer_send = test_cmdarray;
+			printf("test comdarray :");
+			for(int lp =0; lp <33; lp++)
+			{
+				printf("%2x %x  %d", test_cmdarray[lp], *(buffer_send+lp), lp );
+				printf("--");
+			}
+			printf("\n");
+			cout << "BUffer_send array :" << *buffer_send << endl;
+		//client_obj->client_send(buffer_send, sizeof(send_packet));
+		client_obj->client_send(buffer_send, 33);
 		//cout << "CIOD16:daconv:header=1: error4" ;
 		struct udppacket_control *asp_control = &send_packet;
-    //std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
+    std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 	}
 
 	else if(header == '0')
@@ -68,7 +85,7 @@ void CIODAC16::daconv(int chan , char header)
 		send_packet_init.ADC = 0x7;
 		send_packet_init.counters = 0x0;
 		send_packet_init.errors = 0x0;
-		send_packet_init.sampling_period = 0x0A00;
+		send_packet_init.sampling_period = 100;
 		buffer_send = (char*)&send_packet_init;
 
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));

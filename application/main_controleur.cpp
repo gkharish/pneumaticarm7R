@@ -592,6 +592,7 @@ void controler ()
 		}
 	 	control_command = controleur1.get_commande();
     angle_read = controleur1.get_angle_reel();
+		cout << "controlcommand1: " << control_command << endl;
 		//cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
     trait_muscle_i(&controleur1, &control_command, vit);
   }
@@ -628,6 +629,7 @@ void controler ()
 		}
     control_command = controleur4.get_commande();
     angle_read = controleur4.get_angle_reel();
+		cout << "controlcommand4: " << control_command << endl;
     trait_muscle_i(&controleur4, &control_command, vit);
   }
   if(CTRL_FLAG(4)==1)
@@ -731,14 +733,14 @@ void principale (void* )
   char * cont2 = new char [1];
   char * cont1 = new char [1];
   char * tmp = new char [1];
-	float user_pressure;
+	double user_pressure;
 
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
   int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e6;//1000000;
+  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e9;//1000000;
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
@@ -884,7 +886,7 @@ int main(void)
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
 	int man_pres;
-	int user_pressure;
+	double user_pressure;
   mlockall(MCL_CURRENT|MCL_FUTURE);
 
   // Round robin period
@@ -932,14 +934,14 @@ int main(void)
 		{
 			cout << "\n Please enter the delta pressure value between 0 to 2.5 for "<<i+1<<"th " << "joint's" << endl;
 			std::cin >> user_pressure; //scanf("%s",tmp);
-
-			std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
 			cout <<  "\n input userpressure: " << user_pressure << endl;
+			std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
+
 			pressure_command_array(index-1) = user_pressure;
 		}
   }
   cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
-	cout << "Presuure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
+	cout << "Pressure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

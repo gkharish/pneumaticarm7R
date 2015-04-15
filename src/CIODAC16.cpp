@@ -51,32 +51,24 @@ void CIODAC16::daconv(int chan , char header)
 		//test_cmdarray[lp+1]=0x80;
 
 	}*/
-	cout << "\n size of send_packetcbeforeif" <<sizeof(send_packet)<< endl;
-	cout << "\n size of send_packet_init"<<sizeof(send_packet_init)<< endl;
+
 	if(header == '1')
 	{
 		//std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
-		cout << "\n size of send_packetcinsideif"<<sizeof(send_packet)<< endl;
-		send_packet.CLIENT_HEADER = '1';
+
+		send_packet.CLIENT_HEADER[0] = '1';
+		send_packet.CLIENT_HEADER[1] = '1';
 		send_array[14] = 0;
 		send_array[15] = 0;
 		//*buffer_send = send_packet.CLIENT_HEADER;
 		//buffer_send++;
-		cout << "\n size of send_packetc1"<<sizeof(send_packet)<< endl;
+
 		for(int loop =0; loop < 16; loop++)
 		{
 			send_packet.control_cmd[loop] = (unsigned short)13107.0*send_array[loop];
-			cout<<"\n sendpacket[loop]: " << send_packet.control_cmd[loop] << endl;
-			//*(buffer_send + loop*2) =(char)13107.0*send_array[loop];
-			cout << "\n size of send_packetc"<<loop<<"\t"<<sizeof(send_packet)<< endl;
+
 		}
-        //cout << "CIOD16:daconv:header=1: error2"  <<std::endl;
-			//*buffer_send = (char)send_packet.CLIENT_HEADER;
-			//buffer_send++;
-			//buffer_send = (char*)&send_packet.control_cmd;
-		cout << "\n size of send_packetc"<<sizeof(send_packet)<< endl;
 		buffer_send = (char*)&send_packet;
-		cout << "\n size of buffer_sendc"<<sizeof(buffer_send)<< endl;
     	//cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
 			//buffer_send = test_cmdarray;
 			/*printf("test comdarray :");
@@ -90,20 +82,22 @@ void CIODAC16::daconv(int chan , char header)
 		client_obj->client_send(buffer_send, sizeof(send_packet));
 		//client_obj->client_send(buffer_send, 33);
 		//cout << "CIOD16:daconv:header=1: error4" ;
-		//struct udppacket_control *asp_control = &send_packet;
-    //std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
+		struct udppacket_control *asp_control = &send_packet;
+    std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 	}
 
 	else if(header == '0')
 	{
-		send_packet_init.CLIENT_HEADER = '0';
+		send_packet_init.CLIENT_HEADER[0] = '0';
+		send_packet_init.CLIENT_HEADER[1] = '0';
+
 		send_packet_init.ADC = 0x7;
 		send_packet_init.counters = 0x0;
 		send_packet_init.errors = 0x0;
-		send_packet_init.sampling_period = 100;
-		cout << "\n size of sendpacket_init"<<sizeof(send_packet_init)<< endl;
+		send_packet_init.sampling_period = 1000;
+
 		buffer_send = (char*)&send_packet_init;
-		cout << "\n size of buffer_send_init"<<sizeof(buffer_send)<< endl;
+
 		client_obj->client_send(buffer_send, sizeof(send_packet_init));
 		//struct udppacket_init *asp_control1 = &send_packet_init;
     //std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
@@ -120,7 +114,9 @@ void CIODAC16::daconv(int chan , char header)
 
 	else if(header == '2')
 	{
-		send_packet_countersreset.CLIENT_HEADER = header;
+		send_packet_countersreset.CLIENT_HEADER[0] = '2';
+		send_packet_countersreset.CLIENT_HEADER[1] = '2';
+
 		send_packet_countersreset.data = true;
 		buffer_send = (char*)&send_packet_countersreset;
 		client_obj->client_send(buffer_send, sizeof(send_packet_countersreset));
@@ -128,7 +124,8 @@ void CIODAC16::daconv(int chan , char header)
 	}
 	else if(header == '3')
 	{
-		send_packet_digitaloutputcontrol.CLIENT_HEADER = header;
+		send_packet_digitaloutputcontrol.CLIENT_HEADER[0] = header;
+		send_packet_digitaloutputcontrol.CLIENT_HEADER[1] = header;
 		send_packet_countersreset.data = true;
 		buffer_send = (char*)&send_packet_digitaloutputcontrol;
 		client_obj -> client_send(buffer_send, sizeof(send_packet_digitaloutputcontrol));

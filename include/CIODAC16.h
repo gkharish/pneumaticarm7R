@@ -72,8 +72,8 @@ struct udppacket_control                    // clientheader = '0';
 
 struct udppacket_countersreset              // clientheader = '1';
 {
-    char CLIENT_HEADER;
-    bool data;
+    char CLIENT_HEADER[2];
+    unsigned short data;
 }client_packet_countersreset;
 
 std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)

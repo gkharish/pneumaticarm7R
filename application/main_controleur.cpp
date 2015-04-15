@@ -906,13 +906,14 @@ int main(void)
   {
     cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
     //getline(cin,num);
+		flag_num = 0;
     scanf("%d", &num_joints);
-    if(num_joints>=7 || num_joints < 0)
+    if(num_joints>7 || num_joints < 1)
     {
       cout << "\n Invalid input is entered, please try again:" << endl;
       flag_num = 1;
     }
-    flag_num = 0;
+
   }
   //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
   //getline(cin, line);

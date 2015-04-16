@@ -209,6 +209,8 @@ int boucle;
 double control_command;
 RT_TASK principal_task;
 int BOUCLE_PRESCMD = 2;
+int CALIBERATION_FLAG = 0;
+int CONTROL_MODE_FLAG = 0;
 /*struct axisparam
 {
   long int li_delta;
@@ -234,6 +236,7 @@ CIODAS64 *ciodas64;
 VectorXd recving_Data(15);
 VectorXd CTRL_FLAG(7);
 VectorXd pressure_command_array(7);
+VectorXd sensors_array(7);
 int num_joints;
 //pressure_command_array(7) << 0,0,0,0,0,0,0;
 //actionneurs
@@ -559,7 +562,29 @@ void degonfler(void)
 
 }
 
+/********************************************************
+ *							*
+ *	caliberation ()					*
+ *							*
+ 							*
+ ********************************************************/
+void caliberation()
+{
+	cout << "\n CALIBERATION MODE ON ......" << endl;
+	cout << "\n received sensors data : \n" << endl;
+	sensors_array(0) = controleur1.get_angle_lire();
+	sensors_array(1) = controleur2.get_angle_lire();
+	sensors_array(2) = controleur3.get_angle_lire();
+	sensors_array(3) = controleur4.get_angle_lire();
+	sensors_array(4) = controleur5.get_angle_lire();
+	sensors_array(5) = controleur6.get_angle_lire();
+	sensors_array(6) = controleur7.get_angle_lire();
+	for(int loop_sensors_array = 0; loop_sensors_array <7; loop_sensors_array++)
+	{
+		cout << sensors_array(loop_sensors_array) << "\t" << endl;
+	}
 
+}
 
 /********************************************************
  *							*
@@ -580,6 +605,7 @@ void controler ()
   //Lancement en parallele des taches de controle des axes
 
   ciodas64 -> adconv(1);
+	cout << "check the sensor data matrix: " << endl;
   /*Add here all 7 axis control*/
   if(CTRL_FLAG(0)==1)
   {
@@ -797,7 +823,15 @@ void principale (void* )
     t = present_time - time_start_loop;
 		time_diff = now - previous;
 		cout << "\n time difference :" << time_diff/1.0e6 << endl;
-	  controler_robot();
+		if(CALIBERATION_FLAG == 1)
+		{
+			caliberation();
+		}
+		if(CONTROL_MODE_FLAG == 1)
+		{
+			controler_robot();
+		}
+
 		previous = now;
     //cout << "\n the time past is : " << t;
     if(t >= timeofsimulation_s)
@@ -882,6 +916,7 @@ int main(void)
   int n;
   int index;
   int flag_num = 1;
+	int mode_flag = 0;
   string line;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
@@ -903,45 +938,57 @@ int main(void)
   printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
+	cout << "\n Enter 0 for Caliberation mode and 1 for control mdoe" << endl;
+	std::cin >> mode_flag; //scanf("%s",tmp);
+	cout <<  "\n mode_flag: " << mode_flag << endl;
+	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+	if(mode_flag == 0)
+	{
+		CALIBERATION_FLAG = 1;
+	}
+	if(mode_flag == 1)
+	{
+		CONTROL_MODE_FLAG = 1;
 
-  while(flag_num)
-  {
-    cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
-    //getline(cin,num);
-		flag_num = 0;
-    scanf("%d", &num_joints);
-    if(num_joints>7 || num_joints < 1)
-    {
-      cout << "\n Invalid input is entered, please try again:" << endl;
-      flag_num = 1;
-    }
+	  while(flag_num)
+	  {
+	    cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
+	    //getline(cin,num);
+			flag_num = 0;
+	    scanf("%d", &num_joints);
+	    if(num_joints>7 || num_joints < 1)
+	    {
+	      cout << "\n Invalid input is entered, please try again:" << endl;
+	      flag_num = 1;
+	    }
 
-  }
+	  }
   //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
   //getline(cin, line);
   //std::istringstream stream(line);
-	cout << "\n  Do you want to manually pressurize the muscles? (Type 1 for YES and 0 for NO): " << endl;
-	scanf("%d", &man_pres);
+		cout << "\n  Do you want to manually pressurize the muscles? (Type 1 for YES and 0 for NO): " << endl;
+		scanf("%d", &man_pres);
 
-  for(int i= 0; i<num_joints;i++)
-  {
-    cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
-    //getline(cin, index);
-    //stream >> index;
-    scanf("%d", &index);
-    CTRL_FLAG(index-1) = 1;
-		if(man_pres == 1)
-		{
-			cout << "\n Please enter the delta pressure value between 0 to 2.5 for "<<i+1<<"th " << "joint's" << endl;
-			std::cin >> user_pressure; //scanf("%s",tmp);
-			cout <<  "\n input userpressure: " << user_pressure << endl;
-			std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
+	  for(int i= 0; i<num_joints;i++)
+	  {
+	    cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
+	    //getline(cin, index);
+	    //stream >> index;
+	    scanf("%d", &index);
+	    CTRL_FLAG(index-1) = 1;
+			if(man_pres == 1)
+			{
+				cout << "\n Please enter the delta pressure value between 0 to 2.5 for "<<i+1<<"th " << "joint's" << endl;
+				std::cin >> user_pressure; //scanf("%s",tmp);
+				cout <<  "\n input userpressure: " << user_pressure << endl;
+				std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
 
-			pressure_command_array(index-1) = user_pressure;
-		}
-  }
-  cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
-	cout << "Pressure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
+				pressure_command_array(index-1) = user_pressure;
+			}
+	  }
+  	cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
+		cout << "Pressure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
+	}
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

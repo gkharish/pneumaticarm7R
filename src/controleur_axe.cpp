@@ -300,6 +300,13 @@ double controleur_axe::get_angle_reel (void)
 	return (angle_reel);
 }
 
+double controleur_axe::get_angle_lire (void) // get te angle s read by controller from DAQ
+{
+  double angle_lire;
+  angle_lire = (this ->lire_position());
+	return (angle_lire);
+}
+
 double controleur_axe::get_commande(void)
 {
 	return (commande);

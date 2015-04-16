@@ -161,8 +161,6 @@ struct udppacket_error                      // serverheader = 'c';
     unsigned char data[4];
 }client_packet_error;
 
-
-
 std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
 {
     // write obj to stream

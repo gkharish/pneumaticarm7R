@@ -737,10 +737,10 @@ void principale (void* )
 
   /* variables used in the principal program */
   int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 10; /* time in seconds*/
+  int timeofsimulation_s = 20; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e9;//1000000;
+  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e8;//1000000;
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;

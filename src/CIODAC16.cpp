@@ -83,7 +83,7 @@ void CIODAC16::daconv(int chan , char header)
 		//client_obj->client_send(buffer_send, 33);
 		//cout << "CIOD16:daconv:header=1: error4" ;
 		struct udppacket_control *asp_control = &send_packet;
-    std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
+    //std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 	}
 
 	else if(header == '0')

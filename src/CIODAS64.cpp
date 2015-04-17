@@ -48,7 +48,7 @@ void CIODAS64::adconv(int chan)
 	//cout << "\n ciodas64:adconv()debug1 " ;
 	unsigned int val;
 	float val1;
-	
+
 	//cout << "\n cioas64:adconv()debug1.2 " ;
 
   memset(recv_buffer,0,BUFLEN);
@@ -108,7 +108,7 @@ void CIODAS64::adconv(int chan)
 			//cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
 
     	cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
-    	printf("%x %u %x %x %x %x %x %x %x \n ",
+    	printf("%x %u %f %f %f %f %f %f %f \n ",
 				(*recv_packet_DAQ).SERVER_HEADER[0],
 				( (*recv_packet_DAQ).label), (*recv_packet_DAQ).data[0],
 				(*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],

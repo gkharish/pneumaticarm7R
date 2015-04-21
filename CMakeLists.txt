@@ -31,21 +31,22 @@ SET(CUSTOM_HEADER_DIR "${PROJECT_NAME}")
 
 SET(${PROJECT_NAME}_HEADERS
 
-	include/actionneur.h  
-	include/capteur.h 
-	include/capteur_position.h  
-	include/carte.h  
-	include/CIODAC16.h  
+	include/actionneur.h
+	include/capteur.h
+	include/capteur_position.h
+	include/carte.h
+	include/CIODAC16.h
 	include/CIODAS64.h
 	include/clientudp3.h
-	include/controleur_axe.h  
-	include/controleur_outil.h  
-	include/fichier.h  
-	include/I_teleop.h  
-	include/joystick.h  
+	include/controleur_axe.h
+	include/controleur_outil.h
+	include/fichier.h
+	include/I_teleop.h
+	include/joystick.h
 	include/modele.h
 	include/port.h
 	#include/main_controleur.h
+  #include/test_config.h
 
 )
 SET(CXX_DISABLE_WERROR TRUE)

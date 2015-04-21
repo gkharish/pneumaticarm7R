@@ -202,6 +202,7 @@
 #include "fichier.h"
 #include "modele.h"
 #include "clientudp3.h"
+#include "test_config.h"
 
 using namespace std;
 /***** VARIABLES GLOBALES *****/
@@ -231,7 +232,7 @@ controleur_axe controleur1,controleur2,controleur3,
 controleur_outil controleur_pince;
 
 ClientUDP *clientUDP;
-
+test *test1;
 //cartes
 CIODAC16 *ciodac16;
 CIODAS64 *ciodas64;
@@ -927,31 +928,34 @@ void catch_signal(int sig)
 int main(void)
 {
   int n;
-  int index;
-  int flag_num = 1;
-	int mode_flag = 0;
+  //int index;
+  //int flag_num = 1;
+	//int mode_flag = 0;
   string line;
   signal(SIGTERM, catch_signal);
   signal(SIGINT, catch_signal);
-	int man_pres;
-	double user_pressure;
+	//int man_pres;
+	//double user_pressure;
   mlockall(MCL_CURRENT|MCL_FUTURE);
 
   // Round robin period
   //kernelTimeSlice(25);
-
+	test1 = new test();
+	test1 -> test_config();
+	CTRL_FLAG(0) = test1 -> get_CTRL_FLAG(0);
+	pressure_command_array(0) = test1 -> get_pressure_command_array(0);
   // Initializing objects and variables
   init();
 
   printf("\n");
   printf("	*****************************************************************\n");
-  printf("*								                      *\n");
+  printf("	*								                      *\n");
   printf("	*		        CONTORL SOFTWARE  		  *\n");
   printf("	*               for the 7 DOFs ARM			                      *\n");
   printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
-	cout << "\n Enter 0 for 'Caliberation mode', 1 for 'Control mode' and 2 for 'Inflating only mode'" << endl;
+	/*cout << "\n Enter 0 for 'Caliberation mode', 1 for 'Control mode' and 2 for 'Inflating only mode'" << endl;
 	std::cin >> mode_flag; //scanf("%s",tmp);
 	cout <<  "\n mode_flag: " << mode_flag << endl;
 	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
@@ -967,8 +971,8 @@ int main(void)
 	{
 		CONTROL_MODE_FLAG = 1;
 		INFLATING_FLAG = 1;
-
-	  while(flag_num)
+		*/
+	  /*while(flag_num)
 	  {
 	    cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
 	    //getline(cin,num);
@@ -1003,7 +1007,7 @@ int main(void)
 
 				pressure_command_array(index-1) = user_pressure;
 			}
-	  }
+	  }*/
   	cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
 		cout << "Pressure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
 	}

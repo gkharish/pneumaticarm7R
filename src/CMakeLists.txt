@@ -35,20 +35,20 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 
 ADD_LIBRARY(${LIBRARY_NAME}
   SHARED
-  actionneur.cpp  
-  capteur.cpp  
-  capteur_position.cpp  
-  CIODAC16.cpp  
+  actionneur.cpp
+  capteur.cpp
+  capteur_position.cpp
+  CIODAC16.cpp
   CIODAS64.cpp
   clientudp3.cpp
-  controleur_axe.cpp  
-  controleur_outil.cpp  
-  fichier.cpp  
-  I_teleop.cpp  
-  joystick.cpp  
-    
+  controleur_axe.cpp
+  controleur_outil.cpp
+  fichier.cpp
+  I_teleop.cpp
+  joystick.cpp
+  testfile.cpp
   modele.cpp
-  
+
 
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )

@@ -93,11 +93,11 @@
 	//v1 = pcarte->adconv(chanNumber);
 	//std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
   v1 = pcarte -> read_sensors(ind);
-  std::cout << "\n Value read by the IO board:" << v1 << std::endl;
+  //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
-	angle = v1*180/3.14;//((double)v * 360)/4095;
+	angle = v1;//*180/3.14;//((double)v * 360)/4095;
 
 	return (angle);
 

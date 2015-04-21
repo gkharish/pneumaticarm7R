@@ -211,6 +211,8 @@ RT_TASK principal_task;
 int BOUCLE_PRESCMD = 2;
 int CALIBERATION_FLAG = 0;
 int CONTROL_MODE_FLAG = 0;
+int INFLATING_FLAG = 0;
+
 /*struct axisparam
 {
   long int li_delta;
@@ -237,6 +239,7 @@ VectorXd recving_Data(15);
 VectorXd CTRL_FLAG(7);
 VectorXd pressure_command_array(7);
 VectorXd sensors_array(7);
+ofstream sensorlog;
 int num_joints;
 //pressure_command_array(7) << 0,0,0,0,0,0,0;
 //actionneurs
@@ -313,9 +316,9 @@ void reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
 {
   double vit = *vitesse;
-  const char * buf = std::string("ok").c_str();
-  char * buffer = new char[2 * sizeof(double) + 2];
-  double pos_joy,coef;
+  //const char * buf = std::string("ok").c_str();
+  //char * buffer = new char[2 * sizeof(double) + 2];
+  //double pos_joy,coef;
   if (!fin)
   {
     double del = *delta;
@@ -354,7 +357,7 @@ void init()
 
   ciodas64 = new CIODAS64();
   ciodas64->get_client(clientUDP);
-
+	ciodas64 -> openlogudpdata();
   for (int i = 0; i<7;i++)
   {
     //construction des capteurs
@@ -570,8 +573,7 @@ void degonfler(void)
  ********************************************************/
 void caliberation()
 {
-	cout << "\n CALIBERATION MODE ON ......" << endl;
-	cout << "\n received sensors data : \n" << endl;
+
 	sensors_array(0) = controleur1.get_angle_lire();
 	sensors_array(1) = controleur2.get_angle_lire();
 	sensors_array(2) = controleur3.get_angle_lire();
@@ -579,11 +581,17 @@ void caliberation()
 	sensors_array(4) = controleur5.get_angle_lire();
 	sensors_array(5) = controleur6.get_angle_lire();
 	sensors_array(6) = controleur7.get_angle_lire();
+	cout << "\n received sensors data : " << endl;
 	for(int loop_sensors_array = 0; loop_sensors_array <7; loop_sensors_array++)
 	{
-		cout << sensors_array(loop_sensors_array) << "\t" << endl;
+		cout << "val1 " << sensors_array(loop_sensors_array) << endl;
 	}
+	sensorlog << sensors_array(0) << "\t" << sensors_array(1) << "\t"
+	<< sensors_array(2) << "\t" << sensors_array(3) << "\t"
+	<< sensors_array(4) << "\t" << sensors_array(5) << "\t"
+	<< sensors_array(6) << "\n" << endl;
 
+	//cout << "\n" << endl;
 }
 
 /********************************************************
@@ -605,7 +613,8 @@ void controler ()
   //Lancement en parallele des taches de controle des axes
 
   ciodas64 -> adconv(1);
-	cout << "check the sensor data matrix: " << endl;
+	ciodas64 -> logudpdata();
+
   /*Add here all 7 axis control*/
   if(CTRL_FLAG(0)==1)
   {
@@ -753,58 +762,58 @@ void controler_robot()
 void principale (void* )
 {
   //variables locales
-  bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
-  char * fich = new char [40];
-  char * commencer = new char [1];
-  char * cont2 = new char [1];
-  char * cont1 = new char [1];
+  //bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
+	bool ok3 =false;
+  //char * fich = new char [40];
+  //char * commencer = new char [1];
+  //char * cont2 = new char [1];
+  //char * cont1 = new char [1];
   char * tmp = new char [1];
-	double user_pressure;
+	//double user_pressure;
 
   /* variables used in the principal program */
-  int whileloop_counter = 0, error_counter = 0, loop = 0;
+  //int whileloop_counter = 0, error_counter = 0, loop = 0;
   int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous, present, time_diff, TASK_PERIOD = 1.0e9;//1000000;
+  RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e9;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
 
+	sensorlog.open("sensorlog.txt");
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
-
-  printf("\n ..... INFLATING THE MUSCLES   .....");
-
-  //Appel a la fonction de gonflement des muscles
-  gonfler();
-
-	sleep(5);
-	printf("\n ..... INFLATING should be completed  .....");
-
-	//printf("\n ..... OPENLOOP PRESSURE COMMAND  .....");
-	//printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrolm, or p for open loop pressure command and confirm (ok3, tmp) : ");
-	printf("\n ..... CONTROL MODE Begins   .....");
-
-	printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol, or p for open loop pressure command and confirm (ok3, tmp) : ");
-	std::cin >> tmp; //scanf("%s",tmp);
-
-	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-	if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}
-	if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
-	if (strcmp(tmp,"p")==0)  {boucle=BOUCLE_PRESCMD; cout << "boucle pressure is set :"  << boucle;ok3=true;}
-	/*/else
+	if(CALIBERATION_FLAG == 1)
 	{
-		if (strcmp(tmp,"p")==0)
-		{
-			boucle=BOUCLE_PRESCMD;
-			ok3=true;
-		}
-		else ok3=false;
-	}*/
+		cout << "\n CALIBERATION MODE ON ...... \n" << endl;
+	}
+	if(INFLATING_FLAG == 1)
+	{
+		printf("\n ..... INFLATING THE MUSCLES   .....");
+
+		//Appel a la fonction de gonflement des muscles
+		gonfler();
+
+		sleep(5);
+		printf("\n ..... INFLATING should be completed  .....");
+	}
+
+	if(CONTROL_MODE_FLAG == 1)
+	{
+		printf("\n ..... CONTROL MODE Begins   .....");
+
+		printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol, or p for open loop pressure command and confirm (ok3, tmp) : ");
+		std::cin >> tmp; //scanf("%s",tmp);
+
+		std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+		if (strcmp(tmp,"o")==0) {boucle=BOUCLE_OUVERTE;ok3=true;}
+		if (strcmp(tmp,"f")==0) {boucle=BOUCLE_FERMEE;ok3=true;}
+		if (strcmp(tmp,"p")==0)  {boucle=BOUCLE_PRESCMD; cout << "boucle pressure is set :"  << boucle;ok3=true;}
+	}
 
 
-  printf(" \n APPLY THE PRESSURE   \n");
+  //printf(" \n APPLY THE PRESSURE   \n");
 
   now = rt_timer_read();
   time_start_loop  = round(now/1.0e9);
@@ -831,6 +840,10 @@ void principale (void* )
 		{
 			controler_robot();
 		}
+		if(INFLATING_FLAG == 1 && CONTROL_MODE_FLAG == 0 )
+		{
+			cout << "\n You have Inflated the muscles!" << endl;
+		}
 
 		previous = now;
     //cout << "\n the time past is : " << t;
@@ -842,7 +855,7 @@ void principale (void* )
 
     }
   } //while (ok2) finish
-
+	sensorlog.close();
 
   // terminaison
 
@@ -938,7 +951,7 @@ int main(void)
   printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
-	cout << "\n Enter 0 for Caliberation mode and 1 for control mdoe" << endl;
+	cout << "\n Enter 0 for 'Caliberation mode', 1 for 'Control mode' and 2 for 'Inflating only mode'" << endl;
 	std::cin >> mode_flag; //scanf("%s",tmp);
 	cout <<  "\n mode_flag: " << mode_flag << endl;
 	std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
@@ -946,9 +959,14 @@ int main(void)
 	{
 		CALIBERATION_FLAG = 1;
 	}
+	if(mode_flag == 2)
+	{
+		INFLATING_FLAG = 1;
+	}
 	if(mode_flag == 1)
 	{
 		CONTROL_MODE_FLAG = 1;
+		INFLATING_FLAG = 1;
 
 	  while(flag_num)
 	  {

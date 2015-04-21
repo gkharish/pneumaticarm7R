@@ -171,8 +171,8 @@ void controleur_axe::set_userpressure(double pres)
 	if (angle <= 360 && angle > 180)
 		angle = - (360 - angle);
 
-	std::cout << "Angle controleur_axe:lireposition and rapport :" << offset_capteur<<","<<offset_lu<< ","<<angle_repos<<","<<sens_capteur <<","<<angle <<","<< rapport <<","<< std::endl;
-	cout << "rapport" << rapport << endl;
+	//std::cout << "Angle controleur_axe:lireposition and rapport :" << offset_capteur<<","<<offset_lu<< ","<<angle_repos<<","<<sens_capteur <<","<<angle <<","<< rapport <<","<< std::endl;
+	//cout << "rapport" << rapport << endl;
   return ( angle);
 
  }

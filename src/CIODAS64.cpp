@@ -48,7 +48,7 @@ void CIODAS64::adconv(int chan)
 	//cout << "\n ciodas64:adconv()debug1 " ;
 	unsigned int val;
 	float val1;
-	
+
 	//cout << "\n cioas64:adconv()debug1.2 " ;
 
   memset(recv_buffer,0,BUFLEN);
@@ -157,7 +157,19 @@ double CIODAS64::read_sensors(int axis_num)
 
     float val2 = rand() % 10;
 		//cout << "\n random  value in read_sensors: " << val2/10 << endl;
-    return(val2/10);
+    return(val1);
+}
+void CIODAS64::openlogudpdata()
+{
+	udprecvlog.open("udprecv_datalog.txt");
+}
+void CIODAS64::logudpdata()
+{
+
+	udprecvlog << (*recv_packet_DAQ).data[0] << "\t" << (*recv_packet_DAQ).data[1] << "\t"
+	<< (*recv_packet_DAQ).data[2] << "\t" << (*recv_packet_DAQ).data[3] << "\t"
+	<< (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[5] << "\t"
+	<< (*recv_packet_DAQ).data[6] << "\n" << endl;
 }
 /*Permet une initialisation de la carte
  ****************************************************************************************

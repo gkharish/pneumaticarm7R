@@ -190,7 +190,10 @@ class CIODAS64 : public carte//, public ClientUDP
 	 	udppacket_error *recv_packet_error;
 	 	virtual double read_sensors(int);
 		ClientUDP* client_obj;
+    ofstream udprecvlog;
 		void get_client(ClientUDP* parent_client);
+    void openlogudpdata();
+    void logudpdata();
 };
 
 #endif

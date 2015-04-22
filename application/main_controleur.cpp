@@ -944,6 +944,9 @@ int main(void)
 	test1 -> test_config();
 	CTRL_FLAG(0) = test1 -> get_CTRL_FLAG(0);
 	pressure_command_array(0) = test1 -> get_pressure_command_array(0);
+	cout<< "Control flag after testconfig: "<<CTRL_FLAG(0) << endl;
+	cout << "Pressure array after testconfig: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
+
   // Initializing objects and variables
   init();
 
@@ -1010,7 +1013,7 @@ int main(void)
 	  }*/
   	cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
 		cout << "Pressure array: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
-	}
+	//}
   n = rt_task_create(&principal_task, "principal_function", 0, 99, 0);
   if (n!=0)
   {

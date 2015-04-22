@@ -210,9 +210,11 @@ int boucle;
 double control_command;
 RT_TASK principal_task;
 int BOUCLE_PRESCMD = 2;
-int CALIBERATION_FLAG = 0;
-int CONTROL_MODE_FLAG = 0;
-int INFLATING_FLAG = 0;
+bool DEFAULT_FLAG=0;
+bool CALIBERATION_FLAG=1;
+bool CONTROL_MODE_NOPRES_FLAG=1;
+bool CONTROL_MODE_PRES_FLAG=0;
+bool INFLATING_FLAG=0
 
 /*struct axisparam
 {
@@ -942,6 +944,12 @@ int main(void)
   //kernelTimeSlice(25);
 	test1 = new test();
 	test1 -> test_config();
+	test1 -> test_config();
+	DEFAULT_FLAG= test1 -> get_DEFAULT_FLAG();
+	CALIBERATION_FLAG = test1 -> get_CALIBERATION_FLAG();
+	CONTROL_MODE_NOPRES_FLAG = test1 -> get_CONTROL_MODE_NOPRES_FLAG;
+	CONTROL_MODE_PRES_FLAG = test1 -> get_CONTROL_MODE_PRES_FLAG();
+	INFLATING_FLAG = test1 -> get_INFLATING_FLAG();
 	CTRL_FLAG(0) = test1 -> get_CTRL_FLAG(0);
 	pressure_command_array(0) = test1 -> get_pressure_command_array(0);
 	cout<< "Control flag after testconfig: "<<CTRL_FLAG(0) << endl;

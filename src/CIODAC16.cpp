@@ -95,7 +95,7 @@ void CIODAC16::daconv(int chan , char header)
 		send_packet_init.ADC = 0x7;
 		send_packet_init.counters = 0x0;
 		send_packet_init.errors = 0x0;
-		send_packet_init.sampling_period = 1000;
+		send_packet_init.sampling_period = 100;
 
 		buffer_send = (char*)&send_packet_init;
 

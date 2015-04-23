@@ -171,7 +171,12 @@ void controleur_axe::set_userpressure(double pres)
 	if (angle <= 360 && angle > 180)
 		angle = - (360 - angle);
 
-	//std::cout << "Angle controleur_axe:lireposition and rapport :" << offset_capteur<<","<<offset_lu<< ","<<angle_repos<<","<<sens_capteur <<","<<angle <<","<< rapport <<","<< std::endl;
+	/*std::cout << "Angle controleur_axe:lireposition and rapport : " << offset_capteur<<", "
+  <<offset_lu<< ", "
+  <<angle_repos<<", "
+  <<sens_capteur <<", "
+  <<angle <<", "
+  << rapport <<","<< std::endl;*/
 	//cout << "rapport" << rapport << endl;
   return ( angle);
 
@@ -490,14 +495,14 @@ j = PRESSION_BASE - (delta_repos + commande);
 
 while(i>0||j>0)
  {
-  i=i - 2 * vitesse_pression;
-  j=j - 2 * vitesse_pression;
+  i=i - vitesse_pression;//i - 2 * vitesse_pression;
+  j=j - vitesse_pression;//j - 2 * vitesse_pression;
   if (i < 0)
  	i=0;
   if (j < 0)
  	j=0;
   pactionneur->recevoir_commande_decouple(i,j);
-  taskDelay (sysClkRateGet ( ) / 32);
+  taskDelay (sysClkRateGet () / 32);
 //for (int t=0;t<100000;t++){}
  }
 }

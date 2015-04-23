@@ -71,7 +71,7 @@
 
 	//v1 = pcarte->adconv(chanNumber);
  //v1 = pcarte -> read_sensors(*axis_num);
- std::cout << "Value read by the IO board:" << v1 << std::endl;
+ std::cout << "Value read b cap_pos_lire:" << v1 << std::endl;
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
@@ -97,8 +97,8 @@
 	//printf("valeur lue au can %d \r",v);
 	/* calcul de l'angle */
 
-	angle = v1;//*180/3.14;//((double)v * 360)/4095;
-
+	angle = v1*18; // 1volt from potentiometers = 18 degrees //*180/3.14;//((double)v * 360)/4095;
+  //std::cout << "angle cap_pos_read_sensor_array"<<ind<<": " << angle << std::endl;
 	return (angle);
 
  }

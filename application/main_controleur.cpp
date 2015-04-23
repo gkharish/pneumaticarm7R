@@ -34,8 +34,8 @@
 
 
 //infos d'initialisations des pressions correspondant a la position initiale du bras
-#define DELTA_INIT_AXE_1 -1.4
-#define DELTA_INIT_AXE_2 -2.5
+#define DELTA_INIT_AXE_1 -1.4//-1.4
+#define DELTA_INIT_AXE_2 -2.5 //-2.5
 #define DELTA_INIT_AXE_3  0.0
 #define DELTA_INIT_AXE_4  1.8
 #define DELTA_INIT_AXE_5  0.2
@@ -43,20 +43,20 @@
 #define DELTA_INIT_AXE_7 -0.2
 
 //Ports de sorties des actionneurs sur la carte de commande (CIODAC16)
-#define VOIE_1_1  2
-#define VOIE_1_2  3
-#define VOIE_2_1  0
-#define VOIE_2_2  1
+#define VOIE_1_1  0	//2
+#define VOIE_1_2  1 //3
+#define VOIE_2_1  2	//0
+#define VOIE_2_2  3	//1
 #define VOIE_3_1  5
 #define VOIE_3_2  4
 #define VOIE_4_1  7
 #define VOIE_4_2  6
-#define VOIE_5_1 12
-#define VOIE_5_2 13
-#define VOIE_6_1  9
-#define VOIE_6_2  8
-#define VOIE_7_1 10
-#define VOIE_7_2 11
+#define VOIE_5_1 10	//12
+#define VOIE_5_2 	9	//13
+#define VOIE_6_1 11	//9
+#define VOIE_6_2 12	//8
+#define VOIE_7_1 13	//10
+#define VOIE_7_2 14	//11
 
 //Ports d'entree des joysticks et du palonnier sur la carte d'acquisition (CIODAS64)
 #define VOIE_X_1          1
@@ -87,7 +87,7 @@
 #define DEMI_TRAJET     180.0
 #define P_ECHANT         10.0  //periode d echantillonnage en ms
 #define P_ECHANT_S	 1/P_ECHANT
-#define DUREE_GONFLEMENT  4.0     //duree pour effectuer 1/2 trajet (180 deg) en secondes
+#define DUREE_GONFLEMENT  8.0     //duree pour effectuer 1/2 trajet (180 deg) en secondes
 #define VITESSE_PRESSION (P_ECHANT*PRESSION_BASE)/(DUREE_GONFLEMENT*1000)
 #define VITESSE_ANGLE   ( P_ECHANT * DEMI_TRAJET) / (DUREE_GONFLEMENT*1000)
 
@@ -99,7 +99,7 @@
 #define ANGLE_REPOS_1    0.0
 #define ANGLE_REPOS_2    0.0
 #define ANGLE_REPOS_3    0.0
-#define ANGLE_REPOS_4    0.0
+#define ANGLE_REPOS_4    45.0
 #define ANGLE_REPOS_5    0.0
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
@@ -214,7 +214,7 @@ bool DEFAULT_FLAG=0;
 bool CALIBERATION_FLAG=1;
 bool CONTROL_MODE_NOPRES_FLAG=1;
 bool CONTROL_MODE_PRES_FLAG=0;
-bool INFLATING_FLAG=0
+bool INFLATING_FLAG=0;
 
 /*struct axisparam
 {
@@ -584,10 +584,11 @@ void caliberation()
 	sensors_array(4) = controleur5.get_angle_lire();
 	sensors_array(5) = controleur6.get_angle_lire();
 	sensors_array(6) = controleur7.get_angle_lire();
-	cout << "\n received sensors data : " << endl;
+	//cout << "\n received sensors data : " << endl;
 	for(int loop_sensors_array = 0; loop_sensors_array <7; loop_sensors_array++)
 	{
-		cout << "val1 " << sensors_array(loop_sensors_array) << endl;
+		cout << sensors_array(loop_sensors_array) << endl;
+
 	}
 	sensorlog << sensors_array(0) << "\t" << sensors_array(1) << "\t"
 	<< sensors_array(2) << "\t" << sensors_array(3) << "\t"
@@ -616,6 +617,7 @@ void controler ()
   //Lancement en parallele des taches de controle des axes
 
   ciodas64 -> adconv(1);
+	caliberation();
 	ciodas64 -> logudpdata();
 
   /*Add here all 7 axis control*/
@@ -630,7 +632,7 @@ void controler ()
 		}
 	 	control_command = controleur1.get_commande();
     angle_read = controleur1.get_angle_reel();
-		cout << "controlcommand1: " << control_command << endl;
+		//cout << "controlcommand1: " << control_command << endl;
 		//cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
     trait_muscle_i(&controleur1, &control_command, vit);
   }
@@ -776,10 +778,10 @@ void principale (void* )
 
   /* variables used in the principal program */
   //int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 10; /* time in seconds*/
+  int timeofsimulation_s = 30; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e9;//1000000; ..present,
+  RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16 -> client_start();
   //udppacket_control send_packet;
@@ -802,7 +804,7 @@ void principale (void* )
 		printf("\n ..... INFLATING should be completed  .....");
 	}
 
-	if(CONTROL_MODE_FLAG == 1)
+	if(CONTROL_MODE_PRES_FLAG == 1 || CONTROL_MODE_NOPRES_FLAG == 1)
 	{
 		printf("\n ..... CONTROL MODE Begins   .....");
 
@@ -839,11 +841,11 @@ void principale (void* )
 		{
 			caliberation();
 		}
-		if(CONTROL_MODE_FLAG == 1)
+		if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)
 		{
 			controler_robot();
 		}
-		if(INFLATING_FLAG == 1 && CONTROL_MODE_FLAG == 0 )
+		if(INFLATING_FLAG == 1 && CONTROL_MODE_PRES_FLAG == 0 && CONTROL_MODE_NOPRES_FLAG == 0)
 		{
 			cout << "\n You have Inflated the muscles!" << endl;
 		}
@@ -944,14 +946,21 @@ int main(void)
   //kernelTimeSlice(25);
 	test1 = new test();
 	test1 -> test_config();
-	test1 -> test_config();
 	DEFAULT_FLAG= test1 -> get_DEFAULT_FLAG();
 	CALIBERATION_FLAG = test1 -> get_CALIBERATION_FLAG();
-	CONTROL_MODE_NOPRES_FLAG = test1 -> get_CONTROL_MODE_NOPRES_FLAG;
+	CONTROL_MODE_NOPRES_FLAG = test1 -> get_CONTROL_MODE_NOPRES_FLAG();
 	CONTROL_MODE_PRES_FLAG = test1 -> get_CONTROL_MODE_PRES_FLAG();
 	INFLATING_FLAG = test1 -> get_INFLATING_FLAG();
-	CTRL_FLAG(0) = test1 -> get_CTRL_FLAG(0);
-	pressure_command_array(0) = test1 -> get_pressure_command_array(0);
+	for(int lpctr =0; lpctr < 7; lpctr++)
+	{
+		CTRL_FLAG(lpctr) = test1 -> get_CTRL_FLAG(lpctr);
+	}
+	for(int lppres =0; lppres < 7; lppres++)
+	{
+		pressure_command_array(lppres) = test1 -> get_pressure_command_array(lppres);
+	}
+
+
 	cout<< "Control flag after testconfig: "<<CTRL_FLAG(0) << endl;
 	cout << "Pressure array after testconfig: " << pressure_command_array(0) <<","<< pressure_command_array(1) <<","<< pressure_command_array(2) <<","<< pressure_command_array(3) <<","<< pressure_command_array(4) <<"," << pressure_command_array(5) <<","<< pressure_command_array(6) <<","<< endl;
 

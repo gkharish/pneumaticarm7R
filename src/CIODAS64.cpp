@@ -56,7 +56,7 @@ void CIODAS64::adconv(int chan)
 
 	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
 
-	int lind=0;
+	/*int lind=0;
 	//printf("Sensor raw packet \n");
 	{
 	  unsigned char auc=recv_buffer[lind];
@@ -100,7 +100,7 @@ void CIODAS64::adconv(int chan)
 			(unsigned char)recv_buffer[lind++],
 			TheTrueFloat);
 	}
-  printf("\n");
+  printf("\n");*/
 
     if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
     {
@@ -151,11 +151,11 @@ double CIODAS64::read_sensors(int axis_num)
 	int index = axis_num;
 	//cout << "\n cioads64:read_sensors()1 " << index;
 	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-    val1 = (*recv_packet_DAQ).data[index -1];
+    val1 = (*recv_packet_DAQ).data[7- index];
     val = (double ) val1;
     //cout << "\n cioads64:read_sensors()2 " << val1;
 
-    float val2 = rand() % 10;
+    //float val2 = rand() % 10;
 		//cout << "\n random  value in read_sensors: " << val2/10 << endl;
     return(val1);
 }

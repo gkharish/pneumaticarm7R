@@ -58,6 +58,10 @@ void CIODAC16::daconv(int chan , char header)
 
 		send_packet.CLIENT_HEADER[0] = '1';
 		send_packet.CLIENT_HEADER[1] = '1';
+		send_array[0] = 0;
+		send_array[1] = 0;
+		send_array[2] = 0;
+		send_array[3] = 0;
 		send_array[14] = 0;
 		send_array[15] = 0;
 		//*buffer_send = send_packet.CLIENT_HEADER;
@@ -99,7 +103,7 @@ void CIODAC16::daconv(int chan , char header)
 
 		buffer_send = (char*)&send_packet_init;
 
-		client_obj->client_send(buffer_send, sizeof(send_packet_init));
+		client_obj -> client_send(buffer_send, sizeof(send_packet_init));
 		//struct udppacket_init *asp_control1 = &send_packet_init;
     //std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
 		printf("command raw packet \n");

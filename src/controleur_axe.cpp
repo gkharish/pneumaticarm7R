@@ -165,7 +165,7 @@ void controleur_axe::set_userpressure(double pres)
 		else
 			angle = 360 - ( angle - offset_capteur );
 	}
-	//angle =  fmod( angle ,360);
+	angle =  fmod( angle ,360);
 
 	//Pour avoir un intervalle -180->180
 	if (angle <= 360 && angle > 180)
@@ -534,7 +534,8 @@ void controleur_axe::calculer_commande_BF ()
   //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
   erreur = angle_th - angle_filtre;
-  //std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
+
+  std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
   //Calcul de la derivee de l'erreur
   derivee_erreur = (erreur - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;

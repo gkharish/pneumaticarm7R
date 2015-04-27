@@ -99,7 +99,7 @@
 #define ANGLE_REPOS_1    0.0
 #define ANGLE_REPOS_2    0.0
 #define ANGLE_REPOS_3    0.0
-#define ANGLE_REPOS_4    45.0
+#define ANGLE_REPOS_4    00.0
 #define ANGLE_REPOS_5    0.0
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
@@ -839,6 +839,7 @@ void principale (void* )
 		cout << "\n time difference :" << time_diff/1.0e6 << endl;
 		if(CALIBERATION_FLAG == 1)
 		{
+			ciodas64 -> adconv(1);
 			caliberation();
 		}
 		if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)

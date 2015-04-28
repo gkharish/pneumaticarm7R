@@ -123,6 +123,7 @@ class controleur_axe
 		double get_angle_reel();
 		double get_angle_lire (void);
 		double get_commande();
+		void get_reference_angle(double , double);
 
 
 

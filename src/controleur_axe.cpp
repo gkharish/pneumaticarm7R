@@ -317,7 +317,22 @@ double controleur_axe::get_commande(void)
 	return (commande);
 }
 
+/**********************************************************************
 
+ *                   	   Refernce Generator    		              *
+
+ **********************************************************************/
+void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_angle)
+{
+  if (!saturation_avant)
+    {
+      angle_th = angle_th + sens_pression * (coef_vitesse * vitesse_angle);
+      cout << "!saturation_avant" << endl;
+    }
+  //return(angle_th);
+  cout << "\n Angle_the: "<< angle_th << endl;
+
+}
 /**********************************************************************
 
  *                   	   controler    		              *
@@ -334,6 +349,7 @@ double controleur_axe::get_commande(void)
  *			coef_vitesse : regle la vitesse du mouvement  *
  *			vitesse_angle : vitesse angulaire du mouvement*
  **********************************************************************/
+
 
  void controleur_axe::controler ()
  {
@@ -355,6 +371,7 @@ double controleur_axe::get_commande(void)
 	 			angle_th = angle_th - sens_pression * (coef_vitesse * vitesse_angle);
  		}*/
 
+     //angle_th = 60;
  	//cout << "inside controleur.controler()debug1" << endl;
 	//On calcule la commande correspondant a l'angle theorique actuel
  	(this->*pcalculer_commande)();
@@ -443,7 +460,7 @@ double controleur_axe::get_commande(void)
 
  void controleur_axe::init_angles ()
  {
- 	offset_lu = pcapteur-> get_offset();
+ 	offset_lu = pcapteur -> get_offset();
  	offset_capteur = fabs(offset_lu - angle_repos);
  }
 

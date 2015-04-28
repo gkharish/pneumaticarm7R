@@ -99,7 +99,7 @@
 #define ANGLE_REPOS_1    0.0
 #define ANGLE_REPOS_2    0.0
 #define ANGLE_REPOS_3    0.0
-#define ANGLE_REPOS_4    00.0
+#define ANGLE_REPOS_4    0.0
 #define ANGLE_REPOS_5    0.0
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
@@ -598,6 +598,16 @@ void caliberation()
 	//cout << "\n" << endl;
 }
 
+void reference_generator()
+{
+	controleur1.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur2.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur3.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur4.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur5.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur6.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+	controleur7.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+}
 /********************************************************
  *							*
  *	controler ()					*
@@ -619,7 +629,7 @@ void controler ()
   ciodas64 -> adconv(1);
 	caliberation();
 	ciodas64 -> logudpdata();
-
+	reference_generator();
   /*Add here all 7 axis control*/
   if(CTRL_FLAG(0)==1)
   {

@@ -557,8 +557,8 @@ void controleur_axe::calculer_commande_BF ()
   derivee_erreur = (erreur - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;
   //Calcul de la commande
-  commande  = sens_pression * (P * erreur  +D * derivee_erreur); //numero
-  //std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
+  commande  = sens_pression * (P * erreur  + D * derivee_erreur); //numero
+  std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
   //Actualisation du tableau d'erreurs
   for (int i = 1; i < 10;i++)
   	tab_erreur [i] = tab_erreur[i-1];

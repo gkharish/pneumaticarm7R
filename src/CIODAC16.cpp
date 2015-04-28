@@ -43,7 +43,7 @@ void CIODAC16::daconv(int chan , char header)
 	//ClientUDP *client;
 	//'0';
 	//value(14) = 0; // control value for the tool
-	char test_cmdarray[33];
+
 	/*test_cmdarray[0]= 0x31;
 	for(int lp =1; lp <33; lp++)
 	{
@@ -58,34 +58,19 @@ void CIODAC16::daconv(int chan , char header)
 
 		send_packet.CLIENT_HEADER[0] = '1';
 		send_packet.CLIENT_HEADER[1] = '1';
+
 		send_array[0] = 0;
 		send_array[1] = 0;
 		send_array[2] = 0;
 		send_array[3] = 0;
 		send_array[14] = 0;
 		send_array[15] = 0;
-		//*buffer_send = send_packet.CLIENT_HEADER;
-		//buffer_send++;
-
 		for(int loop =0; loop < 16; loop++)
 		{
-			send_packet.control_cmd[loop] = (unsigned short)13107.0*send_array[loop];
-
+			send_packet.control_cmd[loop] = (unsigned short)(13107.0*send_array[loop]);
 		}
 		buffer_send = (char*)&send_packet;
-    	//cout << "CIOD16:daconv:header=1: error3 " <<sizeof(send_packet) << std::endl ;
-			//buffer_send = test_cmdarray;
-			/*printf("test comdarray :");
-			for(int lp =0; lp <sizeof(send_packet); lp++)
-			{
-				printf("%2x %x  %d", test_cmdarray[lp], *(buffer_send+lp), lp );
-				printf("--");
-			}
-			printf("\n");*/
-		//cout << "Buffer_send array :" << *buffer_send << endl;
 		client_obj->client_send(buffer_send, sizeof(send_packet));
-		//client_obj->client_send(buffer_send, 33);
-		//cout << "CIOD16:daconv:header=1: error4" ;
 		struct udppacket_control *asp_control = &send_packet;
     std::cout << "\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control << std::endl;
 		//std::cout << "\n  CIODAC16 message: CONTROL_CMD (float): " << *asp_control/13107 << std::endl;
@@ -142,7 +127,43 @@ void CIODAC16::daconv(int chan , char header)
 {
 	return(send_array);
 }*/
+void CIODAC16::pressure_inidividualmuscle(int index, double pres)
+{
 
+			send_packet.CLIENT_HEADER[0] = '1';
+			send_packet.CLIENT_HEADER[1] = '1';
+			send_array[0] = 0;
+			send_array[1] = 0.0;
+			send_array[2] = 0.0;
+			send_array[3] = 0.0;
+			send_array[4] = 0;
+			send_array[5] = 0;
+			send_array[6] = 0;
+			send_array[7] = 0;
+			send_array[8] = 0;
+			send_array[9] = 0;
+			send_array[10] = 0;
+			send_array[11] = 0;
+			send_array[12] = 0;
+			send_array[13] = 0;
+			send_array[14] = 0;
+			send_array[15] = 0;
+			//*buffer_send = send_packet.CLIENT_HEADER;
+			//buffer_send++;
+
+			for(int loop =0; loop < 16; loop++)
+			{
+				send_packet.control_cmd[loop] = (unsigned short)(13107.0*send_array[loop]);
+
+			}
+			send_packet.control_cmd[index] = (unsigned short)(13107.0*pres);
+
+			buffer_send = (char*)&send_packet;
+			client_obj->client_send(buffer_send, sizeof(send_packet));
+			struct udppacket_control *asp_control = &send_packet;
+	    std::cout << "\n  CIODAC16 message: CONTROL_CMD to inidividual muscles : " << *asp_control << std::endl;
+
+}
 void CIODAC16::send_command_array(int index, double control_value)
 {
 	//VectorXd

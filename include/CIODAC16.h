@@ -120,6 +120,7 @@ class CIODAC16 : public carte//, public  ClientUDP
 		//{}  // constructeur
 		virtual ~CIODAC16();
 		virtual void daconv(int chan , char header);
+    void pressure_inidividualmuscle(int, double);
 		void send_command_array(int, double);
 		char*  buffer_send;
 		udppacket_control send_packet;

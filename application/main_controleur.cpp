@@ -215,6 +215,7 @@ bool CALIBERATION_FLAG=1;
 bool CONTROL_MODE_NOPRES_FLAG=1;
 bool CONTROL_MODE_PRES_FLAG=0;
 bool INFLATING_FLAG=0;
+bool PRES_INDIVIDUAL_FLAG=0;
 
 /*struct axisparam
 {
@@ -788,7 +789,7 @@ void principale (void* )
 
   /* variables used in the principal program */
   //int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 30; /* time in seconds*/
+  int timeofsimulation_s = 10; /* time in seconds*/
   int FLAG = 1;
 
   RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
@@ -812,6 +813,23 @@ void principale (void* )
 
 		sleep(5);
 		printf("\n ..... INFLATING should be completed  .....");
+	}
+	if(PRES_INDIVIDUAL_FLAG == 1)
+	{
+		int index_pres_indiv;
+		double pres_pres_indiv;
+		char depres;
+		cout << "\n Select the muscle number: "<< endl;
+		std::cin >> index_pres_indiv; //scanf("%s",tmp);
+		cout << "\n Enter the pressure value: " << endl;
+		std::cin >> pres_pres_indiv;
+		std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+		ciodac16 -> pressure_inidividualmuscle(index_pres_indiv, pres_pres_indiv);
+		printf("\n Type Any letter to depressurize : ");
+		std::cin >> depres; //scanf("%s",tmp);
+		std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+		degonfler();
+		timeofsimulation_s = 2; /* time in seconds*/
 	}
 
 	if(CONTROL_MODE_PRES_FLAG == 1 || CONTROL_MODE_NOPRES_FLAG == 1)
@@ -852,6 +870,7 @@ void principale (void* )
 			ciodas64 -> adconv(1);
 			caliberation();
 		}
+
 		if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)
 		{
 			controler_robot();
@@ -962,6 +981,7 @@ int main(void)
 	CONTROL_MODE_NOPRES_FLAG = test1 -> get_CONTROL_MODE_NOPRES_FLAG();
 	CONTROL_MODE_PRES_FLAG = test1 -> get_CONTROL_MODE_PRES_FLAG();
 	INFLATING_FLAG = test1 -> get_INFLATING_FLAG();
+	PRES_INDIVIDUAL_FLAG = test1 -> get_PRES_INDIVIDUAL_FLAG();
 	for(int lpctr =0; lpctr < 7; lpctr++)
 	{
 		CTRL_FLAG(lpctr) = test1 -> get_CTRL_FLAG(lpctr);

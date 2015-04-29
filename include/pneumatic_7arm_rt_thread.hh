@@ -51,88 +51,121 @@
 #include "test_config.h"
 
 
-class Pneumatic7ArmRtThread: public
+class Pneumatic7ArmRtThread
 {
-int boucle_;
-double control_command_;
-RT_TASK principal_task_;
+  int loop_;
+  double control_command_;
+  RT_TASK principal_task_;
 
   /* Internal states */
-int BOUCLE_PRESCMD = 2;
-bool DEFAULT_FLAG=0;
-bool CALIBERATION_FLAG=1;
-bool CONTROL_MODE_NOPRES_FLAG=1;
-bool CONTROL_MODE_PRES_FLAG=0;
-bool INFLATING_FLAG=0;
-bool PRES_INDIVIDUAL_FLAG=0;
+  int BOUCLE_PRESCMD ;
+  bool DEFAULT_FLAG;
+  bool CALIBRATION_FLAG;
+  bool CONTROL_MODE_NOPRES_FLAG;
+  bool CONTROL_MODE_PRES_FLAG;
+  bool INFLATING_FLAG;
+  bool PRES_INDIVIDUAL_FLAG;
 
-// Axis controlers
-controleur_axe controleur1,controleur2,controleur3,
-  controleur4,controleur5,controleur6,controleur7;
+  // Axis controlers
+  controleur_axe controleur1,controleur2,controleur3,
+    controleur4,controleur5,controleur6,controleur7;
 
-// Gripper controler
-controleur_outil controleur_pince;
+  // Gripper controler
+  controleur_outil controleur_pince;
 
-// Network connection.
-ClientUDP *clientUDP;
+  // Network connection.
+  ClientUDP *clientUDP;
 
-test *test1;
-// IO Boards
-CIODAC16 *ciodac16;
-CIODAS64 *ciodas64;
+  test *test1;
+  // IO Boards
+  CIODAC16 *ciodac16_;
+  CIODAS64 *ciodas64_;
 
-// Informations to be send to the NIC module
-VectorXd recving_Data(15);
-VectorXd CTRL_FLAG(7);
-VectorXd pressure_command_array(7);
-VectorXd sensors_array(7);
-ofstream sensorlog_;
+  // Informations to be send to the NIC module
+  VectorXd recving_Data_;
+  VectorXd CTRL_FLAG;
+  VectorXd pressure_command_array_;
+  VectorXd sensors_array_;
+  ofstream sensorlog_;
 
-int num_joints_;
-// Actuators
-actionneur a1,a2,a3,a4,a5,a6,a7;
+  int num_joints_;
+  // Actuators
+  actionneur a1,a2,a3,a4,a5,a6,a7;
 
-// Joysticks
-I_teleop * joy1,*joy2,* ppalonnier;
+  // Joysticks
+  I_teleop * joy1,*joy2,* ppalonnier;
 
-// tableau de capteurs
-capteur_position cap[7];
+  // tableau de capteurs
+  capteur_position cap[7];
 
-// Angles measurements
-double angle[7];
-double erreur[7];
-double angle_read;
-//watchdog
-WDOG_ID tempo;
-
-
-//taches
-long int  main1,tgo,
-  tache_arret,tache_controle_mvt,tache_controle_outil,
-  tache_init_1,tache_init_2,tache_init_3,
-  tache_init_4,tache_init_5,tache_init_6,tache_init_7,
-  tache_joy,
-  tache_muscle_1,tache_muscle_2,tache_muscle_3,
-  tache_muscle_4,tache_muscle_5,tache_muscle_6,tache_muscle_7,
-  tache_fin_1,tache_fin_2,tache_fin_3,
-  tache_fin_4,tache_fin_5,tache_fin_6,tache_fin_7;
+  // Angles measurements
+  double angle[7];
+  double erreur[7];
+  double angle_read;
+  //watchdog
+  WDOG_ID tempo;
 
 
-/* divers */
-double temps = 0.0;
-int saisie = 0,increm = 0;
-char debut;
-bool fin = false,tele_op = false;
-bool sortie = false;
-char * buffer_joy[7];
+  //taches
+  long int  main1,tgo,
+    tache_arret,tache_controle_mvt,tache_controle_outil,
+    tache_init_1,tache_init_2,tache_init_3,
+    tache_init_4,tache_init_5,tache_init_6,tache_init_7,
+    tache_joy,
+    tache_muscle_1,tache_muscle_2,tache_muscle_3,
+    tache_muscle_4,tache_muscle_5,tache_muscle_6,tache_muscle_7,
+    tache_fin_1,tache_fin_2,tache_fin_3,
+    tache_fin_4,tache_fin_5,tache_fin_6,tache_fin_7;
 
-Pneumatic7ArmRtThread();
 
-/**! Main method to apply the control. */
-void principale();
+  /* divers */
+  double temps_;
+  int saisie_ ,increm_ ;
+  char debut_;
+  bool fin_ ,tele_op_ ;
+  bool sortie_;
+  char * buffer_joy_[7];
 
-/** ! Starting the main real time thread. */
-void StartingRealTimeThread()
+  /** ! Initialize sensors */
+  void InitializeSensors(); // fka init_capteurs
+
+  /** ! Inflating the muscles */
+  void Inflating (); // fka gonfler
+
+  /** ! Deflating the muscles */
+  void Deflating (); // fka gonfler
+
+  /** ! Calibration */
+  void Calibration(); // fka caliberation
+
+  /** ! Reference generator */
+  void ReferenceGenerator(); // fka reference_generator
+
+  /** ! Main Controler for each axis */
+  void Controler(); // fka controler
+
+  /** ! Main Controler for the whole robot */
+  void RobotControler(); // fka controler
+
+public:
+  Pneumatic7ArmRtThread();
+
+  /**! Main method to apply the control. */
+  void PrincipalTask();
+
+  /**! Main initialization */
+  void Initializing();
+
+  /** ! Starting the main real time thread. */
+  void StartingRealTimeThread();
+
+  /**! Initialize muscle */
+  void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  
+  void reset_muscle_i(controleur_axe *controleur_i, double *vitesse);
+
+  void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  
 
 };
 #endif /* _PNEMUATIC_7ARM_RT_THREAD_HH_ */

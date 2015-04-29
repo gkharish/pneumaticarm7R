@@ -40,6 +40,7 @@ class capteur_position: public capteur
 		
   /* modif attr. */
   void set_offset(double);
+  void set_pente(double);
 };
 
 #endif

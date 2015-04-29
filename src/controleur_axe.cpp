@@ -52,30 +52,27 @@ using namespace std;
 
 /********************************************************************
 
- *                          set_boucle                            *
+ *                          set_loop                            *
 
  ********************************************************************
 
  *                                                                  *
 
- *    PARAMETRES :                                                  *
+ *    PARAMETERS :                                                  *
 
- *                _boucle  : 0 pour boucle ouverte , 		    *
+ *                loop  : 0 for an open loop                        *
 
- *		  et 1 pour boucle FERMEE  			    *
+ *		  and 1 for a closed loop  			    *
 
  *                                                                  *
 
  ********************************************************************/
 
- void controleur_axe::set_boucle (int _boucle)
-
- {
-
-	if (_boucle==OUVERTE) pcalculer_commande=&controleur_axe::calculer_commande_BO;
-	if (_boucle==FERMEE)  pcalculer_commande=&controleur_axe::calculer_commande_BF;
-	if (_boucle==PRESCMD) pcalculer_commande=&controleur_axe::pressure_commande;
-  //else pcalculer_commande=&controleur_axe::pressure_commande;
+void controleur_axe::set_loop (int aloop)
+{
+  if (aloop==OUVERTE) pcalculer_commande=&controleur_axe::calculer_commande_BO;
+  if (aloop==FERMEE)  pcalculer_commande=&controleur_axe::calculer_commande_BF;
+  if (aloop==PRESCMD) pcalculer_commande=&controleur_axe::pressure_commande;
  }
 
 
@@ -109,8 +106,8 @@ using namespace std;
   	//rapport=rap;
   	double var = pcapteur -> read_sensors_array(numero);//lire_position();
   	cout << "\n controleur_axe.setcapteur read sensors array: " << var << endl;
-  	double var1 = var - angle_repos;
-  	double offset_capteur = fabs( var1);
+        //  	double var1 = var - angle_repos;
+  	//double offset_capteur = fabs( var1);
   	//printf("\n controleur_axe.setcapteur()3");
   	//cet offset est recalcule plus tard, inutile ?
  }

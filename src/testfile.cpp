@@ -1,7 +1,33 @@
 // Setup the flags.
 #include "test_config.h"
 
-test::test()
+test::test():
+  DEFAULT_FLAG(0),
+  CALIBRATION_FLAG(0),
+  CONTROL_MODE_NOPRES_FLAG(0),
+  CONTROL_MODE_PRES_FLAG(1),
+  INFLATING_FLAG(0),
+  PRES_INDIVIDUAL_FLAG(0),
+  NUM_JOINTS(1),
+  MAN_PRES(0),
+  MAN_PRES_ALL(0),
+  JOINT_ALL(0),
+  JOINT_1(0),
+  JOINT_2(0),
+  JOINT_3(1),
+  JOINT_4(0),
+  JOINT_5(0),
+  JOINT_6(0),
+  JOINT_7(0),
+  MAN_PRES_VAL_ALL(0.5),
+  MAN_PRES_VAL_1(0.5),
+  MAN_PRES_VAL_2(0.0),
+  MAN_PRES_VAL_3(0.0),
+  MAN_PRES_VAL_4(0.0),
+  MAN_PRES_VAL_5(0.0),
+  MAN_PRES_VAL_6(0.0),
+  MAN_PRES_VAL_7(0.0),
+  CONTROLLER_TYPE(1)
 {
 
 }
@@ -11,17 +37,17 @@ void test::test_config()
 
   if(DEFAULT_FLAG == 1)
   {
-    CALIBERATION_FLAG=1;
+    CALIBRATION_FLAG=1;
 
-    cout << "CALIBERATION Mode is ON..." << endl;
+    cout << "CALIBRATION Mode is ON..." << endl;
   }
-  if(CALIBERATION_FLAG == 1)
+  if(CALIBRATION_FLAG == 1)
   {
     INFLATING_FLAG=0;
     CONTROL_MODE_PRES_FLAG=0;
 
 
-    cout << "CALIBERATION Mode is ON..." << endl;
+    cout << "CALIBRATION Mode is ON..." << endl;
   }
   if(CONTROL_MODE_NOPRES_FLAG == 1)
   {
@@ -38,7 +64,7 @@ void test::test_config()
   if(PRES_INDIVIDUAL_FLAG == 1)
   {
     DEFAULT_FLAG = 0;
-    CALIBERATION_FLAG=0;
+    CALIBRATION_FLAG=0;
     INFLATING_FLAG=0;
     CONTROL_MODE_PRES_FLAG=0;
     CONTROL_MODE_NOPRES_FLAG=0;
@@ -132,9 +158,9 @@ bool test::get_DEFAULT_FLAG()
 {
   return(DEFAULT_FLAG);
 }
-bool test::get_CALIBERATION_FLAG()
+bool test::get_CALIBRATION_FLAG()
 {
-  return(CALIBERATION_FLAG);
+  return(CALIBRATION_FLAG);
 }
 bool test::get_CONTROL_MODE_NOPRES_FLAG()
 {

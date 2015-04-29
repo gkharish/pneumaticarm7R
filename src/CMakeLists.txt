@@ -48,7 +48,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   joystick.cpp
   testfile.cpp
   modele.cpp
-
+  pneumatic_7arm_rt_thread.cpp
 
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )

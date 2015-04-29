@@ -140,60 +140,59 @@
 using namespace Eigen;
 
 using namespace std;
-struct udppacket_DAQ                        // serverheader = 'a';
-{
-    char SERVER_HEADER[4];
-    unsigned int label;
-    float data[7];
-}client_packet_DAQ;
 
-struct udppacket_COUNTER                    // serverheader = 'b';
+typedef struct udppacket_DAQ                        // serverheader = 'a';
 {
-    char SERVER_HEADER[4];
-    unsigned int label;
-    signed int data[1];
-}client_packet_COUNTER;
-
-struct udppacket_error                      // serverheader = 'c';
-{
-    char SERVER_HEADER[4];
-    unsigned int label;
-    unsigned char data[4];
-}client_packet_error;
-
-std::ostream& operator<<(std::ostream& os, const struct udppacket_DAQ & obj)
-{
+  char SERVER_HEADER[4];
+  unsigned int label;
+  float data[7];
+  friend std::ostream& operator<<(std::ostream& os, const udppacket_DAQ & obj)
+  {
     // write obj to stream
     os << " " << obj.SERVER_HEADER
-    << " " << obj.label
-    << " " << obj.data[0]
-    << " " << obj.data[1]
-    << " " << obj.data[2]
-    << " " << obj.data[3]
-    << " " << obj.data[4]
-    << " " << obj.data[5]
-    << " " << obj.data[6];
+       << " " << obj.label;
+    for(unsigned int i=0;i<7;i++)
+      os << obj.data[0] << " ";
+    os << std::endl;
     return os;
 }
+
+}client_packet_DAQ;
+
+typedef struct udppacket_COUNTER                    // serverheader = 'b';
+{
+  char SERVER_HEADER[4];
+  unsigned int label;
+  signed int data[1];
+}client_packet_COUNTER;
+
+typedef struct udppacket_error                      // serverheader = 'c';
+{
+  char SERVER_HEADER[4];
+  unsigned int label;
+  unsigned char data[4];
+}client_packet_error;
+
+
 class CIODAS64 : public carte//, public ClientUDP
 {
-	public :
-		CIODAS64();//: ClientUDP()
-		//{}
-		virtual ~CIODAS64();
-		virtual void initialisation ();
-		virtual void adconv(int chan);
-	 	virtual unsigned char dread ();
-	 	char recv_buffer[BUFLEN];
-	 	udppacket_DAQ *recv_packet_DAQ;
-	 	udppacket_COUNTER *recv_packet_COUNTER;
-	 	udppacket_error *recv_packet_error;
-	 	virtual double read_sensors(int);
-		ClientUDP* client_obj;
-    ofstream udprecvlog;
-		void get_client(ClientUDP* parent_client);
-    void openlogudpdata();
-    void logudpdata();
+ public :
+  CIODAS64();//: ClientUDP()
+  //{}
+  virtual ~CIODAS64();
+  virtual void initialisation ();
+  virtual void adconv(int chan);
+  virtual unsigned char dread ();
+  char recv_buffer[BUFLEN];
+  udppacket_DAQ *recv_packet_DAQ;
+  udppacket_COUNTER *recv_packet_COUNTER;
+  udppacket_error *recv_packet_error;
+  virtual double read_sensors(int);
+  ClientUDP* client_obj;
+  ofstream udprecvlog;
+  void get_client(ClientUDP* parent_client);
+  void openlogudpdata();
+  void logudpdata();
 };
 
 #endif

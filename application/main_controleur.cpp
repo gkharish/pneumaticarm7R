@@ -104,6 +104,29 @@
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
 
+// Angles maximum and minimum reached by joints
+#define ANGLE_MIN_1    	-12.0
+#define ANGLE_MAX_1    90.0
+
+#define ANGLE_MIN_2    -15.0
+#define ANGLE_MAX_2    90.0
+
+#define ANGLE_MIN_3   -90.0
+#define ANGLE_MAX_3    50.0
+
+#define ANGLE_MIN_4    -5.0
+#define ANGLE_MAX_4   130.0
+
+#define ANGLE_MIN_5   -90.0
+#define ANGLE_MAX_5    90.0
+
+#define ANGLE_MIN_6   -30.0
+#define ANGLE_MAX_6    30.0
+
+#define ANGLE_MIN_7   -30.0
+#define ANGLE_MAX_7    30.0
+
+
 // Rapports mecaniques entre rotation des axes des capteurs et rotation reelle des articulations
 // Determines par une mesure de la tension avec l articulation a 90 degres K=90/(Vmes*360/5)
 #define RAP_MECA_CAP_1    1.5
@@ -396,13 +419,13 @@ void init()
   //printf("\n init()debug6 \n");
 
   //controleurs d'axe
-  controleur1 = controleur_axe(joy1,&a1,1,ANGLE_REPOS_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
-  controleur2 = controleur_axe(joy1,&a2,2,ANGLE_REPOS_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
-  controleur3 = controleur_axe(joy1,&a3,3,ANGLE_REPOS_3,SENS_CAPTEUR_3,SENS_PRESSION_3,P_AXE_3,D_AXE_3);
-  controleur4 = controleur_axe(joy2,&a4,4,ANGLE_REPOS_4,SENS_CAPTEUR_4,SENS_PRESSION_4,P_AXE_4,D_AXE_4);
-  controleur5 = controleur_axe(ppalonnier,&a5,5,ANGLE_REPOS_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
-  controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
-  controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
+  controleur1 = controleur_axe(joy1,&a1,1,ANGLE_REPOS_1,ANGLE_MIN_1, ANGLE_MAX_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
+  controleur2 = controleur_axe(joy1,&a2,2,ANGLE_REPOS_2,ANGLE_MIN_2, ANGLE_MAX_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
+  controleur3 = controleur_axe(joy1,&a3,3,ANGLE_REPOS_3,ANGLE_MIN_3, ANGLE_MAX_3,SENS_CAPTEUR_3,SENS_PRESSION_3,P_AXE_3,D_AXE_3);
+  controleur4 = controleur_axe(joy2,&a4,4,ANGLE_REPOS_4,ANGLE_MIN_4, ANGLE_MAX_4,SENS_CAPTEUR_4,SENS_PRESSION_4,P_AXE_4,D_AXE_4);
+  controleur5 = controleur_axe(ppalonnier,&a5,5,ANGLE_REPOS_5,ANGLE_MIN_5, ANGLE_MAX_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
+  controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,ANGLE_MIN_6, ANGLE_MAX_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
+  controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,ANGLE_MIN_7, ANGLE_MAX_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
 
    //printf("\n init()debug7 \n");
   //Initialisation des controleurs
@@ -789,7 +812,7 @@ void principale (void* )
 
   /* variables used in the principal program */
   //int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 10; /* time in seconds*/
+  int timeofsimulation_s = 30; /* time in seconds*/
   int FLAG = 1;
 
   RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,

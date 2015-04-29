@@ -62,7 +62,7 @@ class controleur_axe
     capteur_position *pcapteur;   //capteur de position associe
     int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
     int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
-    double angle_repos,angle_reel;
+    double angle_repos,angle_reel, angle_max, angle_min;
     double delta_repos; //regle lors de l'initialisation des muscles
         		            //reste constant pendant la phase de controle
 		double offset_capteur;  //difference entre la valeur initiale lue
@@ -90,7 +90,7 @@ class controleur_axe
 
 		//constructeurs
 		controleur_axe (){};
-		controleur_axe (I_teleop*,actionneur *,int,double,int,int,double,double);
+		controleur_axe (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
 
 		//Fonction d'association du capteur au controleur d'axe
 		void set_capteur (capteur_position*);

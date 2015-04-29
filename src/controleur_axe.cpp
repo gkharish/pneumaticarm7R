@@ -16,7 +16,7 @@ using namespace std;
 /***********************************************************
  *			CONSTRUCTEUR			   *
  ***********************************************************/
- controleur_axe::controleur_axe (I_teleop* pjoy,actionneur *paction,int num,double angle_init,int s_cap,int s_pre,double p,double d)
+ controleur_axe::controleur_axe (I_teleop* pjoy,actionneur *paction,int num,double angle_init, double angle_min_bound, double angle_max_bound, int s_cap,int s_pre,double p,double d)
  {
     //boucle=FERMEE; //par defaut on est en boucle fermee
     numero = num;
@@ -27,6 +27,8 @@ using namespace std;
     sens_capteur = s_cap;
     sens_pression = s_pre;
     angle_th = angle_init;
+    angle_min = angle_min_bound;
+    angle_max = angle_max_bound;
     angle_reel_prec = angle_init;
     angle_filtre_prec = angle_init;
     angle_filtre = angle_init;
@@ -145,7 +147,7 @@ void controleur_axe::set_userpressure(double pres)
 	//angle = pcapteur->lire_position();
 	angle = pcapteur->read_sensors_array(numero);
 
- //std::cout << "Angle is :" << angle << std::endl;
+  //std::cout << " read sensor array Angle is :" << angle << std::endl;
 	//Calcul de l'angle theorique en fonction de l'angle lu par le capteur
 
 	//Calcul different selon le sens de rotation du capteur
@@ -327,10 +329,10 @@ void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_ang
   if (!saturation_avant)
     {
       angle_th = angle_th + sens_pression * (coef_vitesse * vitesse_angle);
-      cout << "!saturation_avant" << endl;
+      //cout << "!saturation_avant" << endl;
     }
   //return(angle_th);
-  cout << "\n Angle_the: "<< angle_th << endl;
+  //cout << "\n Angle_the: "<< angle_th << endl;
 
 }
 /**********************************************************************
@@ -372,9 +374,19 @@ void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_ang
  		}*/
 
      //angle_th = 60;
- 	//cout << "inside controleur.controler()debug1" << endl;
+    // SECURITY CHECK
+    //double  angle_boundary = (this ->lire_position());
+  double  angle_boundary = pcapteur->read_sensors_array(numero);
+ 	cout << "\n Angle Boundary : "<< angle_boundary << endl;
 	//On calcule la commande correspondant a l'angle theorique actuel
- 	(this->*pcalculer_commande)();
+  if(angle_boundary < angle_max && angle_boundary > angle_min)
+ 	{
+     (this->*pcalculer_commande)();
+  }
+  else
+  {
+    pactionneur->recevoir_commande(delta_repos);
+  }
 	//cout << "inside controleur.controler()debug2" << endl;
 	//On verifie que delta_repos ne depasse pas les limite
 	//delta_repos = pression reglee lors de l'initialisation des muscles en position de repos

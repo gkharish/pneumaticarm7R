@@ -1036,7 +1036,7 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
     }
   else cout << "END of RT Create" << endl;
 
-  n = rt_task_start(&principal_task_, &principale, NULL);
+  n = rt_task_start(&principal_task_, &principale, this);
   if (n!=0)
     {
       cout << "Failed of RT STart" <<n<< endl;

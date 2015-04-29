@@ -3,18 +3,19 @@
  * Jeremie Guiochet			*
  * cree le 17/07/2002 par Mehdi SEFFAR	*
  ****************************************/
- 
+
 /*** MODIFICATIONS ***
-20/12/2002 : Ajout du pointeur de methode pour choisir Boucle Fermee ou boucle Ouverte
+     20/12/2002 : Ajout du pointeur de methode pour choisir Boucle Fermee ou boucle Ouverte
 
 
-*/ 
- 
+*/
+
 #ifndef CONTROLEUR_AXE
 #define CONTROLEUR_AXE
 
 #define OUVERTE 0
 #define FERMEE 1
+#define PRESCMD 2
 
 #define FREQ_COUPURE 2.0  //frequence de coupure du filtre en Hz
 #define TAU   1/FREQ_COUPURE //periode de coupure
@@ -45,91 +46,106 @@
 #include "I_teleop.h"
 #include <stdlib.h>
 #include <stdio.h>
+//using Eigen;
 using namespace std;
 
-class controleur_axe
+typedef struct controler_axe_data_s
+{
+  // Reference to the joystick
+  I_teleop* pjoystick;
+  // Actuator reference.
+  actionneur *pactionneur;
+  // Identifier of the actuator
+  int numero;
+  // Rest value of the angle
+  double angle_repos;
+  // Reel value of the angle
+  double angle_reel,angle_reel_prec;
+  // Maximinal and minimal boundaries for the joint.
+  double angle_min_bound;
+  double angle_max_bound;
+  // Direction of the sensor
+  int sens_capteur;
+  // Direction of the pressure
+  int sens_pression;
+  // PD gains
+  double p;
+  double d;
+  double angle_th;
+} controler_axe_data;
 
+class controleur_axe
 {
 
-	private :
+ private :
+  controler_axe_data ControlerAxeData_;
 
-		int numero;			//numero de l'axe
+  double zero_joy;		//position initiale du joystick
+  capteur_position *pcapteur;   //capteur de position associe
+  double delta_repos; //regle lors de l'initialisation des muscles
+  //reste constant pendant la phase de controle
+  double offset_capteur;  //difference entre la valeur initiale lue
+  // par le capteur et l'angle au repos theorique
+  double offset_lu; //valeur lue par le capteur a t =0
+  double rapport;
+  bool saturation_avant,saturation_arriere;
+  int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
+  double user_pressure;
+  //Donnees calcul commande  PID
+  double derivee_erreur;
+  double tab_erreur [10];		//sauvegarde des 10 dernieres erreurs
+  double commande;
+  double erreur;
+  double angle_th; 	//angle theorique
+  double angle_reel_prec,angle_filtre,angle_filtre_prec; //infos filtre
+  void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
+  void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
+  void pressure_commande (void);         //calcul de la commande en Boucle prescmd
+  void (controleur_axe::*pcalculer_commande)(); //Pointeur de methode qui servira pour
+  //pointer sur calculer_commande en BO ou BF
 
-  		actionneur * pactionneur;	//actionneur associe
-  		
-        I_teleop * pjoystick;     //joystick associe
+ public :
 
-        double zero_joy;		//position initiale du joystick
+  //constructeurs
+  controleur_axe (){};
+  controleur_axe (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
+  controleur_axe (controler_axe_data & aControlerAxeData);
 
-        capteur_position *pcapteur;   //capteur de position associe
+  //Fonction d'association du capteur au controleur d'axe
+  void set_capteur (capteur_position*);
 
-        int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
+  //Lecture de l'angle
+  double lire_position(void);
 
-        int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression	
+  //initialisation elctronique de la carte de commande
+  void initialisation_carte();
 
-        double angle_repos,angle_reel;
-		
-        double delta_repos; //regle lors de l'initialisation des muscles
-        		            //reste constant pendant la phase de controle			
-		double offset_capteur;  //difference entre la valeur initiale lue
-             				// par le capteur et l'angle au repos theorique
-		double offset_lu; //valeur lue par le capteur a t =0
-		double rapport;
-		bool saturation_avant,saturation_arriere;
-		int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
-             	
-             	//Donnees calcul commande  PID      
-        double P;  			//coefficient du proportionnel
-	  	double D;  			//coefficient de la derivee
-  		double derivee_erreur;
-  		double tab_erreur [10];		//sauvegarde des 10 dernieres erreurs
-  		double commande;
-  		double erreur, angle_th; 	//angle theorique
-  		double angle_reel_prec,angle_filtre,angle_filtre_prec; //infos filtre
-        void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
-        void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
-        void (controleur_axe::*pcalculer_commande)(); //Pointeur de methode qui servira pour 
-        						  //pointer sur calculer_commande en BO ou BF
-        	
-	public :
+  //Initialisation des muscles en position de repos
+  void initialisation_muscles(double,double);
 
-		//constructeurs
-		controleur_axe (){};
-		controleur_axe (I_teleop*,actionneur *,int,double,int,int,double,double);
-		
-		//Fonction d'association du capteur au controleur d'axe
-		void set_capteur (capteur_position*);
-		
-		//Lecture de l'angle
-		double lire_position(void);
-		
-		//initialisation elctronique de la carte de commande
-		void initialisation_carte();
-		
-		//Initialisation des muscles en position de repos
-		void initialisation_muscles(double,double);
-		
-		//Changer de style de boucle fermee ou ouverte
-		void set_boucle(int);
-				
-		//Controle de l'axe
-		void controler();
-		
-		//Degonflement des muscles
-		void degonfle (double);
-		
-		/** recuperation des attributs **/
-		void init_angles (void);
-		capteur_position * get_capteur(void);
-		double get_rapport(void);
-		double get_delta(void);
-		double get_angle_desire();
-		double get_angle_filtre();
-		double get_angle_reel();
-		double get_commande();
-		
-		
-		
+  //Changer de style de boucle fermee ou ouverte
+  void set_boucle(int);
+  void set_userpressure(double pres);
+  //Controle de l'axe
+  void controler();
+
+  //Degonflement des muscles
+  void degonfle (double);
+
+  /** recuperation des attributs **/
+  void init_angles (void);
+  capteur_position * get_capteur(void);
+  double get_rapport(void);
+  double get_delta(void);
+  double get_angle_desire();
+  double get_angle_filtre();
+  double get_angle_reel();
+  double get_angle_lire (void);
+  double get_commande();
+  void get_reference_angle(double , double);
+
+
+
 };
 
 

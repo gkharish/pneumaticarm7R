@@ -54,32 +54,32 @@ using namespace Eigen;
 
 struct udppacket_init                    // clientheader = '0';
 {
-    char CLIENT_HEADER;
+    char CLIENT_HEADER[2];
     //double control_cmd;
-    unsigned char ADC;
-    unsigned char counters;
-    unsigned char errors;
+    unsigned short ADC;
+    unsigned short counters;
+    unsigned short errors;
     unsigned short sampling_period;
 }client_packet_init;
 
 struct udppacket_control                    // clientheader = '0';
 {
-    char CLIENT_HEADER;
+    char CLIENT_HEADER[2];
     //double control_cmd[3];
     //unsigned int control_cmd[16];
     unsigned short control_cmd[16];
 }client_packet_control;
-    
+
 struct udppacket_countersreset              // clientheader = '1';
 {
-    char CLIENT_HEADER;
-    bool data;
+    char CLIENT_HEADER[2];
+    unsigned short data;
 }client_packet_countersreset;
 
 std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
 {
     // write obj to stream
-     os << " " << obj.CLIENT_HEADER 
+     os << " " << obj.CLIENT_HEADER
 	<< " " << obj.control_cmd[0]
 	<< " " << obj.control_cmd[1]
 	<< " " << obj.control_cmd[2]
@@ -96,36 +96,37 @@ std::ostream& operator<<(std::ostream& os, const struct udppacket_control & obj)
 	<< " " << obj.control_cmd[13]
 	<< " " << obj.control_cmd[14]
 	<< " " << obj.control_cmd[15]
-	
+
 	;
-    return os; 
-} 
+    return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const struct udppacket_init & obj)
 {
     // write obj to stream
-    os << " " << obj.CLIENT_HEADER 
-    << " " << obj.ADC 
-    << " " << obj.counters 
+    os << " " << obj.CLIENT_HEADER
+    << " " << obj.ADC
+    << " " << obj.counters
     << " " << obj.errors
     << " " << obj.sampling_period;
-    
-    return os; 
-}  
+
+    return os;
+}
 
 class CIODAC16 : public carte//, public  ClientUDP
-{	 
+{
 	public :
 		CIODAC16();//:  ClientUDP()
 		//{}  // constructeur
 		virtual ~CIODAC16();
 		virtual void daconv(int chan , char header);
+    void pressure_inidividualmuscle(int, double);
 		void send_command_array(int, double);
 		char*  buffer_send;
 		udppacket_control send_packet;
 		udppacket_countersreset send_packet_countersreset, send_packet_digitaloutputcontrol;
 		udppacket_init send_packet_init;
-		
+
 		//VectorXd send_array;
 		double send_array[16];
 		double get_send_array();

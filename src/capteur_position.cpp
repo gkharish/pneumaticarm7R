@@ -3,11 +3,11 @@
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
- 
- 
+
+
 #include <iostream>
 #include "capteur_position.h"
- 
+
 //sens du capteur
 #define POSITIF  1
 #define NEGATIF -1
@@ -34,16 +34,16 @@
 
  ********************************************************************/
 
- capteur_position::capteur_position (double off,double pen)
+capteur_position::capteur_position (double off,double pen)
 
- {
+{
 
 
-	offset = off;
-	pente = pen;
- }
+  offset = off;
+  pente = pen;
+}
 
- 
+
 /********************************************************************
 
  *                Lecture de la position du capteur                 *
@@ -60,50 +60,48 @@
 
  ********************************************************************/
 
- double capteur_position::lire_position (void)
+double capteur_position::lire_position (void)
 
- {
+{
 
-	double angle=0;
-	unsigned int v=0;
-	float v1;
-	/* recup�ration de la tension */
+  double angle=0;
+  float v1=0.0;
+  /* recup�ration de la tension */
 
-	//v1 = pcarte->adconv(chanNumber);
- //v1 = pcarte -> read_sensors(*axis_num);
- std::cout << "Value read by the IO board:" << v1 << std::endl;
-	//printf("valeur lue au can %d \r",v);
-	/* calcul de l'angle */
+  //v1 = pcarte->adconv(chanNumber);
+  //v1 = pcarte -> read_sensors(*axis_num);
+  std::cout << "Value read b cap_pos_lire:" << v1 << std::endl;
+  /* calcul de l'angle */
 
-	angle = v1*180/3.14;//((double)v * 360)/4095;
-	
-	return (angle);
+  angle = v1*180/3.14;//((double)v * 360)/4095;
 
- }
- 
- double capteur_position::read_sensors_array (int ind)
+  return (angle);
 
- {
+}
 
-	double angle=0;
-	unsigned int v=0;
-	double v1;
-	/* recup�ration de la tension */
+double capteur_position::read_sensors_array (int ind)
 
-	//v1 = pcarte->adconv(chanNumber);
-	//std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
- v1 = pcarte -> read_sensors(ind);
- //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
-	//printf("valeur lue au can %d \r",v);
-	/* calcul de l'angle */
+{
 
-	angle = v1*180/3.14;//((double)v * 360)/4095;
-	
-	return (angle);
+  double angle=0;
+  //  unsigned int v=0;
+  double v1;
+  /* recup�ration de la tension */
 
- }
+  //v1 = pcarte->adconv(chanNumber);
+  //std::cout << "capteur_position:read_sensors_array:" << ind << std::endl;
+  v1 = pcarte -> read_sensors(ind);
+  //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
+  //printf("valeur lue au can %d \r",v);
+  /* calcul de l'angle */
 
- 
+  angle = v1*18; // 1volt from potentiometers = 18 degrees //*180/3.14;//((double)v * 360)/4095;
+  //std::cout << "angle cap_pos_read_sensor_array"<<ind<<": " << angle << std::endl;
+  return (angle);
+
+}
+
+
 /********************************************************************
 
  *                   	     get_offset       		            *
@@ -120,11 +118,11 @@
 
  ********************************************************************/
 
- double capteur_position::get_offset(void)
- {
- 	return(offset);
- }
- /********************************************************************
+double capteur_position::get_offset(void)
+{
+  return(offset);
+}
+/********************************************************************
 
  *                   	     set_offset       		            *
 
@@ -140,12 +138,12 @@
 
  ********************************************************************/
 
- void capteur_position::set_offset(double off)
- {
- 	offset = off;
- }
- 	
- 
+void capteur_position::set_offset(double off)
+{
+  offset = off;
+}
+
+
 /********************************************************************
 
  *                   	     get_pente       		            *
@@ -162,7 +160,7 @@
 
  ********************************************************************/
 
- double capteur_position::get_pente(void)
- {
- 	return(pente);
- }
+double capteur_position::get_pente(void)
+{
+  return(pente);
+}

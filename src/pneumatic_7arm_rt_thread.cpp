@@ -1,4 +1,4 @@
-/************************************************************
+</************************************************************
  *	       PROGRAMME DE TEST DE LA REALISATION	    *
  *		     DU CONTROLEUR DE ROBOT	            *
  ************************************************************
@@ -16,7 +16,11 @@
 
 
 #define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__
-#define ODEBUG(x) std::cerr << x << DBG_INFO << std::endl
+#ifndef NDEBUG
+#define ODEBUG(x) std::cerr << x << std::endl
+#else
+#define ODEBUG(x)
+#endif
 
 /***** DEFINITION DE L'ADRESSAGE DES CARTES *****/
 /*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
@@ -379,7 +383,7 @@ void Pneumatic7ArmRtThread::Initializing()
 
 
   cout<< "Control flag after testconfig: "<<CTRL_FLAG(0) << endl;
-  cout << "Pressure array after testconfig: ";
+  ODEBUG("Pressure array after testconfig: ");
   for(unsigned int i=0;i<7;i++)
     cout << pressure_command_array_(i) <<",";
   cout << endl;
@@ -749,31 +753,7 @@ Controler()
 void Pneumatic7ArmRtThread::
 RobotControler()
 {
-
-  // tache_arret : pour les evenements clavier
-  //tache_arret=taskSpawn("tache_arret",90,0,22000,(FUNCPTR)attente,0,0,0,0,0,0,0,0,0,0);
-
-  //printf(" To stop press a button and confirm Pour arreter appuyez sur une touche puis validez\n\n");
-  //printf( "\n\n capt1   capt2   capt3   capt4   capt5   capt6   capt7\n");
-  //printf("\n jusqu'ici tout va bien 10 controler_robot");
-
-  // tache_controle_mvt : controle des differnts axes du robot et acquisition des mesures
-  //tache_controle_mvt=taskSpawn("t_controle_mvt",95,0,22000,(FUNCPTR)controler,0,0,0,0,0,0,0,0,0,0);
   Controler();
-  //printf("\n jusqu'ici tout va bien controler_robot");
-
-  //tache_controle_outil : gestion de l'ouverture et de la fermeture de la pince
-  //tache_controle_outil = taskSpawn("t_controle_outil",95,0,22000,(FUNCPTR)controler_pince,0,0,0,0,0,0,0,0,0,0);
-
-
-  //printf("\n jusqu'ici tout va bien 12 controler_robot");
-
-
-  //printf("\n jusqu'ici tout va bien 13 controler_robot");
-
-  //printf("\n jusqu'ici tout va bien 14 controler_robot");
-  //Remise a faux de variables booleennes pour une autre execution consecutive
-
 }
 
 void principale(void *arg)

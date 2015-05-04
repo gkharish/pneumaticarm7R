@@ -39,17 +39,16 @@ reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 
 void Muscle::
 trait_muscle_i (controleur_axe *controleur_i,
-                double * ,//delta,
+                double * delta,
                 double * vitesse)
 {
-  double vit = *vitesse;
   //const char * buf = std::string("ok").c_str();
   //char * buffer = new char[2 * sizeof(double) + 2];
   //double pos_joy,coef;
   if (!end_)
     {
       //double del = *delta;
-      controleur_i -> controler();//initialisation_muscles(del,vit);
+      controleur_i -> initialisation_muscles(*delta,*vitesse);
       /*if (!tele_op)
 	{
 	double del = *delta;
@@ -60,6 +59,6 @@ trait_muscle_i (controleur_axe *controleur_i,
     }
   else
     {
-      controleur_i -> degonfle(vit);
+      controleur_i -> degonfle(*vitesse);
     }
 }

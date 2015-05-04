@@ -7,7 +7,7 @@
 #define P_ECHANT_S	 1/P_ECHANT
 #define PRESSION_BASE     2.5
 #define K_BOUCLE_OUVERTE (2.5/180)
-#include "controleur_axe.h"
+#include "controleur_axe.hh"
 #include <math.h>
 #include <stdio.h>
 #include <iostream>
@@ -27,34 +27,34 @@ controleur_axe::controleur_axe (I_teleop* pjoy,
 				double p,
 				double d)
 {
-  controler_axe_data aControlerAxeData;
-  aControlerAxeData.numero = num;
-  aControlerAxeData.pactionneur = paction;
-  aControlerAxeData.pjoystick = pjoy;
-  aControlerAxeData.angle_repos = angle_init;
-  aControlerAxeData.angle_reel = angle_init;
-  aControlerAxeData.sens_capteur = s_cap;
-  aControlerAxeData.sens_pression = s_pre;
+  controller_axe_data aControllerAxeData;
+  aControllerAxeData.numero = num;
+  aControllerAxeData.pactionneur = paction;
+  aControllerAxeData.pjoystick = pjoy;
+  aControllerAxeData.angle_repos = angle_init;
+  aControllerAxeData.angle_reel = angle_init;
+  aControllerAxeData.sens_capteur = s_cap;
+  aControllerAxeData.sens_pression = s_pre;
   
-  aControlerAxeData.angle_th = angle_init;
-  aControlerAxeData.angle_min_bound = angle_min_bound;
-  aControlerAxeData.angle_max_bound = angle_max_bound;
-  aControlerAxeData.angle_reel_prec = angle_init;
-  aControlerAxeData.angle_filtre_prec = angle_init;
-  aControlerAxeData.angle_filtre = angle_init;
-  aControlerAxeData.erreur = 0;
-  aControlerAxeData.saturation_avant = false;
-  aControlerAxeData.saturation_arriere = false;
-  aControlerAxeData.delta_repos = 0;
-  aControlerAxeData.P = p;
-  aControlerAxeData.D = d;
+  aControllerAxeData.angle_th = angle_init;
+  aControllerAxeData.angle_min_bound = angle_min_bound;
+  aControllerAxeData.angle_max_bound = angle_max_bound;
+  aControllerAxeData.angle_reel_prec = angle_init;
+  aControllerAxeData.angle_filtre_prec = angle_init;
+  aControllerAxeData.angle_filtre = angle_init;
+  aControllerAxeData.error = 0;
+  aControllerAxeData.forward_saturation = false;
+  aControllerAxeData.backward_saturation = false;
+  aControllerAxeData.delta_repos = 0;
+  aControllerAxeData.P = p;
+  aControllerAxeData.D = d;
 
-  controleur_axe(aControlerAxeData);
+  init_controller_axe(aControllerAxeData);
 }
 
-controleur_axe::controleur_axe (controler_axe_data & aControlerAxeData)
+void controleur_axe::init_controller_axe (controller_axe_data & aControllerAxeData)
 {
-  ControlerAxeData_ = aControlerAxeData;
+  ControllerAxeData_ = aControllerAxeData;
   commande = 0;
   for (int i = 0;i < 10;i++)
     tab_erreur [i] = 0;
@@ -251,7 +251,7 @@ double controleur_axe::get_rapport(void)
 
 double controleur_axe::get_delta(void)
 {
-  return(delta_repos+commande);
+  return(ControllerAxeData_.delta_repos+commande);
 }
 
 
@@ -289,7 +289,7 @@ double controleur_axe::get_angle_desire(void) {
 
 
 double controleur_axe::get_angle_filtre (void) {
-  return (angle_filtre);
+  return (ControllerAxeData_.angle_filtre);
 }
 
 
@@ -332,7 +332,7 @@ double controleur_axe::get_commande(void)
  **********************************************************************/
 void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_angle)
 {
-  if (!saturation_avant)
+  if (!ControllerAxeData_.forward_saturation)
     {
       angle_th = angle_th + sens_pression * (coef_vitesse * vitesse_angle);
       //cout << "!saturation_avant" << endl;
@@ -343,7 +343,7 @@ void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_ang
 }
 /**********************************************************************
 
- *                   	   controler    		              *
+ *                   	   controller    		              *
 
  **********************************************************************
 
@@ -359,7 +359,7 @@ void controleur_axe::get_reference_angle(double coef_vitesse, double vitesse_ang
  **********************************************************************/
 
 
-void controleur_axe::controler ()
+void controleur_axe::controller ()
 {
 
   // on ne modifie la commande que si le seuil de prise en compte du
@@ -391,28 +391,28 @@ void controleur_axe::controler ()
     }
   else
     {
-      pactionneur->recevoir_commande(delta_repos);
+      pactionneur->recevoir_commande(ControllerAxeData_.delta_repos);
     }
   //cout << "inside controleur.controler()debug2" << endl;
   //On verifie que delta_repos ne depasse pas les limite
   //delta_repos = pression reglee lors de l'initialisation des muscles en position de repos
   //a tout instant le couple de muscle recoit PRESSION_BASE (+/-) delta_repos + commande
 
-  if (((delta_repos + commande)<= PRESSION_BASE) && ((delta_repos + commande) >=-PRESSION_BASE))
+  if (((ControllerAxeData_.delta_repos + commande)<= PRESSION_BASE) && ((ControllerAxeData_.delta_repos + commande) >=-PRESSION_BASE))
     {
-      if (saturation_avant) saturation_avant = false;
-      if (saturation_arriere) saturation_arriere = false;
-      pactionneur->recevoir_commande(delta_repos+commande);
+      if (ControllerAxeData_.forward_saturation) ControllerAxeData_.forward_saturation = false;
+      if (ControllerAxeData_.backward_saturation) ControllerAxeData_.backward_saturation = false;
+      pactionneur->recevoir_commande(ControllerAxeData_.delta_repos+commande);
     }
   else
     {
-      if ((delta_repos+commande) > PRESSION_BASE)
-	saturation_avant = true;
+      if ((ControllerAxeData_.delta_repos+commande) > PRESSION_BASE)
+	ControllerAxeData_.forward_saturation = true;
 
       else
-	saturation_arriere = true;
+	ControllerAxeData_.backward_saturation = true;
     }
-  //cout << "inside controleur.controler()debug3" << delta_repos<<endl;
+  //cout << "inside controleur.controler()debug3" << ControllerAxeData_.delta_repos<<endl;
 }
 
 /********************************************************************
@@ -457,7 +457,7 @@ void controleur_axe::initialisation_muscles (double delta_init,double vitesse_pr
 
 
     }
-  delta_repos = delta_init;
+  ControllerAxeData_.delta_repos = delta_init;
 
 
 }
@@ -525,8 +525,8 @@ void controleur_axe::initialisation_carte ()
 void controleur_axe::degonfle (double vitesse_pression)
 {
   double i,j;
-  i = PRESSION_BASE + (delta_repos + commande);
-  j = PRESSION_BASE - (delta_repos + commande);
+  i = PRESSION_BASE + (ControllerAxeData_.delta_repos + commande);
+  j = PRESSION_BASE - (ControllerAxeData_.delta_repos + commande);
 
   while(i>0||j>0)
     {
@@ -565,24 +565,26 @@ void controleur_axe::calculer_commande_BF ()
   angle_reel = (this ->lire_position());
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
-  angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
+  ControllerAxeData_.angle_filtre = (P_ECHANT_S *(ControllerAxeData_.angle_reel + ControllerAxeData_.angle_reel_prec) 
+                                     - ControllerAxeData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
   //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
-  erreur = angle_th - angle_filtre;
+  ControllerAxeData_.error = ControllerAxeData_.angle_th - ControllerAxeData_.angle_filtre;
 
-  std::cout << "\n erreur inside calcler_commande_BF :" << erreur << endl;
+  std::cout << "\n erreur inside calcler_commande_BF :" << ControllerAxeData_.error << endl;
   //Calcul de la derivee de l'erreur
-  derivee_erreur = (erreur - tab_erreur[9]) / (10 * P_ECHANT);
+  derivee_erreur = (ControllerAxeData_.error - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;
   //Calcul de la commande
-  commande  = sens_pression * (P * erreur  + D * derivee_erreur); //numero
+  commande  = sens_pression * (ControllerAxeData_.P * ControllerAxeData_.error  
+                               + ControllerAxeData_.D * derivee_erreur); //numero
   std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
   //Actualisation du tableau d'erreurs
   for (int i = 1; i < 10;i++)
     tab_erreur [i] = tab_erreur[i-1];
-  tab_erreur [0] = erreur;
-  angle_filtre_prec = angle_filtre;
-  angle_reel_prec = angle_reel;
+  tab_erreur [0] = ControllerAxeData_.error;
+  ControllerAxeData_.angle_filtre_prec = ControllerAxeData_.angle_filtre;
+  ControllerAxeData_.angle_reel_prec = angle_reel;
 }
 
 /********************************************************************
@@ -607,14 +609,16 @@ void controleur_axe::calculer_commande_BO ()
   angle_reel = (this ->lire_position());
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
-  angle_filtre = (P_ECHANT_S *(angle_reel + angle_reel_prec) - angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
+  ControllerAxeData_.angle_filtre = (P_ECHANT_S *
+                                     (ControllerAxeData_.angle_reel + ControllerAxeData_.angle_reel_prec) - 
+                                     ControllerAxeData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 
 
   //Calcul de la commande
   commande  = sens_pression * K_BOUCLE_OUVERTE*angle_th;
 
-  angle_filtre_prec = angle_filtre;
-  angle_reel_prec = angle_reel;
+  ControllerAxeData_.angle_filtre_prec = ControllerAxeData_.angle_filtre;
+  ControllerAxeData_.angle_reel_prec = angle_reel;
 }
 
 void controleur_axe::pressure_commande ()

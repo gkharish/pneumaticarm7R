@@ -22,7 +22,7 @@
 
  *		  		        			    *
  ********************************************************************/
-#include "controleur_axe.h"
+#include "controleur_axe.hh"
 #include "controleur_outil.h"
 #include "joystick.h"
 #include "fichier.h"

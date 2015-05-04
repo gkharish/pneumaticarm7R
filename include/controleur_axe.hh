@@ -33,7 +33,7 @@
 
 
  *     Cette classe fournit toutes les operations servant 	    *
- *     a controler le mouvement de rotation de certain axes	    *
+ *     a controller le mouvement de rotation de certain axes	    *
 
  *                                                                  *
 
@@ -49,7 +49,7 @@
 //using Eigen;
 using namespace std;
 
-typedef struct controler_axe_data_s
+typedef struct controller_axe_data_s
 {
   // Reference to the joystick
   I_teleop* pjoystick;
@@ -69,16 +69,37 @@ typedef struct controler_axe_data_s
   // Direction of the pressure
   int sens_pression;
   // PD gains
-  double p;
-  double d;
+  double P;
+  double D;
   double angle_th;
-} controler_axe_data;
+
+  /*@{ Filter related data*/
+  /*! Filtered angle */
+  double angle_filtre;
+  /*! Previous filtered angle */
+  double angle_filtre_prec; //infos filtre
+  /*@}*/
+
+  /*! Error */
+  double error; // erreur
+  
+  /*@{ Saturations */
+  /*! Forward saturation */
+  bool forward_saturation; //saturation_avant;
+
+  /*! Backward saturation */
+  bool backward_saturation; //saturation_arriere;
+
+  /*!  Rule during muscle initialization */
+  double delta_repos; 
+  
+} controller_axe_data;
 
 class controleur_axe
 {
 
  private :
-
+  controller_axe_data ControllerAxeData_;
   int numero;			//numero de l'axe
   actionneur * pactionneur;	//actionneur associe
   I_teleop * pjoystick;     //joystick associe
@@ -87,24 +108,19 @@ class controleur_axe
   int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
   int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
   double angle_repos,angle_reel, angle_max, angle_min;
-  double delta_repos; //regle lors de l'initialisation des muscles
   //reste constant pendant la phase de controle
   double offset_capteur;  //difference entre la valeur initiale lue
   // par le capteur et l'angle au repos theorique
   double offset_lu; //valeur lue par le capteur a t =0
   double rapport;
-  bool saturation_avant,saturation_arriere;
   int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
   double user_pressure;
   //Donnees calcul commande  PID
 
-  double P;  			//coefficient du proportionnel
-  double D;  			//coefficient de la derivee
   double derivee_erreur;
   double tab_erreur [10];		//sauvegarde des 10 dernieres erreurs
   double commande;
-  double erreur, angle_th; 	//angle theorique
-  double angle_reel_prec,angle_filtre,angle_filtre_prec; //infos filtre
+  double angle_th; 	//angle theorique
   void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
   void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
   void pressure_commande (void);         //calcul de la commande en Boucle prescmd
@@ -116,6 +132,8 @@ class controleur_axe
   //constructeurs
   controleur_axe (){};
   controleur_axe (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
+
+  void init_controller_axe (controller_axe_data & aControllerAxeData);
 
   //Fonction d'association du capteur au controleur d'axe
   void set_capteur (capteur_position*);
@@ -133,7 +151,7 @@ class controleur_axe
   void set_loop(int);
   void set_userpressure(double pres);
   //Controle de l'axe
-  void controler();
+  void controller();
 
   //Degonflement des muscles
   void degonfle (double);

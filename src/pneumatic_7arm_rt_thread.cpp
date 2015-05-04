@@ -224,7 +224,7 @@
 #include "joystick.h"
 #include "capteur.h"
 #include "capteur_position.h"
-#include "controleur_axe.h"
+#include "controleur_axe.hh"
 #include "controleur_outil.h"
 #include "fichier.h"
 #include "modele.h"
@@ -307,17 +307,18 @@ reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 
 void Pneumatic7ArmRtThread::
 trait_muscle_i (controleur_axe *controleur_i,
-                double * ,//delta,
+                double * delta,
                 double * vitesse)
 {
-  double vit = *vitesse;
+  if ((delta==0) || (vitesse==0))
+    return;
   //const char * buf = std::string("ok").c_str();
   //char * buffer = new char[2 * sizeof(double) + 2];
   //double pos_joy,coef;
   if (!fin_)
     {
       //double del = *delta;
-      controleur_i -> controler();//initialisation_muscles(del,vit);
+      controleur_i -> initialisation_muscles(*delta,*vitesse);
       /*if (!tele_op)
 	{
 	double del = *delta;
@@ -328,7 +329,7 @@ trait_muscle_i (controleur_axe *controleur_i,
     }
   else
     {
-      controleur_i -> degonfle(vit);
+      controleur_i -> degonfle(*vitesse);
     }
 }
 

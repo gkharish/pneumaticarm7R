@@ -43,7 +43,7 @@
 #include "joystick.h"
 #include "capteur.h"
 #include "capteur_position.h"
-#include "controleur_axe.h"
+#include "controleur_axe.hh"
 #include "controleur_outil.h"
 #include "fichier.h"
 #include "modele.h"

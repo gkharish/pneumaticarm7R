@@ -101,7 +101,7 @@ class controller_axis
  private :
   controller_axis_data ControllerAxisData_;
   int numero;			//numero de l'axe
-  Actuator * pactuator;	//actionneur associe
+  Actuator * pactuator;	//actuator associe
   I_teleop * pjoystick;     //joystick associe
   double zero_joy;		//position initiale du joystick
   capteur_position *pcapteur;   //capteur de position associe

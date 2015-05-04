@@ -1,15 +1,16 @@
 /****************************************
- * Fichier actionneur.cpp          	*
- * Mehdi SEFFAR				*
- * cree le 17/07/2002  			*
- ****************************************/
-#include "actionneur.h" 
+ * Fichier actuator.cpp          	*
+ * Mehdi SEFFAR										*
+ * cree le 17/07/2002  						*
+ * Modified by Ganes Kumar on 04/5/2015
+****************************************/
+#include "actuator.hh"
 #include "math.h"
 
 
 /********************************************************************
 
- *                          CONSTRUCTEUR                            *
+ *                          CONSTRUCTOR                            *
 
  ********************************************************************
 
@@ -17,20 +18,22 @@
 
  *    PARAMETRES :                                                  *
 
- *                pcard : pointeur sur une carte du type CIODAS6402 *
+ *                pcard : Pointer to the card type CIODAS64 				*
 
- *                chan : numero de port d'entr�e sur la carte       *
+
+ *                chan : Number of port of entry in the card				*
+
  *                                                                  *
 
- *    RETOURNE :                                                    *
+ *    RETURN :                                                    	*
 
- *                un objet actionneur                               *
+ *                An object actuator                               	*
 
  *                                                                  *
 
  ********************************************************************/
 
-actionneur::actionneur (int chan1,int chan2 ,carte* carte)
+Actuator::Actuator (int chan1,int chan2 ,carte* carte)
 
 {
 
@@ -61,7 +64,7 @@ actionneur::actionneur (int chan1,int chan2 ,carte* carte)
 
  ********************************************************************/
 
-void actionneur::recevoir_commande (double commande)
+void Actuator::recevoir_commande (double commande)
 
 {
 	double m1,m2;
@@ -88,7 +91,7 @@ void actionneur::recevoir_commande (double commande)
 
  ********************************************************************/
 
-void actionneur::recevoir_commande_decouple (double val1,double val2)
+void Actuator::recevoir_commande_decouple (double val1,double val2)
 
 {
 
@@ -103,25 +106,24 @@ void actionneur::recevoir_commande_decouple (double val1,double val2)
 		//pcarte->daconv(muscle1, buffer);
 		pcarte -> send_command_array(muscle1, buffer);
 
-		
+
 	}
 
-	
-		
+
+
 	if (val2>=0 && val2 <= PRESSION_MAX)
 
 	{
 
-    
-	            
+
+
 		buffer = (val2) ;//* RAPPORT;
 
 		//pcarte->daconv(muscle2,(int)ceil(buffer));
 		//pcarte->daconv(muscle2, buffer);
 		pcarte -> send_command_array(muscle2, buffer);
-	
+
 	}
 
-	
+
 }
-	

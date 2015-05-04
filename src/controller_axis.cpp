@@ -14,18 +14,18 @@
 using namespace std;
 
 /***********************************************************
- *			CONSTRUCTEUR			   *
+ *			CONSTRUCTOR			   *
  ***********************************************************/
 controller_axis::controller_axis (I_teleop* pjoy,
-				actionneur *paction,
-				int num,
-				double angle_init, 
-				double angle_min_bound, 
-				double angle_max_bound, 
-				int s_cap,
-				int s_pre,
-				double p,
-				double d)
+                                  actionneur *paction,
+                                  int num,
+                                  double angle_init, 
+                                  double angle_min_bound, 
+                                  double angle_max_bound, 
+                                  int s_cap,
+                                  int s_pre,
+                                  double p,
+                                  double d)
 {
   controller_axis_data aControllerAxisData;
   aControllerAxisData.numero = num;
@@ -88,7 +88,7 @@ void controller_axis::set_loop (int aloop)
   if (aloop==OUVERTE) pcalculer_commande=&controller_axis::calculer_commande_BO;
   if (aloop==FERMEE)  pcalculer_commande=&controller_axis::calculer_commande_BF;
   if (aloop==PRESCMD) pcalculer_commande=&controller_axis::pressure_commande;
- }
+}
 
 
 /********************************************************************
@@ -111,15 +111,15 @@ void controller_axis::set_loop (int aloop)
 
 void controller_axis::set_capteur (capteur_position* pcap)
 {
-  	pcapteur = pcap;
-  	//rapport=rap;
-  	double var = pcapteur -> read_sensors_array(numero);//lire_position();
-  	cout << "\n controller_axis.setcapteur read sensors array: " << var << endl;
-        //  	double var1 = var - angle_repos;
-  	//double offset_capteur = fabs( var1);
-  	//printf("\n controller_axis.setcapteur()3");
-  	//cet offset est recalcule plus tard, inutile ?
- }
+  pcapteur = pcap;
+  //rapport=rap;
+  double var = pcapteur -> read_sensors_array(numero);//lire_position();
+  cout << "\n controller_axis.setcapteur read sensors array: " << var << endl;
+  //  	double var1 = var - angle_repos;
+  //double offset_capteur = fabs( var1);
+  //printf("\n controller_axis.setcapteur()3");
+  //cet offset est recalcule plus tard, inutile ?
+}
 
 void controller_axis::set_userpressure(double pres)
 {
@@ -566,7 +566,7 @@ void controller_axis::calculer_commande_BF ()
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *(ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) 
-                                     - ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
+                                      - ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
   //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
   ControllerAxisData_.error = ControllerAxisData_.angle_th - ControllerAxisData_.angle_filtre;
@@ -610,8 +610,8 @@ void controller_axis::calculer_commande_BO ()
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *
-                                     (ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) - 
-                                     ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
+                                      (ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) - 
+                                      ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
 
 
   //Calcul de la commande

@@ -17,9 +17,12 @@
 
 #define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__
 #ifndef NDEBUG
+#define DEBUG_LEVEL 0
 #define ODEBUG(x) std::cerr << x << std::endl
+#define ODEBUGL(x,y) if (y<DEBUG_LEVEL) std::cerr << x << std::endl;
 #else
 #define ODEBUG(x)
+#define ODEBUGL(x,y);
 #endif
 
 /***** DEFINITION DE L'ADRESSAGE DES CARTES *****/
@@ -254,6 +257,7 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CTRL_FLAG(7),
   pressure_command_array_(7),
   sensors_array_(7),
+  joy1_(0), joy2_(0),ppalonnier_(0),
   temps_(0.0),
   saisie_(0),
   increm_(0),
@@ -272,8 +276,8 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   for (int i = 0; i<7;i++)
     {
       //construction des capteurs
-      cap[i].set_offset(0);
-      cap[i].set_pente(0);
+      sensors_[i].set_offset(0);
+      sensors_[i].set_pente(0);
 
     }
 
@@ -350,6 +354,64 @@ void catch_signal(int
  *							*
  ********************************************************/
 
+void Pneumatic7ArmRtThread::InitActuators()
+{
+  int channel1[7] = {VOIE_1_1, VOIE_2_1,  VOIE_3_1, VOIE_4_1, VOIE_5_1, VOIE_6_1, VOIE_7_1};
+  int channel2[7] = {VOIE_1_2, VOIE_2_2,  VOIE_3_2, VOIE_4_2, VOIE_5_2, VOIE_6_2, VOIE_7_2};
+  
+  for (unsigned int i=0;i<7;i++)
+    actuators_[i] = actionneur(channel1[i],channel2[i],ciodac16_);
+
+}
+
+void Pneumatic7ArmRtThread::InitControllers()
+{
+  double rest_angles[7] = { ANGLE_REPOS_1, ANGLE_REPOS_2, ANGLE_REPOS_3, ANGLE_REPOS_4, ANGLE_REPOS_5, ANGLE_REPOS_6, ANGLE_REPOS_7};
+  double min_angles[7] = { ANGLE_MIN_1, ANGLE_MIN_2, ANGLE_MIN_3, ANGLE_MIN_4, ANGLE_MIN_5, ANGLE_MIN_6, ANGLE_MIN_7};
+  double max_angles[7] = { ANGLE_MAX_1, ANGLE_MAX_2, ANGLE_MAX_3, ANGLE_MAX_4, ANGLE_MAX_5, ANGLE_MAX_6, ANGLE_MAX_7};
+  int sensor_directions[7] = {SENS_CAPTEUR_1,SENS_CAPTEUR_2,SENS_CAPTEUR_3,SENS_CAPTEUR_4,SENS_CAPTEUR_5,SENS_CAPTEUR_6,SENS_CAPTEUR_7};
+  int pressure_directions[7] = {SENS_PRESSION_1,SENS_PRESSION_2,SENS_PRESSION_3,SENS_PRESSION_4,SENS_PRESSION_5,SENS_PRESSION_6,SENS_PRESSION_7};
+  double p_gains[7] = {P_AXE_1,P_AXE_2,P_AXE_3,P_AXE_4,P_AXE_5,P_AXE_6,P_AXE_7};
+  double d_gains[7] = {D_AXE_1,D_AXE_2,D_AXE_3,D_AXE_4,D_AXE_5,D_AXE_6,D_AXE_7};
+  I_teleop * joys[7] = {joy1_, joy1_, joy1_, joy2_, ppalonnier_,joy2_,joy2_};
+
+  for(unsigned int i=0;i<7;i++)
+    {
+      // Bind actuators and controllers
+      controllers_[i]=controller_axis(joys[i],& actuators_[i], i,
+                                      rest_angles[i], min_angles[i],max_angles[i],
+                                      sensor_directions[i], pressure_directions[i], p_gains[i],d_gains[i]);
+      // Initialize electronic boards
+      controllers_[i].initialisation_carte();
+    }
+
+  ODEBUGL("\n init()debug8 \n",3);
+  //start the NI module to send data
+  ciodac16_ -> daconv(1, '0'); 
+  ODEBUGL("\n init()debug8.1 \n",3);
+
+  ciodas64_ -> adconv(1);
+  ODEBUGL("\n init()debug8.2\n",3);
+  ODEBUGL("/n init() recv data:adconv:" ,4);
+
+  ciodac16_ -> daconv(1, '1');
+  ODEBUGL("\n init()debug8.3\n",3);
+
+  // Bind controllers and sensors 
+  ciodas64_ -> adconv(1);
+  ODEBUGL("/n init() recv data:adconv:" ,4);
+  ODEBUGL("\n init()debug9 \n",3);
+  controllers_[0].set_capteur(sensors_+4);
+  ODEBUGL("\n init()debug10 \n",3);
+  controllers_[1].set_capteur(sensors_+2);
+  ODEBUGL("\n init()debug11 \n",3);
+  controllers_[2].set_capteur(sensors_+6);
+  ODEBUGL("\n init()debug12 \n",3);
+  controllers_[3].set_capteur(sensors_);
+  controllers_[4].set_capteur(sensors_+1);
+  controllers_[5].set_capteur(sensors_+3);
+  controllers_[6].set_capteur(sensors_+5);
+}
 
 void Pneumatic7ArmRtThread::Initializing()
 {
@@ -402,75 +464,14 @@ void Pneumatic7ArmRtThread::Initializing()
   for (int i = 0; i<7;i++)
     {
       // Linking sensors with the data IO boards
-      cap[i].set_association(ciodas64_,i+16);
+      sensors_[i].set_association(ciodas64_,i+16);
     }
 
-  //printf("\n jusqu'ici tout va bien 1");
-  //Actionneurs
-  a1 = actionneur(VOIE_1_1,VOIE_1_2,ciodac16_);
-  //printf("\n init()debug1 \n");
-  a2 = actionneur(VOIE_2_1,VOIE_2_2,ciodac16_);
-  a3 = actionneur(VOIE_3_1,VOIE_3_2,ciodac16_);
-  a4 = actionneur(VOIE_4_1,VOIE_4_2,ciodac16_);
-  a5 = actionneur(VOIE_5_1,VOIE_5_2,ciodac16_);
-  a6 = actionneur(VOIE_6_1,VOIE_6_2,ciodac16_);
-  a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16_);
+  // Initialize actuators
+  InitActuators();
 
-  //controleurs d'axe
-  controleur1 = controller_axis(joy1,&a1,1,
-			       ANGLE_REPOS_1,ANGLE_MIN_1, ANGLE_MAX_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
-  controleur2 = controller_axis(joy1,&a2,2,ANGLE_REPOS_2,ANGLE_MIN_2, ANGLE_MAX_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
-  controleur3 = controller_axis(joy1,&a3,3,ANGLE_REPOS_3,ANGLE_MIN_3, ANGLE_MAX_3,SENS_CAPTEUR_3,SENS_PRESSION_3,P_AXE_3,D_AXE_3);
-  controleur4 = controller_axis(joy2,&a4,4,ANGLE_REPOS_4,ANGLE_MIN_4, ANGLE_MAX_4,SENS_CAPTEUR_4,SENS_PRESSION_4,P_AXE_4,D_AXE_4);
-  controleur5 = controller_axis(ppalonnier,&a5,5,ANGLE_REPOS_5,ANGLE_MIN_5, ANGLE_MAX_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
-  controleur6 = controller_axis(joy2,&a6,6,ANGLE_REPOS_6,ANGLE_MIN_6, ANGLE_MAX_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
-  controleur7 = controller_axis(joy2,&a7,7,ANGLE_REPOS_7,ANGLE_MIN_7, ANGLE_MAX_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
-
-  //printf("\n init()debug7 \n");
-  //Initialisation des controleurs
-  controleur1.initialisation_carte();
-  controleur2.initialisation_carte();
-  controleur3.initialisation_carte();
-  controleur4.initialisation_carte();
-  controleur5.initialisation_carte();
-  controleur6.initialisation_carte();
-  controleur7.initialisation_carte();
-  //printf("\n init()debug8 \n");
-  ciodac16_ -> daconv(1, '0'); //start the NI module to send data
-  //printf("\n init()debug8.1 \n");
-
-  ciodas64_ -> adconv(1);
-  //printf("\n init()debug8.2\n");
-  //cout << "/n init() recv data:adconv:" << recving_Data << endl;
-  //char header = '1';
-
-  ciodac16_ -> daconv(1, '1');
-
-  //printf("\n init()debug8.3\n");
-
-
-
-  //Association des controleur aux capteurs correspondants
-  ciodas64_ -> adconv(1);
-  //cout << "/n init() recv data:adconv:" << recving_Data << endl;
-  //printf("\n init()debug9 \n");
-  controleur1.set_capteur(cap+4);
-  //printf("\n init()debug10 \n");
-  controleur2.set_capteur(cap+2);
-  //printf("\n init()debug11 \n");
-  controleur3.set_capteur(cap+6);
-  //printf("\n init()debug12 \n");
-  controleur4.set_capteur(cap);
-  controleur5.set_capteur(cap+1);
-  controleur6.set_capteur(cap+3);
-  controleur7.set_capteur(cap+5);
-  //printf("\n init()debug13 \n");
-  //Construction du modele
-  /* mon_modele = modele(&controleur1,&controleur2,&controleur3,&controleur4,
-     &controleur5,&controleur6,&controleur7,
-     &controleur_pince,
-     (palonnier *)ppalonnier,(joystick *)joy1,(joystick *)joy2);
-     printf("\n jusqu'ici tout va bien 5");*/
+  // Init axis controllers.
+  InitControllers();
 
 }
 
@@ -485,26 +486,19 @@ void Pneumatic7ArmRtThread::Initializing()
 
 void Pneumatic7ArmRtThread::InitializeSensors ()
 {
-  //printf("\n inside init_capteurs()1 \n");
+  ODEBUGL("\n inside init_capteurs()1 \n",3);
   char header = '1';
 
   ciodac16_ -> daconv(1, header);
   ciodas64_ -> adconv(1);
 
   for (int i = 1;i < 8;i++)
-    {
-      cap[i-1].set_offset( cap[i-1].read_sensors_array(i) );
-    }
-  //  typing is difficult
-  //printf("\n inside init_capteurs()2 \n");
-  controleur1.init_angles();
-  //printf("\n inside init_capteurs()3 \n");
-  controleur2.init_angles();
-  controleur3.init_angles();
-  controleur4.init_angles();
-  controleur5.init_angles();
-  controleur6.init_angles();
-  controleur7.init_angles();
+    sensors_[i-1].set_offset( sensors_[i-1].read_sensors_array(i) );
+
+  ODEBUGL("\n inside init_capteurs()2 \n",3);
+  for(unsigned int i=0;i<7;i++)
+    controllers_[i].init_angles();
+
   printf("\n Done init_capteurs() \n");
 
   ciodac16_ -> daconv(1, header);
@@ -521,37 +515,25 @@ void Pneumatic7ArmRtThread::InitializeSensors ()
 void Pneumatic7ArmRtThread::
 Inflating(void)
 {
-  double  * vit,*d1,*d2,*d3,*d4,*d5,*d6,*d7;
-  vit = new double (VITESSE_PRESSION);
+  double  vit=VITESSE_PRESSION;
+  double d[7] = {DELTA_INIT_AXE_1,
+                 DELTA_INIT_AXE_2,
+                 DELTA_INIT_AXE_3,
+                 DELTA_INIT_AXE_4,
+                 DELTA_INIT_AXE_5,
+                 DELTA_INIT_AXE_6,
+                 DELTA_INIT_AXE_7};
 
-  d1 = new double (DELTA_INIT_AXE_1);
-  d2 = new double (DELTA_INIT_AXE_2);
-  d3 = new double (DELTA_INIT_AXE_3);
-  d4 = new double (DELTA_INIT_AXE_4);
-  d5 = new double (DELTA_INIT_AXE_5);
-  d6 = new double (DELTA_INIT_AXE_6);
-  d7 = new double (DELTA_INIT_AXE_7);
-
-
-  //Lancement en parallele des taches d'initialisation des muscles
-  pneumatic_muscle.init_muscle_i(&controleur1, d1, vit);
-  init_muscle_i(&controleur1, d1, vit);
-  init_muscle_i(&controleur2, d2, vit);
-  init_muscle_i(&controleur3, d3, vit);
-  init_muscle_i(&controleur4, d4, vit);
-  init_muscle_i(&controleur5, d5, vit);
-  init_muscle_i(&controleur6, d6, vit);
-  init_muscle_i(&controleur7, d7, vit);
-  //init_muscle_i(&controleur2, d1, vit);
+  // Initialize muscles
+  for(unsigned int motorID=0;motorID<7;motorID++)
+    init_muscle_i(&controllers_[motorID], d+motorID, &vit);
 
   char header = '1';
 
   ciodac16_ -> daconv(1, header);
   ciodas64_ -> adconv(1);
-  //tele_op = true;
-
-
 }
+
 
 /********************************************************
  *							*
@@ -566,19 +548,13 @@ Deflating(void)
 {
 
   //Variables locales
-  double  * vit;
-  vit = new double (VITESSE_PRESSION);
+  double  vit = VITESSE_PRESSION;
 
-  //Lancement en parallele des taches de degonflement des muscles
-  reset_muscle_i(&controleur1, vit);
-  reset_muscle_i(&controleur2, vit);
-  reset_muscle_i(&controleur3, vit);
-  reset_muscle_i(&controleur4, vit);
-  reset_muscle_i(&controleur5, vit);
-  reset_muscle_i(&controleur6, vit);
-  reset_muscle_i(&controleur7, vit);
+  // Lancement en parallele des taches de degonflement des muscles
+  for(unsigned int motorID=0;motorID<7;motorID++)
+    reset_muscle_i(&controllers_[motorID], &vit);
+
   char header = '1';
-
   ciodac16_ -> daconv(1, header);
   ciodas64_ -> adconv(1);
 
@@ -593,20 +569,13 @@ Deflating(void)
 void Pneumatic7ArmRtThread::
 Calibration()
 {
+  for(unsigned int i=0;i<7;i++)
+    sensors_array_(i) = controllers_[i].get_angle_lire();
 
-  sensors_array_(0) = controleur1.get_angle_lire();
-  sensors_array_(1) = controleur2.get_angle_lire();
-  sensors_array_(2) = controleur3.get_angle_lire();
-  sensors_array_(3) = controleur4.get_angle_lire();
-  sensors_array_(4) = controleur5.get_angle_lire();
-  sensors_array_(5) = controleur6.get_angle_lire();
-  sensors_array_(6) = controleur7.get_angle_lire();
   //cout << "\n received sensors data : " << endl;
   for(int loop_sensors_array_ = 0; loop_sensors_array_ <7; loop_sensors_array_++)
-    {
-      cout << sensors_array_(loop_sensors_array_) << endl;
-
-    }
+    cout << sensors_array_(loop_sensors_array_) << endl;
+  
   for(unsigned int i=0;i<7;i++)
     sensorlog_ << sensors_array_(i) << "\t";
   sensorlog_ << endl;
@@ -615,14 +584,10 @@ Calibration()
 void Pneumatic7ArmRtThread::
 ReferenceGenerator()
 {
-  controleur1.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur2.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur3.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur4.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur5.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur6.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-  controleur7.get_reference_angle(COEF_LENT, VITESSE_ANGLE);
+  for(unsigned int i=0;i<7;i++)
+    controllers_[i].get_reference_angle(COEF_LENT, VITESSE_ANGLE);
 }
+
 /********************************************************
  *							*
  *	controler ()					*
@@ -636,111 +601,39 @@ Controler()
 {
 
 
-  //printf("\n jusqu'ici tout va bien 13 controler");
+  ODEBUGL("\n jusqu'ici tout va bien 13 controler",3);
 
-  double  * vit;
-  vit = new double (VITESSE_PRESSION);
+  double  vit = VITESSE_PRESSION;
   //Lancement en parallele des taches de controle des axes
 
   ciodas64_ -> adconv(1);
   Calibration();
   ciodas64_ -> logudpdata();
   ReferenceGenerator();
-  /*Add here all 7 axis control*/
-  if(CTRL_FLAG(0)==1)
-    {
-      controleur1.set_loop(loop_);
-      //cout <<  "\n loop_" << loop_ << endl;
-      if(loop_ == 2)
-	{
-	  controleur1.set_userpressure(pressure_command_array_(0));
-	  //cout << "inside loop_  = 2" << endl;
-	}
-      control_command_ = controleur1.get_commande();
-      angle_read = controleur1.get_angle_reel();
-      //cout << "controlcommand1: " << control_command_ << endl;
-      //cout << "\n angle read CTRL_FLAG 1 :" << angle_read << endl;
-      trait_muscle_i(&controleur1, &control_command_, vit);
-    }
-  if(CTRL_FLAG(1)==1)
-    {
-      controleur2.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur2.set_userpressure(pressure_command_array_(1));
-	}
 
-      control_command_ = controleur2.get_commande();
-      angle_read = controleur2.get_angle_reel();
-      trait_muscle_i(&controleur2, &control_command_, vit);
-    }
-  if(CTRL_FLAG(2)==1)
+  /* Add here all 7 axis control*/
+  for(unsigned int motorID=0;motorID<7;motorID++)
     {
-      controleur3.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur3.set_userpressure(pressure_command_array_(2));
-	}
-
-      control_command_ = controleur3.get_commande();
-      //angle_read = controleur3.get_angle_reel();
-      trait_muscle_i(&controleur3, &control_command_, vit);
-    }
-  if(CTRL_FLAG(3)==1)
-    {
-      controleur4.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur4.set_userpressure(pressure_command_array_(3));
-	}
-      control_command_ = controleur4.get_commande();
-      angle_read = controleur4.get_angle_reel();
-      cout << "controlcommand4: " << control_command_ << endl;
-      trait_muscle_i(&controleur4, &control_command_, vit);
-    }
-  if(CTRL_FLAG(4)==1)
-    {
-      controleur5.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur5.set_userpressure(pressure_command_array_(4));
-	}
-      control_command_ = controleur5.get_commande();
-      angle_read = controleur5.get_angle_reel();
-      trait_muscle_i(&controleur5, &control_command_, vit);
-    }
-  if(CTRL_FLAG(5)==1)
-    {
-      controleur6.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur6.set_userpressure(pressure_command_array_(5));
-	}
-      control_command_ = controleur6.get_commande();
-      angle_read = controleur6.get_angle_reel();
-      trait_muscle_i(&controleur6, &control_command_, vit);
-    }
-  if(CTRL_FLAG(6)==1)
-    {
-      controleur7.set_loop(loop_);
-      if(loop_ == 2)
-	{
-	  controleur7.set_userpressure(pressure_command_array_(6));
-	}
-      control_command_ = controleur7.get_commande();
-      angle_read = controleur7.get_angle_reel();
-      trait_muscle_i(&controleur7, &control_command_, vit);
+      if(CTRL_FLAG(motorID)==1)
+        {
+          controllers_[motorID].set_loop(loop_);
+          ODEBUGL("\n loop_" << loop_ ,3);
+          if(loop_ == 2)
+            {
+              controllers_[motorID].set_userpressure(pressure_command_array_(motorID));
+              ODEBUGL("inside loop_  = 2",3);
+            }
+          control_command_ = controllers_[motorID].get_commande();
+          angle_read = controllers_[motorID].get_angle_reel();
+          ODEBUGL("controlcommand1: " << control_command_ ,3);
+          ODEBUGL("\n angle read CTRL_FLAG 1 :" << angle_read ,3);
+          trait_muscle_i(&controllers_[motorID], &control_command_, &vit);
+        }
     }
 
-  //std:: cout << "\n Angle read position " << angle_read << endl;
+  ODEBUGL("\n Angle read position " << angle_read,3);
 
   ciodac16_ -> daconv(1, '1');
-
-
-  //printf("\n jusqu'ici tout va bien 2 control\n");
-
-
-  //printf("\n jusqu'ici tout va bien control\n");
 
 }
 
@@ -778,11 +671,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   //variables locales
   //bool bonne_saisie = false,ok1 = false,ok2 = false,ok3 =false;
   bool ok3 =false;
-  //char * fich = new char [40];
-  //char * commencer = new char [1];
-  //char * cont2 = new char [1];
-  //char * cont1 = new char [1];
-  char * tmp = new char [1];
+  char tmp ;
   //double user_pressure;
 
   /* variables used in the principal program */
@@ -838,9 +727,9 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       std::cin >> tmp; //scanf("%s",tmp);
 
       std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      if (strcmp(tmp,"o")==0) {loop_=BOUCLE_OUVERTE;ok3=true;}
-      if (strcmp(tmp,"f")==0) {loop_=BOUCLE_FERMEE;ok3=true;}
-      if (strcmp(tmp,"p")==0)  {loop_=BOUCLE_PRESCMD; cout << "loop_ pressure is set :"  << loop_;ok3=true;}
+      if (strcmp(&tmp,"o")==0) {loop_=BOUCLE_OUVERTE;ok3=true;}
+      if (strcmp(&tmp,"f")==0) {loop_=BOUCLE_FERMEE;ok3=true;}
+      if (strcmp(&tmp,"p")==0)  {loop_=BOUCLE_PRESCMD; cout << "loop_ pressure is set :"  << loop_;ok3=true;}
     }
 
 
@@ -856,7 +745,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       rt_task_wait_period(NULL);
 
 
-      //controleur_pince.initialiser();
+      //controller_gripper.initialiser();
 
       now = rt_timer_read();
       present_time  = round((double)now/1.0e9);
@@ -907,38 +796,29 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   //ciodac16_ -> ~ClientUDP();
 
-  //Destruction des controleurs d'axe
-  controleur1.~controller_axis();
-  controleur2.~controller_axis();
-  controleur3.~controller_axis();
-  controleur4.~controller_axis();
-  controleur5.~controller_axis();
-  controleur6.~controller_axis();
-  controleur7.~controller_axis();
+  // Calling controllers destructors
+  for(unsigned int i=0;i<7;i++)
+    controllers_[i].~controller_axis();
+  
+  // Calling actuators destructors.
+  for(unsigned int i=0;i<7;i++)
+    actuators_[i].~actionneur();
 
-  a1.~actionneur();
-  a2.~actionneur();
-  a3.~actionneur();
-  a4.~actionneur();
-  a5.~actionneur();
-  a6.~actionneur();
-  a7.~actionneur();
+  controller_gripper_.~controller_tool();
 
-  controleur_pince.~controller_tool();
-
-  joy1->~I_teleop();
-  joy2->~I_teleop();
-  ppalonnier->~I_teleop();
+  joy1_->~I_teleop();
+  joy2_->~I_teleop();
+  ppalonnier_->~I_teleop();
 
   ciodac16_->~CIODAC16();
   ciodas64_->~CIODAS64();
 
 
   for (int i = 0; i < 7;i++)
-    cap[i].~capteur_position();
+    sensors_[i].~capteur_position();
 
   printf("\n    ====== PROGRAM FINISHED ======    \n\n");
-  printf("\n .... ELectronics is reset ...\n");
+  printf("\n .... Electronics is reset ...\n");
 } //principale finish
 
 void Pneumatic7ArmRtThread::StartingRealTimeThread()
@@ -977,20 +857,5 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
   n = rt_task_delete(&principal_task_);
   if(n!=0)cout << "Failed of RT Task delete" << endl;
   else cout << "END of RT taslk delete";
-
-}
-
-
-/********************************************************
- *							*
- *	depart ()					*
- *							*
- *	tache init du programme				*
- *							*
- ****************************************************** */
-
-int main(void)
-{
-
 
 }

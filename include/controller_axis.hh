@@ -131,7 +131,28 @@ class controller_axis
 
   //constructeurs
   controller_axis (){};
-  controller_axis (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
+  /*! Constructor 
+    \param pjoy: Pointer towards the joystick structure (not supported anymore).
+    \param lactuator: Pointer towards the actuator to controlled.
+    \param num: Identifier of the joint
+    \param angle_init: Rest position of the joint.
+    \param amgle_min_bound: Lower limit of the joint.
+    \param angle_max_bound: Upper limit of the joint.
+    \param s_cap: Direction of the sensor.
+    \param s_pre: Direction of the pressure.
+    \param P: Proportionnal control gain.
+    \param D: Derivative control gain.
+   */
+  controller_axis (I_teleop* pjoy,
+                   actionneur *lactuator,
+                   int num,
+                   double angle_init,
+                   double angle_min_bound, 
+                   double angle_max_bound, 
+                   int s_cap,
+                   int s_pre,
+                   double p,
+                   double d);
 
   void init_controller_axis (controller_axis_data & aControllerAxeData);
 

@@ -68,13 +68,12 @@ class Pneumatic7ArmRtThread
   bool PRES_INDIVIDUAL_FLAG;
 
   // Axis controlers
-  controller_axis controleur1,controleur2,controleur3,
-    controleur4,controleur5,controleur6,controleur7;
-  controller_axis controleur[7];
+  controller_axis controllers_[7];
+
     // Muscle class object
   Muscle pneumatic_muscle;
   // Gripper controler
-  controller_tool controleur_pince;
+  controller_tool controller_gripper_;
 
   // Network connection.
   ClientUDP *clientUDP;
@@ -92,15 +91,15 @@ class Pneumatic7ArmRtThread
   ofstream sensorlog_;
 
   int num_joints_;
+
   // Actuators
-  actionneur a1,a2,a3,a4,a5,a6,a7;
-  actionneur a[7];
+  actionneur actuators_[7];
 
   // Joysticks
-  I_teleop * joy1,*joy2,* ppalonnier;
+  I_teleop * joy1_,*joy2_,* ppalonnier_;
 
   // tableau de capteurs
-  capteur_position cap[7];
+  capteur_position sensors_[7];
 
   // Angles measurements
   double angle[7];
@@ -129,6 +128,12 @@ class Pneumatic7ArmRtThread
   bool fin_ ,tele_op_ ;
   bool sortie_;
   char * buffer_joy_[7];
+
+  /** ! Initialize actuators */
+  void InitActuators();
+
+  /** ! Initialize controllers */
+  void InitControllers();
 
   /** ! Initialize sensors */
   void InitializeSensors(); // fka init_capteurs

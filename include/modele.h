@@ -22,8 +22,8 @@
 
  *		  		        			    *
  ********************************************************************/
-#include "controleur_axe.hh"
-#include "controleur_outil.h"
+#include "controller_axis.hh"
+#include "controller_tool.hh"
 #include "joystick.h"
 #include "fichier.h"
 #include "I_teleop.h"
@@ -32,8 +32,8 @@
  
  	private:
  	//Pointeurs sur les classes utilisees
- 	controleur_axe *caxe1,*caxe2,*caxe3,*caxe4,*caxe5,*caxe6,*caxe7;
- 	controleur_outil * coutil;
+ 	controller_axis *caxe1,*caxe2,*caxe3,*caxe4,*caxe5,*caxe6,*caxe7;
+ 	controller_tool * coutil;
  	joystick * joy1, * joy2;
  	palonnier * pal;
  	fichier * mon_fichier;
@@ -55,9 +55,9 @@
 	//Constructeurs
 	
 	modele () {}
-	modele (controleur_axe *,controleur_axe *,controleur_axe *,
-		controleur_axe *,controleur_axe *,controleur_axe *,controleur_axe *,
-		controleur_outil *,palonnier *,joystick *,joystick *) ;
+	modele (controller_axis *,controller_axis *,controller_axis *,
+		controller_axis *,controller_axis *,controller_axis *,controller_axis *,
+		controller_tool *,palonnier *,joystick *,joystick *) ;
 	
 	//Mise a jour		
 	void mettre_a_jour(double);

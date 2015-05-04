@@ -5,7 +5,7 @@
  ****************************************/
  
 
-#include "controleur_outil.h"
+#include "controller_tool.hh"
 
 
 #define PRESSION_MAX_NUM 4095
@@ -29,7 +29,7 @@
  ********************************************************************/
  
  
- controleur_outil::controleur_outil(carte * card,int v1,int v2) {
+ controller_tool::controller_tool(carte * card,int v1,int v2) {
  	pcarte = card;
  	pince_ouverte = false;
  	voie_pince_1 = v1;
@@ -52,7 +52,7 @@
  ********************************************************************/
  
  
- void controleur_outil::initialiser () {
+ void controller_tool::initialiser () {
  	/*pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
  	pcarte->daconv(voie_pince_2,PRESSION_MIN_NUM);
  	taskDelay(sysClkRateGet());
@@ -82,7 +82,7 @@
  ********************************************************************/
  
  
- void controleur_outil::controler_pince(bool ouvrir_pince) {
+ void controller_tool::controler_pince(bool ouvrir_pince) {
 	
 	
 	/*//fin de l'impulsion d'ouverture 
@@ -130,7 +130,7 @@
  ********************************************************************/
  
  
- double controleur_outil::get_etat_pince()  {
+ double controller_tool::get_etat_pince()  {
 	if (pince_ouverte) 
 	 	return 1;
 	else
@@ -153,7 +153,7 @@
  ********************************************************************/
  
  
- double controleur_outil::get_etat_voie_1 () {
+ double controller_tool::get_etat_voie_1 () {
  	return (etat_voie_1);
  }
 
@@ -173,7 +173,7 @@
  ********************************************************************/
  
  
- double controleur_outil::get_etat_voie_2 () {
+ double controller_tool::get_etat_voie_2 () {
  	return (etat_voie_2);
  }
  	

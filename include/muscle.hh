@@ -30,8 +30,8 @@
 #include "joystick.h"
 #include "capteur.h"
 #include "capteur_position.h"
-#include "controleur_axe.hh"
-#include "controleur_outil.h"
+#include "controller_axis.hh"
+#include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
 #include "clientudp3.h"
@@ -47,10 +47,10 @@ protected:
   /*! Boolean for the end. */
   bool end_;  // fin
 public:
-  void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  void init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 
-  void reset_muscle_i(controleur_axe *controleur_i, double *vitesse);
+  void reset_muscle_i(controller_axis *controleur_i, double *vitesse);
 
-  void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  void trait_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 };
 #endif /* MUSCLE_HH */

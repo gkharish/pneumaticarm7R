@@ -224,8 +224,8 @@
 #include "joystick.h"
 #include "capteur.h"
 #include "capteur_position.h"
-#include "controleur_axe.hh"
-#include "controleur_outil.h"
+#include "controller_axis.hh"
+#include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
 #include "clientudp3.h"
@@ -291,14 +291,14 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
  ********************************************************/
 
 void Pneumatic7ArmRtThread::
-init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
+init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse)
 {
   controleur_i -> initialisation_muscles(*delta,*vitesse);
   //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void Pneumatic7ArmRtThread::
-reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
+reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
 {
   controleur_i -> degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
@@ -306,7 +306,7 @@ reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 }
 
 void Pneumatic7ArmRtThread::
-trait_muscle_i (controleur_axe *controleur_i,
+trait_muscle_i (controller_axis *controleur_i,
                 double * delta,
                 double * vitesse)
 {
@@ -417,14 +417,14 @@ void Pneumatic7ArmRtThread::Initializing()
   a7 = actionneur(VOIE_7_1,VOIE_7_2,ciodac16_);
 
   //controleurs d'axe
-  controleur1 = controleur_axe(joy1,&a1,1,
+  controleur1 = controller_axis(joy1,&a1,1,
 			       ANGLE_REPOS_1,ANGLE_MIN_1, ANGLE_MAX_1,SENS_CAPTEUR_1,SENS_PRESSION_1,P_AXE_1,D_AXE_1);
-  controleur2 = controleur_axe(joy1,&a2,2,ANGLE_REPOS_2,ANGLE_MIN_2, ANGLE_MAX_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
-  controleur3 = controleur_axe(joy1,&a3,3,ANGLE_REPOS_3,ANGLE_MIN_3, ANGLE_MAX_3,SENS_CAPTEUR_3,SENS_PRESSION_3,P_AXE_3,D_AXE_3);
-  controleur4 = controleur_axe(joy2,&a4,4,ANGLE_REPOS_4,ANGLE_MIN_4, ANGLE_MAX_4,SENS_CAPTEUR_4,SENS_PRESSION_4,P_AXE_4,D_AXE_4);
-  controleur5 = controleur_axe(ppalonnier,&a5,5,ANGLE_REPOS_5,ANGLE_MIN_5, ANGLE_MAX_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
-  controleur6 = controleur_axe(joy2,&a6,6,ANGLE_REPOS_6,ANGLE_MIN_6, ANGLE_MAX_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
-  controleur7 = controleur_axe(joy2,&a7,7,ANGLE_REPOS_7,ANGLE_MIN_7, ANGLE_MAX_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
+  controleur2 = controller_axis(joy1,&a2,2,ANGLE_REPOS_2,ANGLE_MIN_2, ANGLE_MAX_2,SENS_CAPTEUR_2,SENS_PRESSION_2,P_AXE_2,D_AXE_2);
+  controleur3 = controller_axis(joy1,&a3,3,ANGLE_REPOS_3,ANGLE_MIN_3, ANGLE_MAX_3,SENS_CAPTEUR_3,SENS_PRESSION_3,P_AXE_3,D_AXE_3);
+  controleur4 = controller_axis(joy2,&a4,4,ANGLE_REPOS_4,ANGLE_MIN_4, ANGLE_MAX_4,SENS_CAPTEUR_4,SENS_PRESSION_4,P_AXE_4,D_AXE_4);
+  controleur5 = controller_axis(ppalonnier,&a5,5,ANGLE_REPOS_5,ANGLE_MIN_5, ANGLE_MAX_5,SENS_CAPTEUR_5,SENS_PRESSION_5,P_AXE_5,D_AXE_5);
+  controleur6 = controller_axis(joy2,&a6,6,ANGLE_REPOS_6,ANGLE_MIN_6, ANGLE_MAX_6,SENS_CAPTEUR_6,SENS_PRESSION_6,P_AXE_6,D_AXE_6);
+  controleur7 = controller_axis(joy2,&a7,7,ANGLE_REPOS_7,ANGLE_MIN_7, ANGLE_MAX_7,SENS_CAPTEUR_7,SENS_PRESSION_7,P_AXE_7,D_AXE_7);
 
   //printf("\n init()debug7 \n");
   //Initialisation des controleurs
@@ -908,13 +908,13 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   //ciodac16_ -> ~ClientUDP();
 
   //Destruction des controleurs d'axe
-  controleur1.~controleur_axe();
-  controleur2.~controleur_axe();
-  controleur3.~controleur_axe();
-  controleur4.~controleur_axe();
-  controleur5.~controleur_axe();
-  controleur6.~controleur_axe();
-  controleur7.~controleur_axe();
+  controleur1.~controller_axis();
+  controleur2.~controller_axis();
+  controleur3.~controller_axis();
+  controleur4.~controller_axis();
+  controleur5.~controller_axis();
+  controleur6.~controller_axis();
+  controleur7.~controller_axis();
 
   a1.~actionneur();
   a2.~actionneur();
@@ -924,7 +924,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   a6.~actionneur();
   a7.~actionneur();
 
-  controleur_pince.~controleur_outil();
+  controleur_pince.~controller_tool();
 
   joy1->~I_teleop();
   joy2->~I_teleop();

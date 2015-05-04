@@ -21,9 +21,14 @@
  *		  		        			    *
  ********************************************************************/
  
-modele :: modele (controleur_axe * ca1,controleur_axe *ca2,controleur_axe *ca3,
-		 controleur_axe *ca4,controleur_axe *ca5,controleur_axe *ca6,controleur_axe *ca7,
-		 controleur_outil * co,palonnier * p,joystick *j1,joystick *j2) {
+modele :: modele (controller_axis * ca1,
+                  controller_axis *ca2,
+                  controller_axis *ca3,
+                  controller_axis *ca4,
+                  controller_axis *ca5,
+                  controller_axis *ca6,
+                  controller_axis *ca7,
+                  controller_tool * co,palonnier * p,joystick *j1,joystick *j2) {
 	printf("\n jusqu'ici tout va bien 6");
 	caxe1 = ca1;caxe2 = ca2;caxe3 = ca3;caxe4 = ca4;caxe5 = ca5;caxe6 = ca6;caxe7 = ca7;
 	coutil = co;

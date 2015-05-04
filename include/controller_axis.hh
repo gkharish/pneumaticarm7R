@@ -1,5 +1,5 @@
 /****************************************
- * Fichier Controleur_axe.h         	*
+ * Fichier controller_axis.h         	*
  * Jeremie Guiochet			*
  * cree le 17/07/2002 par Mehdi SEFFAR	*
  ****************************************/
@@ -10,8 +10,8 @@
 
 */
 
-#ifndef CONTROLEUR_AXE
-#define CONTROLEUR_AXE
+#ifndef CONTROLLER_AXIS
+#define CONTROLLER_AXIS
 
 #define OUVERTE 0
 #define FERMEE 1
@@ -40,7 +40,7 @@
  ********************************************************************/
 
 #include "actionneur.h"
-#include "controleur_outil.h"
+#include "controller_tool.hh"
 #include "joystick.h"
 #include "capteur_position.h"
 #include "I_teleop.h"
@@ -49,7 +49,7 @@
 //using Eigen;
 using namespace std;
 
-typedef struct controller_axe_data_s
+typedef struct controller_axis_data_s
 {
   // Reference to the joystick
   I_teleop* pjoystick;
@@ -93,13 +93,13 @@ typedef struct controller_axe_data_s
   /*!  Rule during muscle initialization */
   double delta_repos; 
   
-} controller_axe_data;
+} controller_axis_data;
 
-class controleur_axe
+class controller_axis
 {
 
  private :
-  controller_axe_data ControllerAxeData_;
+  controller_axis_data ControllerAxisData_;
   int numero;			//numero de l'axe
   actionneur * pactionneur;	//actionneur associe
   I_teleop * pjoystick;     //joystick associe
@@ -124,18 +124,18 @@ class controleur_axe
   void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
   void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
   void pressure_commande (void);         //calcul de la commande en Boucle prescmd
-  void (controleur_axe::*pcalculer_commande)(); //Pointeur de methode qui servira pour
+  void (controller_axis::*pcalculer_commande)(); //Pointeur de methode qui servira pour
   //pointer sur calculer_commande en BO ou BF
 
  public :
 
   //constructeurs
-  controleur_axe (){};
-  controleur_axe (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
+  controller_axis (){};
+  controller_axis (I_teleop*,actionneur *,int,double,double, double, int,int,double,double);
 
-  void init_controller_axe (controller_axe_data & aControllerAxeData);
+  void init_controller_axis (controller_axis_data & aControllerAxeData);
 
-  //Fonction d'association du capteur au controleur d'axe
+  //Fonction d'association du capteur au controller d'axe
   void set_capteur (capteur_position*);
 
   //Lecture de l'angle

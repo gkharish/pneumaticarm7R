@@ -41,8 +41,8 @@ ADD_LIBRARY(${LIBRARY_NAME}
   CIODAC16.cpp
   CIODAS64.cpp
   clientudp3.cpp
-  controleur_axe.cpp
-  controleur_outil.cpp
+  controller_axis.cpp
+  controller_tool.cpp
   fichier.cpp
   I_teleop.cpp
   joystick.cpp

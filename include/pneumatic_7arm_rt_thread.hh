@@ -43,8 +43,8 @@
 #include "joystick.h"
 #include "capteur.h"
 #include "capteur_position.h"
-#include "controleur_axe.hh"
-#include "controleur_outil.h"
+#include "controller_axis.hh"
+#include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
 #include "muscle.hh"
@@ -68,13 +68,13 @@ class Pneumatic7ArmRtThread
   bool PRES_INDIVIDUAL_FLAG;
 
   // Axis controlers
-  controleur_axe controleur1,controleur2,controleur3,
+  controller_axis controleur1,controleur2,controleur3,
     controleur4,controleur5,controleur6,controleur7;
-  controleur_axe controleur[7];
+  controller_axis controleur[7];
     // Muscle class object
   Muscle pneumatic_muscle;
   // Gripper controler
-  controleur_outil controleur_pince;
+  controller_tool controleur_pince;
 
   // Network connection.
   ClientUDP *clientUDP;
@@ -164,11 +164,11 @@ public:
   void StartingRealTimeThread();
 
   /**! Initialize muscle */
-  void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  void init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 
-  void reset_muscle_i(controleur_axe *controleur_i, double *vitesse);
+  void reset_muscle_i(controller_axis *controleur_i, double *vitesse);
 
-  void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
+  void trait_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 
 
 };

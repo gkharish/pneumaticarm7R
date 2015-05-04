@@ -23,14 +23,14 @@
 
 #include <muscle.hh>
 void Muscle::
-init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
+init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse)
 {
   controleur_i -> initialisation_muscles(*delta,*vitesse);
   //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void Muscle::
-reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
+reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
 {
   controleur_i -> degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
@@ -38,7 +38,7 @@ reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 }
 
 void Muscle::
-trait_muscle_i (controleur_axe *controleur_i,
+trait_muscle_i (controller_axis *controleur_i,
                 double * delta,
                 double * vitesse)
 {

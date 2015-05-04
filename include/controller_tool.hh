@@ -1,24 +1,24 @@
 /****************************************
- * Fichier Controleur_outil.h          	*
+ * Fichier controller_tool.h          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/ 
 
-#ifndef CONTROLEUR_OUTIL
-#define CONTROLEUR_OUTIL
+#ifndef CONTROLLER_TOOL
+#define CONTROLLER_TOOL
 
 #include "carte.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
 /********************************************************
  *							*
- * classe controleur_outil:				*
+ * classe controller_tool:				*
  ********************************************************
  * cette classe offre les attributs et methodes	        *
  * qui permettent de controler la pince du robot	*
  *							*
  ********************************************************/
- class controleur_outil {
+ class controller_tool {
  	
  	private : 
  	bool pince_ouverte;   		// vraie si la pince est ouverte
@@ -29,8 +29,8 @@
  	public :
  	
  	//Constructeurs
- 	controleur_outil () {};
- 	controleur_outil(carte *,int,int);
+ 	controller_tool () {};
+ 	controller_tool(carte *,int,int);
  	
  	//Controle de la pince
  	void controler_pince(bool);

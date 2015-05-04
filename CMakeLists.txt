@@ -38,8 +38,8 @@ SET(${PROJECT_NAME}_HEADERS
 	include/CIODAC16.h
 	include/CIODAS64.h
 	include/clientudp3.h
-	include/controleur_axe.h
-	include/controleur_outil.h
+	include/controller_axis.hh
+	include/controller_tool.hh
 	include/fichier.h
 	include/I_teleop.h
 	include/joystick.h

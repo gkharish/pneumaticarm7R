@@ -49,8 +49,32 @@
 //using Eigen;
 using namespace std;
 
-class controleur_axe
+typedef struct controler_axe_data_s
+{
+  // Reference to the joystick
+  I_teleop* pjoystick;
+  // Actuator reference.
+  actionneur *pactionneur;
+  // Identifier of the actuator
+  int numero;
+  // Rest value of the angle
+  double angle_repos;
+  // Reel value of the angle
+  double angle_reel,angle_reel_prec;
+  // Maximinal and minimal boundaries for the joint.
+  double angle_min_bound;
+  double angle_max_bound;
+  // Direction of the sensor
+  int sens_capteur;
+  // Direction of the pressure
+  int sens_pression;
+  // PD gains
+  double p;
+  double d;
+  double angle_th;
+} controler_axe_data;
 
+class controleur_axe
 {
 
  private :
@@ -73,6 +97,7 @@ class controleur_axe
   int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
   double user_pressure;
   //Donnees calcul commande  PID
+
   double P;  			//coefficient du proportionnel
   double D;  			//coefficient de la derivee
   double derivee_erreur;

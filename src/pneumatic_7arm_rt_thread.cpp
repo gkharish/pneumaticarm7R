@@ -1,4 +1,4 @@
-</************************************************************
+/************************************************************
  *	       PROGRAMME DE TEST DE LA REALISATION	    *
  *		     DU CONTROLEUR DE ROBOT	            *
  ************************************************************
@@ -231,9 +231,9 @@
 #include "clientudp3.h"
 #include "test_config.h"
 
-#include <pneumatic_7arm_rt_thread.hh> 
+#include <pneumatic_7arm_rt_thread.hh>
 using namespace std;
-
+using namespace Eigen;
 /********************************************************
  *							*
  *	Pneumatic7ARmRtThread Constructorxs	*
@@ -306,8 +306,8 @@ reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 }
 
 void Pneumatic7ArmRtThread::
-trait_muscle_i (controleur_axe *controleur_i, 
-                double * ,//delta, 
+trait_muscle_i (controleur_axe *controleur_i,
+                double * ,//delta,
                 double * vitesse)
 {
   double vit = *vitesse;
@@ -334,7 +334,7 @@ trait_muscle_i (controleur_axe *controleur_i,
 
 /*** SiGNAL catch  **/
 
-void catch_signal(int 
+void catch_signal(int
                   //sig
 )
 {
@@ -377,7 +377,7 @@ void Pneumatic7ArmRtThread::Initializing()
     }
   for(int lppres =0; lppres < 7; lppres++)
     {
-      pressure_command_array_(lppres) = 
+      pressure_command_array_(lppres) =
         test1 -> get_pressure_command_array(lppres);
     }
 
@@ -512,7 +512,7 @@ void Pneumatic7ArmRtThread::InitializeSensors ()
 /********************************************************
  *							*
  *	 Inflating()					*
- *                                                      * 
+ *                                                      *
  * Simultaneously inflating all the muscles.            *
  *							*
  ********************************************************/
@@ -533,6 +533,7 @@ Inflating(void)
 
 
   //Lancement en parallele des taches d'initialisation des muscles
+  pneumatic_muscle.init_muscle_i(&controleur1, d1, vit);
   init_muscle_i(&controleur1, d1, vit);
   init_muscle_i(&controleur2, d2, vit);
   init_muscle_i(&controleur3, d3, vit);
@@ -788,7 +789,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   int timeofsimulation_s = 30; /* time in seconds*/
   int FLAG = 1;
 
-  RTIME   now, previous,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
+  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
   //udppacket_control send_packet;
@@ -860,7 +861,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       present_time  = round((double)now/1.0e9);
       t = present_time - time_start_loop;
       time_diff = now - previous;
-      cout << "\n time difference :" << time_diff/1.0e6 << endl;
+      cout << "\n time difference :" << (double)time_diff/(double)1.0e6 << endl;
       if(CALIBRATION_FLAG == 1)
 	{
 	  ciodas64_ -> adconv(1);
@@ -950,61 +951,6 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
   printf("	*			                                                      		*\n");
   printf("	*****************************************************************\n");
   printf("\n\n\n");
-  /*cout << "\n Enter 0 for 'Caliberation mode', 1 for 'Control mode' and 2 for 'Inflating only mode'" << endl;
-    <	std::cin >> mode_flag; //scanf("%s",tmp);
-    cout <<  "\n mode_flag: " << mode_flag << endl;
-    std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-    if(mode_flag == 0)
-    {
-    CALIBRATION_FLAG = 1;
-    }
-    if(mode_flag == 2)
-    {
-    INFLATING_FLAG = 1;
-    }
-    if(mode_flag == 1)
-    {
-    CONTROL_MODE_FLAG = 1;
-    INFLATING_FLAG = 1;
-  */
-  /*while(flag_num)
-    {
-    cout << "\n  How many joints do you want to control (Please enter the number between 1 to 7)? :" << endl;
-    //getline(cin,num);
-    flag_num = 0;
-    scanf("%d", &num_joints);
-    if(num_joints>7 || num_joints < 1)
-    {
-    cout << "\n Invalid input is entered, please try again:" << endl;
-    flag_num = 1;
-    }
-
-    }
-    //cout << "Please enter the joint's number you want to control \n For example if you want to control joint number 1, 3 and 5 please press 1 and hit enter then  135." << endl;
-    //getline(cin, line);
-    //std::istringstream stream(line);
-    cout << "\n  Do you want to manually pressurize the muscles? (Type 1 for YES and 0 for NO): " << endl;
-    scanf("%d", &man_pres);
-
-    for(int i= 0; i<num_joints;i++)
-    {
-    cout << "\n Please enter the " <<i+1<<"th " << "joint's number you want to control" << endl;
-    //getline(cin, index);
-    //stream >> index;
-    scanf("%d", &index);
-    CTRL_FLAG(index-1) = 1;
-    if(man_pres == 1)
-    {
-    cout << "\n Please enter the delta pressure value between 0 to 2.5 for "<<i+1<<"th " << "joint's" << endl;
-    std::cin >> user_pressure; //scanf("%s",tmp);
-    cout <<  "\n input userpressure: " << user_pressure << endl;
-    std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');//scanf("%d", user_pressure);
-
-    pressure_command_array_(index-1) = user_pressure;
-    }
-    }*/
-  cout<< "Control flag: "<<CTRL_FLAG(0) << endl;
-  cout << "Pressure array: ";
   for(unsigned int i=0;i<7;i++)
     cout << pressure_command_array_(i) <<",";
   cout << endl;

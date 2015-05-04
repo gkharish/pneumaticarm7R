@@ -1,13 +1,13 @@
 /*!
  * Main thread to control the pnematic 7DOFS arm at INSA
  * Created from : Erwan GUIOCHET/ Mehdi Seffar / JEREMIE GUIOCHET
- * Date     : 02/07/2002 				    
+ * Date     : 02/07/2002
  * Modif. M.Seffar    : 20/09/2002
- * Modif. J. Guiochet : 15/12/2002			    
+ * Modif. J. Guiochet : 15/12/2002
  * Modif. G. Kumar    : 28/04/2015
  * Modif. O. Stasse   : 28/04/2015
- * 
- * LAAS, CNRS 2015 
+ *
+ * LAAS, CNRS 2015
  *
  */
 
@@ -47,10 +47,11 @@
 #include "controleur_outil.h"
 #include "fichier.h"
 #include "modele.h"
+#include "muscle.hh"
 #include "clientudp3.h"
 #include "test_config.h"
-
-
+#include <Eigen/Eigen>
+using namespace Eigen;
 class Pneumatic7ArmRtThread
 {
   int loop_;
@@ -69,7 +70,9 @@ class Pneumatic7ArmRtThread
   // Axis controlers
   controleur_axe controleur1,controleur2,controleur3,
     controleur4,controleur5,controleur6,controleur7;
-
+  controleur_axe controleur[7];
+    // Muscle class object
+  Muscle pneumatic_muscle;
   // Gripper controler
   controleur_outil controleur_pince;
 
@@ -91,6 +94,7 @@ class Pneumatic7ArmRtThread
   int num_joints_;
   // Actuators
   actionneur a1,a2,a3,a4,a5,a6,a7;
+  actionneur a[7];
 
   // Joysticks
   I_teleop * joy1,*joy2,* ppalonnier;
@@ -161,11 +165,11 @@ public:
 
   /**! Initialize muscle */
   void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
-  
+
   void reset_muscle_i(controleur_axe *controleur_i, double *vitesse);
 
   void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
-  
+
 
 };
 #endif /* _PNEMUATIC_7ARM_RT_THREAD_HH_ */

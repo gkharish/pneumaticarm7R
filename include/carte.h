@@ -7,13 +7,19 @@
 /***** CLASSE CARTE : INTERFACE pour l'utilisation d'autre modele de carte ****/
 #ifndef CARTE_H
 #define CARTE_H
-
-class carte {
+#include <Eigen/Core>
+#include <math.h>
+using namespace Eigen;
+class carte 
+{
 public :
-  virtual void daconv(int ,unsigned int ){}
+  virtual void daconv(int ,char ){}
+  virtual void send_command_array(int, double){}
   virtual void initialisation(){}
-  virtual unsigned int adconv(int ){ return 0;}
+  //virtual float adconv(int ){ return 0;}
+  virtual void adconv(int ){ }
   virtual unsigned char dread(){ return 0;}
+  virtual double read_sensors(int ){return 0;}
 };
 
 #endif

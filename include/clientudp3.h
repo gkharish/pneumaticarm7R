@@ -11,42 +11,44 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 #include "port.h"
 
 #include <iostream>
 #define BUFLEN 2048
-#define MSGS 5	/* number of messages to send */
+
 
 
 using namespace std;
 
 class ClientUDP
 {
-    public: 
+    public:
             //ClientUDP();
             ClientUDP();
             virtual ~ClientUDP();
-                
-                
+
+
             bool client_start();
             bool client_send(char* buf, int size);
             bool client_recv(char* buf, int size);
-                
-                
-                  
+
+
+            int get_recvlen()
+              { return recvlen;}
     private:
-                
-            int _sFd, n;          // Socket 
-        
-            struct sockaddr_in myaddr, remaddr;
-            int fd, i;
+
+            int n;          // Socket
+
+
+            int fd_recv_, fd_send_, i;
             //char buf[BUFLEN];	/* message buffer */
-            socklen_t slen;
+            socklen_t slen, addrlen;
             int recvlen;		/* # bytes in acknowledgement message */
             char* server;	/* change this to use a different server */
+            struct sockaddr_in myaddr_send, myaddr_recv, remaddr_send, remaddr_recv;
 
 };
 
 #endif
-

@@ -59,7 +59,7 @@ double palonnier::lire_position (void) {
     double valeur;
     unsigned int val;
     //recuperation de la valeur
-    val = pcarte->adconv(channel);
+    //val = pcarte->adconv(channel);
     //conversion en tension
     valeur = (val * UMAX) / 4095.0;
     return valeur;

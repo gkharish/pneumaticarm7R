@@ -37,29 +37,103 @@
 //#include "sysLib.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
-
-
+#include <stdlib.h>
+#include <stdio.h>
+#define BUFLEN 2048
+#include <fstream>
+#include <sstream>
+#include <Eigen/Core>
+#include <math.h>
+using namespace std;
+using namespace Eigen;
 /************************************************************************
  *									*
  *			CLASSE CIODAC16					*
  *									*
  ************************************************************************/
 
-struct udppacket_control                    // clientheader = '0';
+typedef struct udppacket_init                    // clientheader = '0';
 {
-    char CLIENT_HEADER;
-    //double control_cmd[3];
-    unsigned int control_cmd;
-}client_packet_control;
+  char CLIENT_HEADER[2];
+  //double control_cmd;
+  unsigned short ADC;
+  unsigned short counters;
+  unsigned short errors;
+  unsigned short sampling_period;
+  friend std::ostream& operator<<(std::ostream& os, const struct udppacket_init & obj)
+  {
+    // write obj to stream
+    os << " " << obj.CLIENT_HEADER
+       << " " << obj.ADC
+       << " " << obj.counters
+       << " " << obj.errors
+       << " " << obj.sampling_period;
 
-class CIODAC16 : public carte, public  ClientUDP
-{	 
-	public :
-		CIODAC16():  ClientUDP()
-		{}  // constructeur
-		virtual ~CIODAC16();
-		virtual void daconv(int chan ,unsigned int valeur);
-		udppacket_control send_packet;
+    return os;
+  }
+
+} client_packet_init;
+
+typedef struct udppacket_control                    // clientheader = '0';
+{
+  char CLIENT_HEADER[2];
+  //double control_cmd[3];
+  //unsigned int control_cmd[16];
+  unsigned short control_cmd[16];
+
+  friend std::ostream& operator<<(std::ostream& os, const udppacket_control & obj)
+  {
+    // write obj to stream
+    os << " " << obj.CLIENT_HEADER
+       << " " << obj.control_cmd[0]
+       << " " << obj.control_cmd[1]
+       << " " << obj.control_cmd[2]
+       << " " << obj.control_cmd[3]
+       << " " << obj.control_cmd[4]
+       << " " << obj.control_cmd[5]
+       << " " << obj.control_cmd[6]
+       << " " << obj.control_cmd[7]
+       << " " << obj.control_cmd[8]
+       << " " << obj.control_cmd[9]
+       << " " << obj.control_cmd[10]
+       << " " << obj.control_cmd[11]
+       << " " << obj.control_cmd[12]
+       << " " << obj.control_cmd[13]
+       << " " << obj.control_cmd[14]
+       << " " << obj.control_cmd[15]
+
+      ;
+    return os;
+  }
+
+} client_packet_control;
+
+typedef struct udppacket_countersreset              // clientheader = '1';
+{
+  char CLIENT_HEADER[2];
+  unsigned short data;
+} client_packet_countersreset;
+
+
+class CIODAC16 : public carte//, public  ClientUDP
+{
+ public :
+  CIODAC16();//:  ClientUDP()
+  //{}  // constructeur
+  virtual ~CIODAC16();
+  virtual void daconv(int chan , char header);
+  void pressure_inidividualmuscle(int, double);
+  void send_command_array(int, double);
+  char*  buffer_send;
+  udppacket_control send_packet;
+  udppacket_countersreset send_packet_countersreset, send_packet_digitaloutputcontrol;
+  udppacket_init send_packet_init;
+
+  //VectorXd send_array;
+  double send_array[16];
+  double get_send_array();
+  ClientUDP* client_obj;
+  void get_client(ClientUDP* parent_client);
 };
 
 #endif

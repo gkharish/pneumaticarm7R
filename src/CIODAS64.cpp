@@ -12,7 +12,7 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
 */
 
 #include "CIODAS64.h"
-#include "clientudp3.h"
+
 /****************************************************************************************
  * 											*
  * 			CONVERSION ANALOGIQUE -> NUMERIQUE				*
@@ -27,41 +27,150 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  * 			3 - Reecriture pour la conversion				*
  * 			4 - Delai d'attente pour la conversion				*
  * 			5 - Recuperation de la valeur lue				*
- * 			6 - Decalage de la valeur lue :					* 
+ * 			6 - Decalage de la valeur lue :					*
  * 											*
  *		les quatres bits de poids faible ne serve pas avec la carte 12 bits	*
  *			il faut donc decaler tous les bits de 4 positions (>> 4)		*
  *
  ****************************************************************************************/
-unsigned int CIODAS64::adconv(int chan)
+CIODAS64::CIODAS64()
 {
-	//unsigned int mot;	// mot de 12 bits
-	
-	/* select channel */	
-	//mot = (chan + 2) & 0xff;
-	//mot = (mot << 8);
-	//mot = (mot | chan )& 0xffff;
-	/*Ecriture des adresses*/
-	//sysOutWord (CHAN_LIMITS,mot); 
-		
-	/* start convertion */
-	/*Lecture du mot*/
-	//mot = sysInWord(AD_DATA_REG);
-	
-	/*Re-Ecriture du mot */
-	//sysOutWord (AD_DATA_REG, mot);
-	//sysDelay();
-	//sysDelay();
-	
-	/*Recuperation du mot*/
-	//mot = sysInWord (AD_DATA_REG);
 
-	//return (mot>>4);
-	
-	unsigned int val = 1;
-	return(val);
 }
 
+CIODAS64::~CIODAS64()
+{
+
+}
+
+void CIODAS64::adconv(int chan)
+{
+	//cout << "\n ciodas64:adconv()debug1 " ;
+  //	unsigned int val;
+  //	float val1;
+
+	//cout << "\n cioas64:adconv()debug1.2 " ;
+
+  memset(recv_buffer,0,BUFLEN);
+	client_obj->client_recv(recv_buffer, BUFLEN);
+
+	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+
+	/*int lind=0;
+	//printf("Sensor raw packet \n");
+	{
+	  unsigned char auc=recv_buffer[lind];
+	  printf("0x%02x ",auc);
+		lind+=4;
+  }
+
+	{
+	  unsigned int TheTrueLabel;
+		char * cTheTrueLabel= (char *)&TheTrueLabel;
+
+		cTheTrueLabel[0]=recv_buffer[4];
+		cTheTrueLabel[1]=recv_buffer[5];
+		cTheTrueLabel[2]=recv_buffer[6];
+		cTheTrueLabel[3]=recv_buffer[7];
+
+	  printf("( 0x%02x%02x%02x%02x , %d, %d) ",
+		  (unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			(*recv_packet_DAQ).label,
+			TheTrueLabel);
+  }
+	for(int lp =0; lp < 7; lp++  )
+	{
+		float TheTrueFloat;
+		char * cTheTrueFloat= (char *)&TheTrueFloat;
+
+		cTheTrueFloat[0]=recv_buffer[lind];
+		cTheTrueFloat[1]=recv_buffer[lind+1];
+		cTheTrueFloat[2]=recv_buffer[lind+2];
+		cTheTrueFloat[3]=recv_buffer[lind+3];
+
+
+		//printf("\t( 0x%02x%02x%02x%02x, %f )",
+		printf("\t%f",
+		  (unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			(unsigned char)recv_buffer[lind++],
+			TheTrueFloat);
+	}
+  printf("\n");*/
+
+    if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
+    {
+    	recv_packet_DAQ = (udppacket_DAQ *)recv_buffer ;
+			//cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
+
+    	cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
+    	printf("%x %u %f %f %f %f %f %f %f \n ",
+				(*recv_packet_DAQ).SERVER_HEADER[0],
+				( (*recv_packet_DAQ).label), (*recv_packet_DAQ).data[0],
+				(*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],
+				(*recv_packet_DAQ).data[3], (*recv_packet_DAQ).data[4],
+				(*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6]);
+
+			//cout << (*recv_packet_DAQ).data[0];
+    	//struct udppacket_DAQ daq = recv_packet_DAQ;
+    	//std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;
+    	/*recv_data(0) = (*recv_packet_DAQ).data[0];
+		recv_data(1) = (*recv_packet_DAQ).data[1];
+    	val1 = (*recv_packet_DAQ).data[0];
+    	val = (unsigned int ) val1;*/
+   	}
+
+
+    else if	(recv_buffer[0] == 'b'&&recv_buffer[1] == 'b'&&recv_buffer[2] == 'b'&&recv_buffer[3] == 'b')
+    {
+		recv_packet_COUNTER = (udppacket_COUNTER *)recv_buffer;
+		cout << "\n Encoder's data in loop b: " << endl;
+    	//recv_data(0) = 0;
+    }
+
+    else if(recv_buffer[0] == 'c'&&recv_buffer[1] == 'c'&&recv_buffer[2] == 'c'&&recv_buffer[3] == 'c')
+	{
+		recv_packet_error = (udppacket_error *)recv_buffer;
+		cout << "\n Error's data in loop c: " << endl;
+		//recv_data(0) = 0;
+	}
+
+
+    //return(recv_data);
+}
+
+double CIODAS64::read_sensors(int axis_num)
+{
+	//cout << "\n cioads64:read_sensors()0 ";
+	double val;
+	float val1;
+	int index = axis_num;
+	//cout << "\n cioads64:read_sensors()1 " << index;
+	//recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+    val1 = (*recv_packet_DAQ).data[7- index];
+    val = (double ) val1;
+    //cout << "\n cioads64:read_sensors()2 " << val1;
+
+    //float val2 = rand() % 10;
+		//cout << "\n random  value in read_sensors: " << val2/10 << endl;
+    return(val1);
+}
+void CIODAS64::openlogudpdata()
+{
+	udprecvlog.open("udprecv_datalog.txt");
+}
+void CIODAS64::logudpdata()
+{
+
+	udprecvlog << (*recv_packet_DAQ).data[0] << "\t" << (*recv_packet_DAQ).data[1] << "\t"
+	<< (*recv_packet_DAQ).data[2] << "\t" << (*recv_packet_DAQ).data[3] << "\t"
+	<< (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[5] << "\t"
+	<< (*recv_packet_DAQ).data[6] << "\n" << endl;
+}
 /*Permet une initialisation de la carte
  ****************************************************************************************
  * 	******* MODE ENHANCED *********							*
@@ -92,7 +201,7 @@ void CIODAS64::initialisation ()
 	//sysOutByte (COMP_CNTRL,ENHANCED_MODE);
 	//sysDelay();
 	//sysOutByte (COMP_CNTRL,(unsigned char)(ENHANCED_MODE|SE_MODE|UNIPOLAR_RANGE|IN_5V));
-   	   	
+
 	/** configuration du registre des status ****/
 	// passage en mode EXTEND
 	//sysOutByte (STATUS_REG,EXTEND);
@@ -101,7 +210,7 @@ void CIODAS64::initialisation ()
 	// lib�ration des Msb ( 0 sur EXTEND)
 	//sysOutByte (STATUS_REG,0x00);
 	/******** Fin de configuration du registre des status *****/
-	
+
 	/******** Configuration du registre d'interruption et de control des Pacers */
 	// Configuration sans interruption, sans bruste mode, avec une conversion A/D en sofware
 	//sysOutByte (PACER_CNTRL,NO_INTERRUPT);
@@ -122,5 +231,7 @@ unsigned char CIODAS64::dread ()
 }
 
 
-
-	
+void CIODAS64::get_client(ClientUDP* parent_client)
+{
+	client_obj = parent_client;
+}

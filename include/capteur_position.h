@@ -31,7 +31,7 @@ class capteur_position: public capteur
 		
   //Lecture de la position de l'axe
   double lire_position(void);
-		
+		double read_sensors_array(int);
   /* recup attr. */
   carte * get_carte (void);
   double get_rapport(void);
@@ -40,6 +40,7 @@ class capteur_position: public capteur
 		
   /* modif attr. */
   void set_offset(double);
+  void set_pente(double);
 };
 
 #endif

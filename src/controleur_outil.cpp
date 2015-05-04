@@ -53,10 +53,10 @@
  
  
  void controleur_outil::initialiser () {
- 	pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
+ 	/*pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
  	pcarte->daconv(voie_pince_2,PRESSION_MIN_NUM);
  	taskDelay(sysClkRateGet());
- 	pcarte->daconv(voie_pince_1,PRESSION_MIN_NUM);
+ 	pcarte->daconv(voie_pince_1,PRESSION_MIN_NUM);*/
  }
  
 
@@ -85,7 +85,7 @@
  void controleur_outil::controler_pince(bool ouvrir_pince) {
 	
 	
-	//fin de l'impulsion d'ouverture 
+	/*//fin de l'impulsion d'ouverture 
  	if (etat_voie_2 == 1) {
  		pcarte->daconv(voie_pince_2,PRESSION_MIN_NUM);
  		etat_voie_2 = 0;
@@ -109,7 +109,7 @@
  		pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
  		pince_ouverte = false;
  		etat_voie_1 = 1;
- 		}
+ 		}*/
  }
  
  

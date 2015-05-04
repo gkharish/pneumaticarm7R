@@ -54,6 +54,8 @@ int capteur::get_channel()
 	return(chanNumber);
 }
 
+
+
 /********************************************************************
 
  *                   	     get_carte        		            *

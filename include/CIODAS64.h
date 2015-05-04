@@ -8,11 +8,11 @@
 
 /****************************************************************************************/
 /*					DEFINES			     			*/
-/****************************************************************************************/           
+/****************************************************************************************/
 
 /****************************************************************************************/
 /*				ADRESSES DES REGISTRES					*/
-/****************************************************************************************/			  	
+/****************************************************************************************/
 #define AD_DATA_REG	(BASE_REG_CIODAS64)    	/* Registre des donnees et de conversion*/
 #define CHAN_LIMITS	(BASE_REG_CIODAS64+2)  	/* Registre de reglage des adresses 	*/
 #define DIGITAL_REG	(BASE_REG_CIODAS64+3) 	/* Registre des donnees Numerique	*/
@@ -22,7 +22,7 @@
 #define PACER_CNTRL     (BASE_REG_CIODAS64+9)  	/* Control des Interruptions & Pacer  	*/
 #define TRIG_CNTRL	(BASE_REG_CIODAS64+10) 	/* Registre de configuration du trigger	*/
 #define COMP_CNTRL     	(BASE_REG_CIODAS64+11) 	/* Registre de configuration de la carte*/
-													  	
+
 #define COMPTEUR_0  	(BASE_REG_CIODAS64+12) 	/* Registre du Compteur 0 	    	*/
 #define COMPTEUR_1  	(BASE_REG_CIODAS64+13) 	/* Registre du compteur 1 	    	*/
 #define COMPTEUR_2	(BASE_REG_CIODAS64+14) 	/* Registre du compteur 2	    	*/
@@ -31,14 +31,14 @@
 /*______________________________________________________________________________________*/
 /****************************************************************************************/
 /*				DETAILS DES REGISTRES				  	*/
-/****************************************************************************************/	
+/****************************************************************************************/
 
 
 /****************************************************************************************/
 /*				REGISTRE DES STATUS					*/
 /****************************************************************************************/
 #define MHZ_1			0x00	  	/* Reglage de clock pacer � 1 Mhz  	*/
-#define MHZ_10			0x80 	  	/* Reglage � 10 Mhz		  	*/   
+#define MHZ_10			0x80 	  	/* Reglage � 10 Mhz		  	*/
 #define POST_MODE 		0x40	  	/* Post-mode			  	*/
 #define EXTEND			0x10		/* Bit d'autorisation de configuration	*/
 #define CLRALL    		0x07	  	/* efface toutes les interruptions 	*/
@@ -50,7 +50,7 @@
 /****************************************************************************************/
 /*		REGISTRE DE CONTROL DES INTERRUPTIONS ET DU PACER			*/
 /****************************************************************************************/
-#define NO_INTERRUPT		0x00	  	/* Pas d'interruption			*/   
+#define NO_INTERRUPT		0x00	  	/* Pas d'interruption			*/
 #define BURSTE_MODE		0x40	  	/* mode Burste ON			*/
 #define INTE			0x80	  	/* Interruptions analogiques autorisees	*/
 #define XINTE       		0x08	  	/* Les Entrees Externes sont autorisees	*/
@@ -83,11 +83,11 @@
 /****************************************************************************************/
 /*		REGISTRE DE CONTROL DU TRIGGER ET REGLAGE DU NUMERIC		  	*/
 /****************************************************************************************/
-#define OUT_5V			0x00 		/* Reglage � +- 5v les 2 sorties   	*/   
+#define OUT_5V			0x00 		/* Reglage � +- 5v les 2 sorties   	*/
 #define OUT_10V_DAC0 		0x10		/* Reglage � +- 10v la sortie DAC0 	*/
 #define OUT_0_5V_DAC0   	0x20		/* Reglage de 0 � 5v la sortie DAC0	*/
 #define OUT_0_10V_DAC0  	0x30		/* Reglage de 0 � 5v la sortie DAC0	*/
- 
+
 #define OUT_10V_DAC1 		0x40		/* Reglage � +- 10v la sortie DAC1	*/
 #define OUT_0_5V_DAC1  		0x80		/* Reglage de 0 � 5v la sortie DAC1	*/
 #define OUT_0_10V_DAC1  	0xC0		/* Reglage de 0 � 5v la sortie DAC1	*/
@@ -101,7 +101,7 @@
 /*			REGISTRE DE CONFIGURATION DE LA CARTE				*/
 /****************************************************************************************/
 #define DMA_1			0x00		/* R�glage sue le DMA 1			*/
-#define DMA_3			0x80		/* Reglage sur le DMA 3			*/   
+#define DMA_3			0x80		/* Reglage sur le DMA 3			*/
 #define UNIPOLAR_RANGE  	0x40		/* MODE UNIPOLAIRE			*/
 #define BIPOLAR_RANGE   	0x00		/* MODE BIPOLAIRE			*/
 #define SE_MODE    		0x20		/* mode Single-ended 		 	*/
@@ -109,7 +109,7 @@
 #define ENHANCED_MODE  		0x10	  	/* mode Enhanced 			*/
 #define COMPATIBLE_MODE 	0x00		/* mode compatible			*/
 #define IN_10V			0x00		/* Entr�e de 0 � 10 V ou +-10V	  	*/
-#define IN_5V			0x01		/* Entr�e de 0 � 5 V ou +- 5V	  	*/		 
+#define IN_5V			0x01		/* Entr�e de 0 � 5 V ou +- 5V	  	*/
 #define IN_2_5V			0x02		/* Entr�e de 0 � 2.5 V ou +-2.5V	*/
 #define IN_1_25V		0x03		/* Entr�e de 0 � 1.25 V ou +-1.25V 	*/
 
@@ -129,15 +129,70 @@
 #include "carte.h"
 #include "clientudp3.h"
 #include "port.h"
-class CIODAS64 : public carte, public ClientUDP
+#include <stdlib.h>
+#define BUFLEN 2048
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <Eigen/Core>
+#include <math.h>
+
+using namespace Eigen;
+
+using namespace std;
+
+typedef struct udppacket_DAQ                        // serverheader = 'a';
 {
-	public :
-		CIODAS64(): ClientUDP()
-		{}
-		virtual void initialisation ();
-		virtual unsigned int adconv(int chan);
-	 	virtual unsigned char dread ();
-	
+  char SERVER_HEADER[4];
+  unsigned int label;
+  float data[7];
+  friend std::ostream& operator<<(std::ostream& os, const udppacket_DAQ & obj)
+  {
+    // write obj to stream
+    os << " " << obj.SERVER_HEADER
+       << " " << obj.label;
+    for(unsigned int i=0;i<7;i++)
+      os << obj.data[0] << " ";
+    os << std::endl;
+    return os;
+}
+
+}client_packet_DAQ;
+
+typedef struct udppacket_COUNTER                    // serverheader = 'b';
+{
+  char SERVER_HEADER[4];
+  unsigned int label;
+  signed int data[1];
+}client_packet_COUNTER;
+
+typedef struct udppacket_error                      // serverheader = 'c';
+{
+  char SERVER_HEADER[4];
+  unsigned int label;
+  unsigned char data[4];
+}client_packet_error;
+
+
+class CIODAS64 : public carte//, public ClientUDP
+{
+ public :
+  CIODAS64();//: ClientUDP()
+  //{}
+  virtual ~CIODAS64();
+  virtual void initialisation ();
+  virtual void adconv(int chan);
+  virtual unsigned char dread ();
+  char recv_buffer[BUFLEN];
+  udppacket_DAQ *recv_packet_DAQ;
+  udppacket_COUNTER *recv_packet_COUNTER;
+  udppacket_error *recv_packet_error;
+  virtual double read_sensors(int);
+  ClientUDP* client_obj;
+  ofstream udprecvlog;
+  void get_client(ClientUDP* parent_client);
+  void openlogudpdata();
+  void logudpdata();
 };
 
 #endif

@@ -484,7 +484,7 @@ void controleur_axe::init_angles ()
 
 /********************************************************************
 
- *                   	   initialisation_card    	            *
+ *                   	   initialisation_ioboards    	            *
 
  ********************************************************************
 
@@ -496,7 +496,7 @@ void controleur_axe::init_angles ()
 
  ********************************************************************/
 
-void controleur_axe::initialisation_card ()
+void controleur_axe::initialisation_ioboards ()
 {
   double i = 0;
   pactionneur->receive_command_decouple(i,i);

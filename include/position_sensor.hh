@@ -32,8 +32,9 @@ class position_sensor: public sensor
   //read the position of the joints
   double read_position(void);
 	double read_sensors_array(int);
-  /* get the attributes. */
-  card * get_card (void);
+  /* recup attr. */
+  ioboards * get_ioboards (void);
+
   double get_rapport(void);
   double get_offset();
   double get_pente();

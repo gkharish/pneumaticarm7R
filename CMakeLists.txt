@@ -34,7 +34,7 @@ SET(${PROJECT_NAME}_HEADERS
 	include/actuator.hh
 	include/sensor.hh
 	include/position_sensor.hh
-	include/card.hh
+	include/ioboards.hh
 	include/CIODAC16.hh
 	include/CIODAS64.hh
 	include/clientudp3.hh

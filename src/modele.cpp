@@ -34,7 +34,7 @@ modele :: modele (controller_axis * ca1,
 	coutil = co;
 	pal = p;
 	joy1 =j1;joy2 = j2;
-	//mon_fichier = new fichier("descards:/export/home/tornado/jeremie/matlab/");
+	//mon_fichier = new fichier("desioboardss:/export/home/tornado/jeremie/matlab/");
 	//mon_fichier = new fichier("c:/");
 	numero_pt =0;
 	printf("\n jusqu'ici tout va bien 7");

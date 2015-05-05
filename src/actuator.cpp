@@ -18,10 +18,10 @@
 
  *    PARAMETRES :                                                  *
 
- *                pcard : Pointer to the card type CIODAS64 				*
+ *                pioboards : Pointer to the ioboards type CIODAS64 				*
 
 
- *                chan : Number of port of entry in the card				*
+ *                chan : Number of port of entry in the ioboards				*
 
  *                                                                  *
 
@@ -33,11 +33,11 @@
 
  ********************************************************************/
 
-Actuator::Actuator (int chan1,int chan2 ,card* card)
+Actuator::Actuator (int chan1,int chan2 ,ioboards* ioboards)
 
 {
 
-	pcard = card;
+	pioboards = ioboards;
 
 	muscle1 = chan1;
 
@@ -102,9 +102,9 @@ void Actuator::receive_command_decouple (double val1,double val2)
 
 
 		buffer = (val1);// * RAPPORT;
-		//pcard->daconv(muscle1,(int)ceil(buffer));
-		//pcard->daconv(muscle1, buffer);
-		pcard -> send_command_array(muscle1, buffer);
+		//pioboards->daconv(muscle1,(int)ceil(buffer));
+		//pioboards->daconv(muscle1, buffer);
+		pioboards -> send_command_array(muscle1, buffer);
 
 
 	}
@@ -119,9 +119,9 @@ void Actuator::receive_command_decouple (double val1,double val2)
 
 		buffer = (val2) ;//* RAPPORT;
 
-		//pcard->daconv(muscle2,(int)ceil(buffer));
-		//pcard->daconv(muscle2, buffer);
-		pcard -> send_command_array(muscle2, buffer);
+		//pioboards->daconv(muscle2,(int)ceil(buffer));
+		//pioboards->daconv(muscle2, buffer);
+		pioboards -> send_command_array(muscle2, buffer);
 
 	}
 

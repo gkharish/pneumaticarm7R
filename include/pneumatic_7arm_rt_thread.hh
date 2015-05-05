@@ -35,7 +35,7 @@
 #include <istream>
 #include <math.h>
 
-#include "card.hh"
+#include "ioboards.hh"
 #include "CIODAC16.hh"
 #include "CIODAS64.hh"
 #include "actuator.hh"
@@ -136,7 +136,7 @@ class Pneumatic7ArmRtThread
   void InitControllers();
 
   /** ! Initialize sensors */
-  void InitializeSensors(); // fka init_captures
+  void InitializeSensors(); // fka init_sensors
 
   /** ! Inflating the muscles */
   void Inflating (); // fka gonfler

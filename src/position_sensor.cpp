@@ -8,7 +8,7 @@
 #include <iostream>
 #include "position_sensor.hh"
 
-//sense of capture
+// Sign of sensor
 #define POSITIF  1
 #define NEGATIF -1
 #define NUL      0
@@ -46,7 +46,7 @@ position_sensor::position_sensor (double off,double pen)
 
 /********************************************************************
 
- *                Lecture de la position du capture                 *
+ *                Position sensor reading                          *
 
  ********************************************************************
 
@@ -61,15 +61,14 @@ position_sensor::position_sensor (double off,double pen)
  ********************************************************************/
 
 double position_sensor::read_position (void)
-
 {
 
   double angle=0;
   float v1=0.0;
   /* recup�ration de la tension */
 
-  //v1 = pcard->adconv(chanNumber);
-  //v1 = pcard -> read_sensors(*axis_num);
+  //v1 = pioboards->adconv(chanNumber);
+  //v1 = pioboards -> read_sensors(*axis_num);
   std::cout << "Value read b cap_pos_lire:" << v1 << std::endl;
   /* calcul de l'angle */
 
@@ -88,9 +87,9 @@ double position_sensor::read_sensors_array (int ind)
   double v1;
   /* recup�ration de la tension */
 
-  //v1 = pcard->adconv(chanNumber);
+  //v1 = pioboards->adconv(chanNumber);
   //std::cout << "position_sensor:read_sensors_array:" << ind << std::endl;
-  v1 = pcard -> read_sensors(ind);
+  v1 = pioboards -> read_sensors(ind);
   //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
   //printf("valeur lue au can %d \r",v);
   /* calcul de l'angle */

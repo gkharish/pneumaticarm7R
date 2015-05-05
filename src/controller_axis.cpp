@@ -34,7 +34,7 @@ controller_axis::controller_axis (I_teleop* pjoy,
   aControllerAxisData.pjoystick = pjoy;
   aControllerAxisData.angle_repos = angle_init;
   aControllerAxisData.angle_reel = angle_init;
-  aControllerAxisData.sens_capture = s_cap;
+  aControllerAxisData.sens_sensor = s_cap;
   aControllerAxisData.sens_pression = s_pre;
 
   aControllerAxisData.angle_th = angle_init;
@@ -94,7 +94,7 @@ void controller_axis::set_loop (int aloop)
 
 /********************************************************************
 
- *                          set_capture                            *
+ *                          set_sensor                            *
 
  ********************************************************************
 
@@ -102,7 +102,7 @@ void controller_axis::set_loop (int aloop)
 
  *    PARAMETRES :                                                  *
 
- *                pcap  : pointeur sur un capture		    *
+ *                pcap  : pointeur sur un sensor		    *
 
  *		  rap	: rapport mecanique			    *
 
@@ -110,15 +110,15 @@ void controller_axis::set_loop (int aloop)
 
  ********************************************************************/
 
-void controller_axis::set_capture (position_sensor* pcap)
+void controller_axis::set_sensor (position_sensor* pcap)
 {
-  pcapture = pcap;
+  psensor = pcap;
   //rapport=rap;
-  double var = pcapture -> read_sensors_array(numero);//read_position();
-  cout << "\n controller_axis.setcapture read sensors array: " << var << endl;
+  double var = psensor -> read_sensors_array(numero);//lire_position();
+  cout << "\n controller_axis.setsensor read sensors array: " << var << endl;
   //  	double var1 = var - angle_repos;
-  //double offset_capture = fabs( var1);
-  //printf("\n controller_axis.setcapture()3");
+  //double offset_sensor = fabs( var1);
+  //printf("\n controller_axis.setsensor()3");
   //cet offset est recalcule plus tard, inutile ?
 }
 
@@ -130,7 +130,7 @@ void controller_axis::set_userpressure(double pres)
 
 /********************************************************************
 
- *                Lecture de la position du capture                 *
+ *                Lecture de la position du sensor                 *
 
  ********************************************************************
 
@@ -151,28 +151,28 @@ double controller_axis::read_position (void)
   double angle;
 
   /* recup�ration de la tension */
-  //angle = pcapture->read_position();
-  angle = pcapture->read_sensors_array(numero);
+  //angle = psensor->lire_position();
+  angle = psensor->read_sensors_array(numero);
 
   //std::cout << " read sensor array Angle is :" << angle << std::endl;
-  //Calcul de l'angle theorique en fonction de l'angle lu par le capture
+  //Calcul de l'angle theorique en fonction de l'angle lu par le sensor
 
-  //Calcul different selon le sens de rotation du capture
+  //Calcul different selon le sens de rotation du sensor
 
-  if (sens_capture == 1)
+  if (sens_sensor == 1)
     {
 
       if (angle_repos > offset_lu)
-	angle =  angle + offset_capture ;
+	angle =  angle + offset_sensor ;
       else
-	angle =  angle - offset_capture ;
+	angle =  angle - offset_sensor ;
     }
   else
     {
       if (angle_repos > offset_lu)
-	angle = 360 - ( angle + offset_capture );
+	angle = 360 - ( angle + offset_sensor );
       else
-	angle = 360 - ( angle - offset_capture );
+	angle = 360 - ( angle - offset_sensor );
     }
   angle =  fmod( angle ,360);
 
@@ -180,10 +180,10 @@ double controller_axis::read_position (void)
   if (angle <= 360 && angle > 180)
     angle = - (360 - angle);
 
-  /*std::cout << "Angle controller_axis:lireposition and rapport : " << offset_capture<<", "
+  /*std::cout << "Angle controller_axis:lireposition and rapport : " << offset_sensor<<", "
     <<offset_lu<< ", "
     <<angle_repos<<", "
-    <<sens_capture <<", "
+    <<sens_sensor <<", "
     <<angle <<", "
     << rapport <<","<< std::endl;*/
   //cout << "rapport" << rapport << endl;
@@ -194,7 +194,7 @@ double controller_axis::read_position (void)
 
 /********************************************************************
 
- *                   	   get_capture      		            *
+ *                   	   get_sensor      		            *
 
  ********************************************************************
 
@@ -202,15 +202,16 @@ double controller_axis::read_position (void)
 
  *    RETOURNE :                                                    *
 
- *                un pointeur sur le capture	                    *
+ *                un pointeur sur le sensor	                    *
 
  *                                                                  *
 
  ********************************************************************/
 
-position_sensor * controller_axis::get_capture(void)
+
+position_sensor * controller_axis::get_sensor(void)
 {
-  return(pcapture);
+  return(psensor);
 }
 
 /********************************************************************
@@ -382,8 +383,8 @@ void controller_axis::controller ()
 
   //angle_th = 60;
   // SECURITY CHECK
-  //double  angle_boundary = (this ->read_position());
-  double  angle_boundary = pcapture->read_sensors_array(numero);
+  //double  angle_boundary = (this ->lire_position());
+  double  angle_boundary = psensor->read_sensors_array(numero);
   cout << "\n Angle Boundary : "<< angle_boundary << endl;
   //On calcule la commande correspondant a l'angle theorique actuel
   if(angle_boundary < angle_max && angle_boundary > angle_min)
@@ -479,13 +480,13 @@ void controller_axis::initialisation_muscles (double delta_init,double vitesse_p
 
 void controller_axis::init_angles ()
 {
-  offset_lu = pcapture -> get_offset();
-  offset_capture = fabs(offset_lu - angle_repos);
+  offset_lu = psensor -> get_offset();
+  offset_sensor = fabs(offset_lu - angle_repos);
 }
 
 /********************************************************************
 
- *                   	   initialisation_card    	            *
+ *                   	   initialisation_ioboards    	            *
 
  ********************************************************************
 
@@ -497,7 +498,7 @@ void controller_axis::init_angles ()
 
  ********************************************************************/
 
-void controller_axis::initialisation_card ()
+void controller_axis::initialisation_ioboards ()
 {
   double i = 0;
   pactuator->receive_command_decouple(i,i);
@@ -562,8 +563,8 @@ void controller_axis::degonfle (double vitesse_pression)
 
 void controller_axis::calculer_commande_BF ()
 {
-  //Lecture de l'angle reel mesure par la capture
-  angle_reel = (this ->read_position());
+  //Lecture de l'angle reel mesure par la sensor
+  angle_reel = (this ->lire_position());
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *(ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) 
@@ -606,8 +607,9 @@ void controller_axis::calculer_commande_BF ()
 
 void controller_axis::calculer_commande_BO ()
 {
-  //Lecture de l'angle reel mesure par la capture
-  angle_reel = (this ->read_position());
+  //Lecture de l'angle reel mesure par la sensor
+  angle_reel = (this ->lire_position());
+
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *

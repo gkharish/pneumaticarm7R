@@ -1,15 +1,15 @@
- /* Fichier card.hh               	*
+ /* Fichier ioboards.hh               	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
 
-/***** CLASSE card : INTERFACE pour l'utilisation d'autre modele de card ****/
+/***** CLASSE ioboards : INTERFACE pour l'utilisation d'autre modele de ioboards ****/
 #ifndef CARD_HH
 #define CARD_HH
 #include <Eigen/Core>
 #include <math.h>
 using namespace Eigen;
-class card
+class ioboards
 {
 public :
   virtual void daconv(int ,char ){}

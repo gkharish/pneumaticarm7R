@@ -1,5 +1,5 @@
 /* CIODAS64.cpp - corps de la classe CIODAS64 */
-/* refcard : CIO-DAS6402/12 */
+/* refioboards : CIO-DAS6402/12 */
 /* Erwan Guiochet - 2002 */
 
 /*
@@ -29,7 +29,7 @@ Ajout de la fonction dread qui permet de lire les entrees numeriques
  * 			5 - Recuperation de la valeur lue				*
  * 			6 - Decalage de la valeur lue :					*
  * 											*
- *		les quatres bits de poids faible ne serve pas avec la card 12 bits	*
+ *		les quatres bits de poids faible ne serve pas avec la ioboards 12 bits	*
  *			il faut donc decaler tous les bits de 4 positions (>> 4)		*
  *
  ****************************************************************************************/
@@ -171,7 +171,7 @@ void CIODAS64::logudpdata()
 	<< (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[5] << "\t"
 	<< (*recv_packet_DAQ).data[6] << "\n" << endl;
 }
-/*Permet une initialisation de la card
+/*Permet une initialisation de la ioboards
  ****************************************************************************************
  * 	******* MODE ENHANCED *********							*
  * 											*
@@ -195,7 +195,7 @@ void CIODAS64::logudpdata()
  ****************************************************************************************/
 void CIODAS64::initialisation ()
 {
-   	/******** Configuration du mode d'utilisation de la card *******/
+   	/******** Configuration du mode d'utilisation de la ioboards *******/
 
 	// unipolar range, Single ended mode, ENHANCED MODE
 	//sysOutByte (COMP_CNTRL,ENHANCED_MODE);

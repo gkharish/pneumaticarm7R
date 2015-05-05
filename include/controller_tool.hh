@@ -7,7 +7,7 @@
 #ifndef CONTROLLER_TOOL
 #define CONTROLLER_TOOL
 
-#include "card.hh"
+#include "ioboards.hh"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
 /********************************************************
@@ -22,15 +22,15 @@
 
  	private :
  	bool pince_ouverte;   		// vraie si la pince est ouverte
- 	card * pcard;        		// card de commande associee
- 	int voie_pince_1,voie_pince_2;  // voies correspondantes sur la card de commande
+ 	ioboards * pioboards;        		// ioboards de commande associee
+ 	int voie_pince_1,voie_pince_2;  // voies correspondantes sur la ioboards de commande
  	int etat_voie_1,etat_voie_2;	// etat des voies (0 ou 1)
 
  	public :
 
  	//Constructeurs
  	controller_tool () {};
- 	controller_tool(card *,int,int);
+ 	controller_tool(ioboards *,int,int);
 
  	//Controle de la pince
  	void controler_pince(bool);

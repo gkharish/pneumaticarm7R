@@ -10,7 +10,7 @@
  ************************************************************/
 
 /*MODIFICATIONS
-  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES captureS DE POSITION
+  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES sensorS DE POSITION
   20/12/2002: AJOUT Du choix boucle ouverte boucle fermee
 */
 
@@ -25,7 +25,7 @@
 #define ODEBUGL(x,y);
 #endif
 
-/***** DEFINITION DE L'ADRESSAGE DES cardS *****/
+/***** DEFINITION DE L'ADRESSAGE DES ioboardsS *****/
 /*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
 /*         BASE_REG_CIODAS64 : CIO-DAS6402/16   */
 /************************************************/
@@ -33,7 +33,7 @@
 #define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
-#define VOIE_PINCE_1        14   // sorties de la card de commande
+#define VOIE_PINCE_1        14   // sorties de la ioboards de commande
 #define VOIE_PINCE_2        15   // reliees a la pince
 
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
@@ -49,7 +49,7 @@
 #define DELTA_INIT_AXE_6 -0.6
 #define DELTA_INIT_AXE_7 -0.2
 
-//Outputports  of actuators of output card (CIODAC16)
+//Outputports  of actuators of output ioboards (CIODAC16)
 #define VOIE_1_1  0	//2
 #define VOIE_1_2  1 //3
 #define VOIE_2_1  2	//0
@@ -65,7 +65,7 @@
 #define VOIE_7_1 13	//10
 #define VOIE_7_2 14	//11
 
-//Ports d'entree des joysticks et du palonnier sur la card d'acquisition (CIODAS64)
+//Ports d'entree des joysticks et du palonnier sur la ioboards d'acquisition (CIODAS64)
 #define VOIE_X_1          1
 #define VOIE_Y_1	  0
 #define VOIE_Z_1          3
@@ -134,7 +134,7 @@
 #define ANGLE_MAX_7    30.0
 
 
-// Rapports mecaniques entre rotation des axes des captures et rotation reelle des articulations
+// Rapports mecaniques entre rotation des axes des sensors et rotation reelle des articulations
 // Determines par une mesure de la tension avec l articulation a 90 degres K=90/(Vmes*360/5)
 #define RAP_MECA_CAP_1    1.5
 #define RAP_MECA_CAP_2    1
@@ -145,14 +145,14 @@
 #define RAP_MECA_CAP_7    1
 
 
-//sens de rotation des captures par rapport au sens theorique
-#define SENS_capture_1   1
-#define SENS_capture_2   0
-#define SENS_capture_3   0
-#define SENS_capture_4   0
-#define SENS_capture_5   0
-#define SENS_capture_6   1
-#define SENS_capture_7   0
+//sens de rotation des sensors par rapport au sens theorique
+#define SENS_sensor_1   1
+#define SENS_sensor_2   0
+#define SENS_sensor_3   0
+#define SENS_sensor_4   0
+#define SENS_sensor_5   0
+#define SENS_sensor_6   1
+#define SENS_sensor_7   0
 
 #define SENS_PRESSION_1   1
 #define SENS_PRESSION_2   1
@@ -219,7 +219,7 @@
 #include <math.h>
 
 
-#include "card.hh"
+#include "ioboards.hh"
 //#include "CIODAC16.h"
 //#include "CIODAS64.h"
 #include "actuator.hh"
@@ -275,7 +275,8 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   // Creating position sensors.
   for (int i = 0; i<7;i++)
     {
-      //construction des captures
+
+      //construction des sensors
       sensors_[i].set_offset(0);
       sensors_[i].set_pente(0);
 
@@ -369,7 +370,7 @@ void Pneumatic7ArmRtThread::InitControllers()
   double rest_angles[7] = { ANGLE_REPOS_1, ANGLE_REPOS_2, ANGLE_REPOS_3, ANGLE_REPOS_4, ANGLE_REPOS_5, ANGLE_REPOS_6, ANGLE_REPOS_7};
   double min_angles[7] = { ANGLE_MIN_1, ANGLE_MIN_2, ANGLE_MIN_3, ANGLE_MIN_4, ANGLE_MIN_5, ANGLE_MIN_6, ANGLE_MIN_7};
   double max_angles[7] = { ANGLE_MAX_1, ANGLE_MAX_2, ANGLE_MAX_3, ANGLE_MAX_4, ANGLE_MAX_5, ANGLE_MAX_6, ANGLE_MAX_7};
-  int sensor_directions[7] = {SENS_capture_1,SENS_capture_2,SENS_capture_3,SENS_capture_4,SENS_capture_5,SENS_capture_6,SENS_capture_7};
+  int sensor_directions[7] = {SENS_sensor_1,SENS_sensor_2,SENS_sensor_3,SENS_sensor_4,SENS_sensor_5,SENS_sensor_6,SENS_sensor_7};
   int pressure_directions[7] = {SENS_PRESSION_1,SENS_PRESSION_2,SENS_PRESSION_3,SENS_PRESSION_4,SENS_PRESSION_5,SENS_PRESSION_6,SENS_PRESSION_7};
   double p_gains[7] = {P_AXE_1,P_AXE_2,P_AXE_3,P_AXE_4,P_AXE_5,P_AXE_6,P_AXE_7};
   double d_gains[7] = {D_AXE_1,D_AXE_2,D_AXE_3,D_AXE_4,D_AXE_5,D_AXE_6,D_AXE_7};
@@ -382,7 +383,7 @@ void Pneumatic7ArmRtThread::InitControllers()
                                       rest_angles[i], min_angles[i],max_angles[i],
                                       sensor_directions[i], pressure_directions[i], p_gains[i],d_gains[i]);
       // Initialize electronic boards
-      controllers_[i].initialisation_card();
+      controllers_[i].initialisation_ioboards();
     }
 
   ODEBUGL("\n init()debug8 \n",3);
@@ -401,16 +402,16 @@ void Pneumatic7ArmRtThread::InitControllers()
   ciodas64_ -> adconv(1);
   ODEBUGL("/n init() recv data:adconv:" ,4);
   ODEBUGL("\n init()debug9 \n",3);
-  controllers_[0].set_capture(sensors_+4);
+  controllers_[0].set_sensor(sensors_+4);
   ODEBUGL("\n init()debug10 \n",3);
-  controllers_[1].set_capture(sensors_+2);
+  controllers_[1].set_sensor(sensors_+2);
   ODEBUGL("\n init()debug11 \n",3);
-  controllers_[2].set_capture(sensors_+6);
+  controllers_[2].set_sensor(sensors_+6);
   ODEBUGL("\n init()debug12 \n",3);
-  controllers_[3].set_capture(sensors_);
-  controllers_[4].set_capture(sensors_+1);
-  controllers_[5].set_capture(sensors_+3);
-  controllers_[6].set_capture(sensors_+5);
+  controllers_[3].set_sensor(sensors_);
+  controllers_[4].set_sensor(sensors_+1);
+  controllers_[5].set_sensor(sensors_+3);
+  controllers_[6].set_sensor(sensors_+5);
 }
 
 void Pneumatic7ArmRtThread::Initializing()
@@ -477,16 +478,16 @@ void Pneumatic7ArmRtThread::Initializing()
 
 /********************************************************
  *							*
- *	 init_captures()				*
+ *	 init_sensors()				*
  *							*
- *	initialisations des offsets des captures	*
+ *	initialisations des offsets des sensors	*
  *							*
  *							*
  ********************************************************/
 
 void Pneumatic7ArmRtThread::InitializeSensors ()
 {
-  ODEBUGL("\n inside init_captures()1 \n",3);
+  ODEBUGL("\n inside init_sensors()1 \n",3);
   char header = '1';
 
   ciodac16_ -> daconv(1, header);
@@ -495,11 +496,11 @@ void Pneumatic7ArmRtThread::InitializeSensors ()
   for (int i = 1;i < 8;i++)
     sensors_[i-1].set_offset( sensors_[i-1].read_sensors_array(i) );
 
-  ODEBUGL("\n inside init_captures()2 \n",3);
+  ODEBUGL("\n inside init_sensors()2 \n",3);
   for(unsigned int i=0;i<7;i++)
     controllers_[i].init_angles();
 
-  printf("\n Done init_captures() \n");
+  printf("\n Done init_sensors() \n");
 
   ciodac16_ -> daconv(1, header);
 }

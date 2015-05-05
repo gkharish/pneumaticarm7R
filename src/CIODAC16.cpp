@@ -1,5 +1,5 @@
-/* CIODAC16.cpp - corps de la classe cardSortie */
-/* refcard : CIO-DAC16-I de Computer boards*/
+/* CIODAC16.cpp - corps de la classe ioboardsSortie */
+/* refioboards : CIO-DAC16-I de Computer boards*/
 /* Erwan Guiochet - 2002 */
 
 /*

@@ -1,5 +1,5 @@
 /****************************************
- * Fichier capture.cpp          	*
+ * Fichier sensor.cpp          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
@@ -15,7 +15,7 @@
  * PARAMETRES :  	                                            *
 
 
- *   - pcard : pointeur sur la card effectuant l'operation adconv *	                                            *
+ *   - pioboards : pointeur sur la ioboards effectuant l'operation adconv *	                                            *
 
 
 
@@ -27,9 +27,9 @@
 
  ********************************************************************/
 
-void sensor::set_association(card *pcard,int chan)
+void sensor::set_association(ioboards *pioboards,int chan)
 {
-  pcard = pcard;
+  pioboards = pioboards;
   chanNumber = chan;
 }
 
@@ -58,7 +58,7 @@ int sensor::get_channel()
 
 /********************************************************************
 
- *                   	     get_card        		            *
+ *                   	     get_ioboards        		            *
 
  ********************************************************************
 
@@ -66,13 +66,13 @@ int sensor::get_channel()
 
  *    RETOURNE :                                                    *
 
- *                un pointeur sur la card	                    *
+ *                un pointeur sur la ioboards	                    *
 
  *                                                                  *
 
  ********************************************************************/
 
- card * sensor::get_card(void)
+ioboards * sensor::get_ioboards(void)
  {
- 	return(pcard);
+ 	return(pioboards);
  }

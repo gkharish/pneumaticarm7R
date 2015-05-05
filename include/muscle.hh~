@@ -22,7 +22,7 @@
 #include <istream>
 #include <math.h>
 
-#include "card.h"
+#include "ioboards.h"
 #include "CIODAC16.h"
 #include "CIODAS64.h"
 #include "actionneur.h"

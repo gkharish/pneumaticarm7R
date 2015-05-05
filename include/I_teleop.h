@@ -6,7 +6,7 @@
 #ifndef I_TELEOP
 #define I_TELEOP
 
-#include "card.hh" 
+#include "ioboards.hh" 
 
 /********************************************************************
 
@@ -26,8 +26,8 @@
 class I_teleop
 {
    protected :
-   	 card * pcard;
-// pointeur sur card d'acquisition
+   	 ioboards * pioboards;
+// pointeur sur ioboards d'acquisition
    	 double UMAX ;   // tension d'alimentation
 	 double seuil;   // seuil de prise en compte d'un mouvement
    public :
@@ -54,12 +54,12 @@ class I_teleop
 class palonnier :public I_teleop
 {
     private:
-    	int channel; //voie correspondante sur la card d'acquisition
+    	int channel; //voie correspondante sur la ioboards d'acquisition
 
     public :
     	//constructeurs
     	palonnier () {}
-    	palonnier (card *,int,double);
+    	palonnier (ioboards *,int,double);
 
     	//lecture de la position
     	double read_position(void);

@@ -66,7 +66,11 @@ typedef struct controller_axis_data_s
   double angle_min_bound;
   double angle_max_bound;
   // Direction of the sensor
+<<<<<<< HEAD
   int sens_capture;
+=======
+  int sens_sensor;
+>>>>>>> card->ioboards; captor->sensor;
   // Direction of the pressure
   int sens_pression;
   // PD gains
@@ -105,6 +109,7 @@ class controller_axis
   Actuator * pactuator;	//actuator associe
   I_teleop * pjoystick;     //joystick associe
   double zero_joy;		//position initiale du joystick
+<<<<<<< HEAD
   position_sensor *pcapture;   //capture de position associe
   int sens_capture;  //sens de rotation de l'axe par rapport au sens du capture
   int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
@@ -113,6 +118,16 @@ class controller_axis
   double offset_capture;  //difference entre la valeur initiale lue
   // par le capture et l'angle au repos theorique
   double offset_lu; //valeur lue par le capture a t =0
+=======
+  position_sensor *psensor;   //sensor de position associe
+  int sens_sensor;  //sens de rotation de l'axe par rapport au sens du sensor
+  int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
+  double angle_repos,angle_reel, angle_max, angle_min;
+  //reste constant pendant la phase de controle
+  double offset_sensor;  //difference entre la valeur initiale lue
+  // par le sensor et l'angle au repos theorique
+  double offset_lu; //valeur lue par le sensor a t =0
+>>>>>>> card->ioboards; captor->sensor;
   double rapport;
   int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
   double user_pressure;
@@ -158,14 +173,19 @@ class controller_axis
 
   void init_controller_axis (controller_axis_data & aControllerAxeData);
 
+<<<<<<< HEAD
   //Fonction d'association du capture au controller d'axe
   void set_capture (position_sensor*);
+=======
+  //Fonction d'association du sensor au controller d'axe
+  void set_sensor (position_sensor*);
+>>>>>>> card->ioboards; captor->sensor;
 
   //Lecture de l'angle
   double read_position(void);
 
-  //initialisation elctronique de la card de commande
-  void initialisation_card();
+  //initialisation elctronique de la ioboards de commande
+  void initialisation_ioboards();
 
   //Initialisation des muscles en position de repos
   void initialisation_muscles(double,double);
@@ -181,7 +201,11 @@ class controller_axis
 
   /** recuperation des attributs **/
   void init_angles (void);
+<<<<<<< HEAD
   position_sensor * get_capture(void);
+=======
+  position_sensor * get_sensor(void);
+>>>>>>> card->ioboards; captor->sensor;
   double get_rapport(void);
   double get_delta(void);
   double get_angle_desire();

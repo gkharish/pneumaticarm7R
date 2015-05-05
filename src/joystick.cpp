@@ -27,18 +27,18 @@ Historique des modifications
 
  *    PARAMETRES :                                                  *
 
- *                pcard : pointeur sur une card du type CIODAS6402 *
+ *                pioboards : pointeur sur une ioboards du type CIODAS6402 *
 
  *                + Numero de voie des divers elements		    *
  *                                                                  *
 
  ********************************************************************/
 
- joystick::joystick (card * card,int X, int Y, int Z, int A,int B, int C,int D, int acc,double delta)
+ joystick::joystick (ioboards * ioboards,int X, int Y, int Z, int A,int B, int C,int D, int acc,double delta)
 
  {
 
-  	pcard = card;
+  	pioboards = ioboards;
 
 	voie_bouton_a = A;
 
@@ -77,7 +77,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_axeX);
+	//val = pioboards->adconv(voie_axeX);
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
 	return (valeur);
@@ -108,7 +108,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_axeY);
+	//val = pioboards->adconv(voie_axeY);
 
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
@@ -140,7 +140,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_axeZ);
+	//val = pioboards->adconv(voie_axeZ);
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
 	return (valeur);
@@ -171,7 +171,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_vitesse);
+	//val = pioboards->adconv(voie_vitesse);
 
 	//conversion en tension
 	valeur = (val * UMAX) /4095;
@@ -202,7 +202,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_bouton_a);
+	//val = pioboards->adconv(voie_bouton_a);
 
 	return (val<200);
 
@@ -231,7 +231,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_bouton_b);
+	//val = pioboards->adconv(voie_bouton_b);
 
 	return (val<200);
 
@@ -260,7 +260,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_bouton_c);
+	//val = pioboards->adconv(voie_bouton_c);
 
 	return (val<200);
  }
@@ -288,7 +288,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcard->adconv(voie_bouton_d);
+	//val = pioboards->adconv(voie_bouton_d);
 
 	return (val<200);
 

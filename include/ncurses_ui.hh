@@ -24,6 +24,7 @@ public:
   NCursesUI();
   ~NCursesUI();
 
+  void DisplayInformation();
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
   

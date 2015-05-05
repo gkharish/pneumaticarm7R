@@ -8,7 +8,7 @@
 #ifndef ACTUATOR
 #define ACTUATOR
 
-#include "carte.h"
+#include "ioboards.hh"
 /********************************************************************
 
  *                        	DEFINES            	            *
@@ -32,9 +32,9 @@
  *     This class provides all operational services *
   * A controller to  a muscle, each actuator corresponds to a muscle  *
 
- *                                                                  *
+*                                                                  *
 
- ********************************************************************/
+********************************************************************/
 
 
 class Actuator
@@ -42,22 +42,22 @@ class Actuator
 {
 
 private :
-	int muscle1,muscle2; 	// number/order of muscle as agonist-antgonist:
-												// agonist = muscle1 and antagonist = muscle2
-	card * pcard;
+  int muscle1,muscle2; // num�ro de voix
+  ioboards * pioboards;
+
 public :
-	//Constructors
-	Actuator (){}
-	Actuator (int,int, carte *);
+  //Constructors
+  Actuator (){}
+  Actuator (int,int, ioboards *);
 
   //==========================================================
-	//===  Functions of commanding the actuators in presure ====
+  //===  Functions of commanding the actuators in presure ====
   //==========================================================
 
-	// Sending the pressure to the two muscles. // Envoi de la meme pression sur les deux muscles
-	void receive_command (double);
-	// sending the pressure differences (Delta pressure ) to the two muscles.// Envoi de pressions differentes sur les deux muscle
-	void receive_command_decouple (double,double);
+  // Sending the pressure to the two muscles. // Envoi de la meme pression sur les deux muscles
+  void receive_command (double);
+  // sending the pressure differences (Delta pressure ) to the two muscles.// Envoi de pressions differentes sur les deux muscle
+  void receive_command_decouple (double,double);
 
 };
 

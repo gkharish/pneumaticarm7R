@@ -14,9 +14,15 @@
  *                        	DEFINES            	            *
 
  ********************************************************************/
+<<<<<<< HEAD
 #define PRESSION_MAX (5.0)             /* Maximum pressue applied on the muscle */
 
 #define RAPPORT (4095.0/PRESSION_MAX)  /* quantification of the control commande 12 bits */
+=======
+#define PRESSION_MAX (5.0)             /* Maximum pressure applied to the muscle */
+
+#define RAPPORT (4095.0/PRESSION_MAX)  /* quantification of the control command 12 bits */
+>>>>>>> lire_position->read_position; some of the texts in controller_axis are translated
 
 #define PRESSION_DE_BASE (2.5);
 
@@ -58,7 +64,7 @@ public :
   void receive_command (double);
   // sending the pressure differences (Delta pressure ) to the two muscles.// Envoi de pressions differentes sur les deux muscle
   void receive_command_decouple (double,double);
-
+  
 };
 
 #endif

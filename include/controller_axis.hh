@@ -25,15 +25,16 @@
 
 /********************************************************************
 
- *                          CLASSE controle_axe                     *
+ *                          CLASS controlle_axis                     *
 
  ********************************************************************
 
  *                                                                  *
 
 
- *     Cette classe fournit toutes les operations servant 	    *
- *     a controller le mouvement de rotation de certain axes	    *
+ *     This class provides all of the operations used               *
+
+ *        to check the rotational movement of some axes	            *
 
  *                                                                  *
 
@@ -66,11 +67,8 @@ typedef struct controller_axis_data_s
   double angle_min_bound;
   double angle_max_bound;
   // Direction of the sensor
-<<<<<<< HEAD
-  int sens_capture;
-=======
   int sens_sensor;
->>>>>>> card->ioboards; captor->sensor;
+
   // Direction of the pressure
   int sens_pression;
   // PD gains
@@ -174,32 +172,40 @@ class controller_axis
   void init_controller_axis (controller_axis_data & aControllerAxeData);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   //Fonction d'association du capture au controller d'axe
   void set_capture (position_sensor*);
 =======
   //Fonction d'association du sensor au controller d'axe
+=======
+  //Associating the sensor with corresponding joint axis
+>>>>>>> lire_position->read_position; some of the texts in controller_axis are translated
   void set_sensor (position_sensor*);
 >>>>>>> card->ioboards; captor->sensor;
 
+<<<<<<< HEAD
   //Lecture de l'angle
+=======
+  //reading the potentiometer
+>>>>>>> lire_position->read_position; some of the texts in controller_axis are translated
   double read_position(void);
 
-  //initialisation elctronique de la ioboards de commande
+  //initializing elctronic ioboards for control command
   void initialisation_ioboards();
 
-  //Initialisation des muscles en position de repos
+  //Initializing the muscles in resting position (zero-configuration)
   void initialisation_muscles(double,double);
 
   //Changer de style de boucle fermee ou ouverte
   void set_loop(int);
   void set_userpressure(double pres);
-  //Controle de l'axe
+  //Controller of Jointsl'axe
   void controller();
 
-  //Degonflement des muscles
+  //Deflating of muscles
   void degonfle (double);
 
-  /** recuperation des attributs **/
+  /** Geting the attributes **/
   void init_angles (void);
 <<<<<<< HEAD
   position_sensor * get_capture(void);

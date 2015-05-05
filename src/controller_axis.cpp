@@ -78,7 +78,7 @@ void controller_axis::init_controller_axis (controller_axis_data & aControllerAx
 
  *                loop  : 0 for an open loop                        *
 
- *		  and 1 for a closed loop  			    *
+ *		                and 1 for a closed loop  			                *
 
  *                                                                  *
 
@@ -102,9 +102,9 @@ void controller_axis::set_loop (int aloop)
 
  *    PARAMETRES :                                                  *
 
- *                pcap  : pointeur sur un sensor		    *
+ *                pcap  : pointeur sur un sensor		                *
 
- *		  rap	: rapport mecanique			    *
+ *		              rap	: rapport mecanique			                    *
 
  *                                                                  *
 
@@ -114,31 +114,28 @@ void controller_axis::set_sensor (position_sensor* pcap)
 {
   psensor = pcap;
   //rapport=rap;
-  double var = psensor -> read_sensors_array(numero);//lire_position();
+  double var = psensor -> read_sensors_array(numero);//read_position();
   cout << "\n controller_axis.setsensor read sensors array: " << var << endl;
-  //  	double var1 = var - angle_repos;
-  //double offset_sensor = fabs( var1);
-  //printf("\n controller_axis.setsensor()3");
-  //cet offset est recalcule plus tard, inutile ?
+  double var1 = var - angle_repos;
+  double offset_sensor = fabs( var1);
 }
 
 void controller_axis::set_userpressure(double pres)
 {
   user_pressure = pres;
-  //cout << "\n set userpressure: " << user_pressure << endl;
 }
 
 /********************************************************************
 
- *                Lecture de la position du sensor                 *
+ *                Reading the position of the sensor                 *
 
  ********************************************************************
 
  *                                                                  *
 
- *    RETOURNE :                                                    *
+ *    RETURN :                                                      *
 
- *                valeur de l'angle mesur� en degr�                 *
+ *                Value of measures angle in degree                 *
 
  *                                                                  *
 
@@ -149,9 +146,6 @@ double controller_axis::read_position (void)
 {
 
   double angle;
-
-  /* recup�ration de la tension */
-  //angle = psensor->lire_position();
   angle = psensor->read_sensors_array(numero);
 
   //std::cout << " read sensor array Angle is :" << angle << std::endl;
@@ -176,7 +170,7 @@ double controller_axis::read_position (void)
     }
   angle =  fmod( angle ,360);
 
-  //Pour avoir un intervalle -180->180
+  //To see the degrees in the interval of  -180->180
   if (angle <= 360 && angle > 180)
     angle = - (360 - angle);
 
@@ -200,9 +194,9 @@ double controller_axis::read_position (void)
 
  *                                                                  *
 
- *    RETOURNE :                                                    *
+ *    RETURN :                                                      *
 
- *                un pointeur sur le sensor	                    *
+ *                A pointer to the sensor     	                    *
 
  *                                                                  *
 
@@ -383,7 +377,7 @@ void controller_axis::controller ()
 
   //angle_th = 60;
   // SECURITY CHECK
-  //double  angle_boundary = (this ->lire_position());
+  //double  angle_boundary = (this ->read_position());
   double  angle_boundary = psensor->read_sensors_array(numero);
   cout << "\n Angle Boundary : "<< angle_boundary << endl;
   //On calcule la commande correspondant a l'angle theorique actuel
@@ -564,10 +558,10 @@ void controller_axis::degonfle (double vitesse_pression)
 void controller_axis::calculer_commande_BF ()
 {
   //Lecture de l'angle reel mesure par la sensor
-  angle_reel = (this ->lire_position());
+  angle_reel = (this ->read_position());
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
-  ControllerAxisData_.angle_filtre = (P_ECHANT_S *(ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) 
+  ControllerAxisData_.angle_filtre = (P_ECHANT_S *(ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec)
                                       - ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
   //std::cout << "\n angle filtre inside calcler_commande_BF :" << angle_filtre<< endl;
   //Calcul de l'erreur
@@ -608,14 +602,13 @@ void controller_axis::calculer_commande_BF ()
 void controller_axis::calculer_commande_BO ()
 {
   //Lecture de l'angle reel mesure par la sensor
-  angle_reel = (this ->lire_position());
-
+  angle_reel = (this ->read_position());
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *
-                                      (ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) - 
+                                      (ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) -
                                       ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
-  
+
   //Calcul de la commande
   commande  = sens_pression * K_BOUCLE_OUVERTE*angle_th;
 

@@ -1,7 +1,7 @@
 #ifndef MAIN_CONTROLEUR_H
 #define MAIN_CONTROLEUR_H
 
-/***** DEFINITION DE L'ADRESSAGE DES cardS *****/
+/***** DEFINITION DE L'ADRESSAGE DES ioboardsS *****/
 /*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
 /*         BASE_REG_CIODAS64 : CIO-DAS6402/16   */
 /************************************************/
@@ -9,7 +9,7 @@
 #define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
-#define VOIE_PINCE_1        14   // sorties de la card de commande
+#define VOIE_PINCE_1        14   // sorties de la ioboards de commande
 #define VOIE_PINCE_2        15   // reliees a la pince
 
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
@@ -25,7 +25,7 @@
 #define DELTA_INIT_AXE_6 -0.6
 #define DELTA_INIT_AXE_7 -0.2
 
-/* Output ports of actuators associated to the ouptput command card (CIODAC16)*/
+/* Output ports of actuators associated to the ouptput command ioboards (CIODAC16)*/
 #define VOIE_1_1  2
 #define VOIE_1_2  3
 #define VOIE_2_1  0
@@ -41,7 +41,7 @@
 #define VOIE_7_1 10
 #define VOIE_7_2 11
 
-//Ports d'entree des joysticks et du palonnier sur la card d'acquisition (CIODAS64)
+//Ports d'entree des joysticks et du palonnier sur la ioboards d'acquisition (CIODAS64)
 #define VOIE_X_1          1
 #define VOIE_Y_1	  0
 #define VOIE_Z_1          3
@@ -154,7 +154,7 @@
 //#include "kernelLib.h"
 //#include "msgQLib.h"
 
-#include "card.hh"
+#include "ioboards.hh"
 #include "CIODAC16.hh"
 #include "CIODAS64.hh"
 #include "actuator.hh"

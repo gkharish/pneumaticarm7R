@@ -8,7 +8,7 @@
 #ifndef ACTUATOR
 #define ACTUATOR
 
-#include "card.hh"
+#include "carte.h"
 /********************************************************************
 
  *                        	DEFINES            	            *
@@ -48,7 +48,7 @@ private :
 public :
 	//Constructors
 	Actuator (){}
-	Actuator (int,int, card *);
+	Actuator (int,int, carte *);
 
   //==========================================================
 	//===  Functions of commanding the actuators in presure ====

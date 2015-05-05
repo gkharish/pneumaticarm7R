@@ -17,25 +17,26 @@ using namespace std;
  *			CONSTRUCTOR			   *
  ***********************************************************/
 controller_axis::controller_axis (I_teleop* pjoy,
-                                  actionneur *paction,
+                                  Actuator *paction,
                                   int num,
-                                  double angle_init, 
-                                  double angle_min_bound, 
-                                  double angle_max_bound, 
+                                  double angle_init,
+                                  double angle_min_bound,
+                                  double angle_max_bound,
                                   int s_cap,
                                   int s_pre,
                                   double p,
                                   double d)
+
 {
   controller_axis_data aControllerAxisData;
   aControllerAxisData.numero = num;
-  aControllerAxisData.pactionneur = paction;
+  aControllerAxisData.pactuator = paction;
   aControllerAxisData.pjoystick = pjoy;
   aControllerAxisData.angle_repos = angle_init;
   aControllerAxisData.angle_reel = angle_init;
   aControllerAxisData.sens_capteur = s_cap;
   aControllerAxisData.sens_pression = s_pre;
-  
+
   aControllerAxisData.angle_th = angle_init;
   aControllerAxisData.angle_min_bound = angle_min_bound;
   aControllerAxisData.angle_max_bound = angle_max_bound;
@@ -391,7 +392,7 @@ void controller_axis::controller ()
     }
   else
     {
-      pactionneur->recevoir_commande(ControllerAxisData_.delta_repos);
+      pactuator->recevoir_commande(ControllerAxisData_.delta_repos);
     }
   //cout << "inside controleur.controler()debug2" << endl;
   //On verifie que delta_repos ne depasse pas les limite
@@ -402,7 +403,7 @@ void controller_axis::controller ()
     {
       if (ControllerAxisData_.forward_saturation) ControllerAxisData_.forward_saturation = false;
       if (ControllerAxisData_.backward_saturation) ControllerAxisData_.backward_saturation = false;
-      pactionneur->recevoir_commande(ControllerAxisData_.delta_repos+commande);
+      pactuator->recevoir_commande(ControllerAxisData_.delta_repos+commande);
     }
   else
     {
@@ -450,7 +451,7 @@ void controller_axis::initialisation_muscles (double delta_init,double vitesse_p
       else
 	j = j + 2 * vitesse_pression;
 
-      pactionneur -> recevoir_commande_decouple(i,j);
+      pactuator -> recevoir_commande_decouple(i,j);
       //for (int k = 0;k< 400000;k++) {}
       // cout << "sysclkrateget value :" << sysClkRateGet ( ) << endl;
       taskDelay (sysClkRateGet ( ) / 32);
@@ -499,20 +500,20 @@ void controller_axis::init_angles ()
 void controller_axis::initialisation_carte ()
 {
   double i = 0;
-  pactionneur->recevoir_commande_decouple(i,i);
+  pactuator->recevoir_commande_decouple(i,i);
 }
 
 
 
 /********************************************************************
 
- *                   	   degonfle		    	            *
+ *                   	   Deflation		    	            *
 
  ********************************************************************
 
  *                                                                  *
 
- *    	  	permet de degonfler un actionneur	   	    *
+ *    	  	Allows deflating of an Actuator   	    *
 
  *                                                                  *
 
@@ -536,7 +537,7 @@ void controller_axis::degonfle (double vitesse_pression)
  	i=0;
       if (j < 0)
  	j=0;
-      pactionneur->recevoir_commande_decouple(i,j);
+      pactuator->recevoir_commande_decouple(i,j);
       taskDelay (sysClkRateGet () / 32);
       //for (int t=0;t<100000;t++){}
     }
@@ -545,15 +546,15 @@ void controller_axis::degonfle (double vitesse_pression)
 
 /********************************************************************
 
- *                   	   calculer_commande	    	            *
+ *                   	   Calculating control command	    	            *
 
  ********************************************************************
 
  *                                                                  *
 
- *    	  	calcule la commande a envoyer a l'actionneur en     *
+ *    	  	Calculates the command to send to the actuator     *
 
- *              en foncton de l'erreur mesuree			    *
+ *              And  function of measuring the error			    *
  *                                                                  *
 
  ********************************************************************/
@@ -576,7 +577,7 @@ void controller_axis::calculer_commande_BF ()
   derivee_erreur = (ControllerAxisData_.error - tab_erreur[9]) / (10 * P_ECHANT);
   //std::cout << "\n derivee_erreur_er inside calcler_commande_BF :" << derivee_erreur << endl;
   //Calcul de la commande
-  commande  = sens_pression * (ControllerAxisData_.P * ControllerAxisData_.error  
+  commande  = sens_pression * (ControllerAxisData_.P * ControllerAxisData_.error
                                + ControllerAxisData_.D * derivee_erreur); //numero
   std::cout << "\n commande inside calcler_commande_BF :" << commande << endl;
   //Actualisation du tableau d'erreurs
@@ -589,15 +590,15 @@ void controller_axis::calculer_commande_BF ()
 
 /********************************************************************
 
- *                   	   calculer_commande_BO	    	            *
+ *    		Calculating the control command in Open loop	  	        *
 
  ********************************************************************
 
  *                                                                  *
 
- *    	  	calcule la commande a envoyer a l'actionneur en     *
+ *    	  	Calculating the command to be sent to the actuator    	*
 
- *              	BOUCLE OUVERTE				    *
+ *              				OPEN LOOP				    												*
  *                                                                  *
 
  ********************************************************************/
@@ -612,8 +613,7 @@ void controller_axis::calculer_commande_BO ()
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *
                                       (ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) - 
                                       ControllerAxisData_.angle_filtre_prec * (P_ECHANT_S - 2 * TAU)) / (P_ECHANT_S + 2* TAU);
-
-
+  
   //Calcul de la commande
   commande  = sens_pression * K_BOUCLE_OUVERTE*angle_th;
 

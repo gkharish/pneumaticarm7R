@@ -25,7 +25,7 @@
 #include "carte.h"
 #include "CIODAC16.h"
 #include "CIODAS64.h"
-#include "actionneur.h"
+#include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
 #include "capteur.h"

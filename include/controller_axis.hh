@@ -39,7 +39,7 @@
 
  ********************************************************************/
 
-#include "actionneur.h"
+#include "actuator.hh"
 #include "controller_tool.hh"
 #include "joystick.h"
 #include "capteur_position.h"
@@ -54,7 +54,7 @@ typedef struct controller_axis_data_s
   // Reference to the joystick
   I_teleop* pjoystick;
   // Actuator reference.
-  actionneur *pactionneur;
+  Actuator *pactuator;
   // Identifier of the actuator
   int numero;
   // Rest value of the angle
@@ -82,7 +82,7 @@ typedef struct controller_axis_data_s
 
   /*! Error */
   double error; // erreur
-  
+
   /*@{ Saturations */
   /*! Forward saturation */
   bool forward_saturation; //saturation_avant;
@@ -91,8 +91,8 @@ typedef struct controller_axis_data_s
   bool backward_saturation; //saturation_arriere;
 
   /*!  Rule during muscle initialization */
-  double delta_repos; 
-  
+  double delta_repos;
+
 } controller_axis_data;
 
 class controller_axis
@@ -101,7 +101,7 @@ class controller_axis
  private :
   controller_axis_data ControllerAxisData_;
   int numero;			//numero de l'axe
-  actionneur * pactionneur;	//actionneur associe
+  Actuator * pactuator;	//actionneur associe
   I_teleop * pjoystick;     //joystick associe
   double zero_joy;		//position initiale du joystick
   capteur_position *pcapteur;   //capteur de position associe
@@ -144,7 +144,7 @@ class controller_axis
     \param D: Derivative control gain.
    */
   controller_axis (I_teleop* pjoy,
-                   actionneur *lactuator,
+                   Actuator *lactuator,
                    int num,
                    double angle_init,
                    double angle_min_bound, 

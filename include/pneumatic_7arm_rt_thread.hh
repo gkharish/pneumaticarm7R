@@ -38,7 +38,7 @@
 #include "carte.h"
 #include "CIODAC16.h"
 #include "CIODAS64.h"
-#include "actionneur.h"
+#include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
 #include "capteur.h"
@@ -93,7 +93,7 @@ class Pneumatic7ArmRtThread
   int num_joints_;
 
   // Actuators
-  actionneur actuators_[7];
+  Actuator actuators_[7];
 
   // Joysticks
   I_teleop * joy1_,*joy2_,* ppalonnier_;

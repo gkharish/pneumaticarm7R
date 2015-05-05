@@ -49,7 +49,7 @@
 #define DELTA_INIT_AXE_6 -0.6
 #define DELTA_INIT_AXE_7 -0.2
 
-//Ports de sorties des actionneurs sur la carte de commande (CIODAC16)
+//Outputports  of actuators of output card (CIODAC16)
 #define VOIE_1_1  0	//2
 #define VOIE_1_2  1 //3
 #define VOIE_2_1  2	//0
@@ -222,7 +222,7 @@
 #include "carte.h"
 //#include "CIODAC16.h"
 //#include "CIODAS64.h"
-#include "actionneur.h"
+#include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
 #include "capteur.h"

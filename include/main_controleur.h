@@ -9,7 +9,7 @@
 #define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
-#define VOIE_PINCE_1        14   // sorties de la carte de commande 
+#define VOIE_PINCE_1        14   // sorties de la carte de commande
 #define VOIE_PINCE_2        15   // reliees a la pince
 
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
@@ -20,12 +20,12 @@
 #define DELTA_INIT_AXE_1 -1.4
 #define DELTA_INIT_AXE_2 -2.5
 #define DELTA_INIT_AXE_3  0.0
-#define DELTA_INIT_AXE_4  1.8 
+#define DELTA_INIT_AXE_4  1.8
 #define DELTA_INIT_AXE_5  0.2
 #define DELTA_INIT_AXE_6 -0.6
-#define DELTA_INIT_AXE_7 -0.2 
+#define DELTA_INIT_AXE_7 -0.2
 
-//Ports de sorties des actionneurs sur la carte de commande (CIODAC16)
+/* Output ports of actuators associated to the ouptput command card (CIODAC16)*/
 #define VOIE_1_1  2
 #define VOIE_1_2  3
 #define VOIE_2_1  0
@@ -50,7 +50,7 @@
 #define VOIE_Y_2	  6
 #define VOIE_Z_2	  4
 #define VOIE_BOUTTON_A_2  5
-#define VOIE_PALONNIER   23 
+#define VOIE_PALONNIER   23
 #define VOIE_INUTILISEE  -1
 
 //seuil de prise en compte des mouvements du joystick et du palonnier
@@ -58,13 +58,13 @@
 #define SEUIL_PAL  0.25
 
 //Informations concernant la vitesse du mouvement
-#define COEF_LENT        0.5    //coefficients de rapidite du 
+#define COEF_LENT        0.5    //coefficients de rapidite du
 #define COEF_MOYEN       1 	// mouvement
 #define COEF_RAPIDE      2
 
 #define VITESSE_LENTE    0
 #define VITESSE_MOY      1
-#define VITESSE_RAPIDE   2 
+#define VITESSE_RAPIDE   2
 
 #define PRESSION_BASE     2.5
 #define DEMI_TRAJET     180.0
@@ -128,7 +128,7 @@
 #define P_AXE_4 (0.0139) *1.25 //ancien: 1.25
 #define P_AXE_5 (0.0139) *1.5
 #define P_AXE_6 (0.0139) *1.75
-#define P_AXE_7 (0.0139) 
+#define P_AXE_7 (0.0139)
 
 //CONSTANTE POUR LA BOUCLE OUVERTE
 #define K_BOUCLE_OUVERTE (2.5/180)
@@ -157,7 +157,7 @@
 #include "carte.h"
 #include "CIODAC16.h"
 #include "CIODAS64.h"
-#include "actionneur.h"
+#include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
 #include "capteur.h"

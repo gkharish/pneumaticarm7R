@@ -35,7 +35,7 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 
 ADD_LIBRARY(${LIBRARY_NAME}
   SHARED
-  actionneur.cpp
+  actuator.cpp
   capteur.cpp
   capteur_position.cpp
   CIODAC16.cpp

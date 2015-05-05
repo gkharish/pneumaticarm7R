@@ -31,7 +31,7 @@ SET(CUSTOM_HEADER_DIR "${PROJECT_NAME}")
 
 SET(${PROJECT_NAME}_HEADERS
 
-	include/actionneur.h
+	include/actuator.hh
 	include/capteur.h
 	include/capteur_position.h
 	include/carte.h

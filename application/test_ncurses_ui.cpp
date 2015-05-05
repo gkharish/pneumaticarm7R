@@ -5,13 +5,16 @@ int main(void)
 {
   NCursesUI ancursesui;
 
-  while(1)
+  ancursesui.Init();
+  bool loop=true;
+  while(loop)
     {
       // Sleep 10ms.
       usleep(10000);
 
       // Display window
-      ancursesui.DisplayInformation();
+      if (ancursesui.DisplayInformation())
+        loop=false;
     }
   exit(0);
 }

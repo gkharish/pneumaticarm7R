@@ -15,3 +15,6 @@ PKG_CONFIG_USE_DEPENDENCY (test-pneumaticarm7R ncurses)
 
 ADD_EXECUTABLE(test_ncurses_ui test_ncurses_ui.cpp  ${CMAKE_SOURCE_DIR}/src/ncurses_ui.cpp)
 PKG_CONFIG_USE_DEPENDENCY (test_ncurses_ui ncurses)
+TARGET_LINK_LIBRARIES(test_ncurses_ui pthread)
+
+

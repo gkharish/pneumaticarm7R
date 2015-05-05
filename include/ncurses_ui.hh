@@ -15,7 +15,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
+#include <ncurses.h>			/* ncurses.h includes stdio.h */
 //#include <pneumatic_7arm_rt_thread.hh>
 
 class NCursesUI
@@ -24,9 +26,15 @@ public:
   NCursesUI();
   ~NCursesUI();
 
-  void DisplayInformation();
+  // Return false if finished
+  bool DisplayInformation();
+  void HandlingKeyboard();
+  void Init();
+
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
-  
+  WINDOW * main_win_;
+  pthread_t handle_keyboard_;
+  bool end_of_loop_;
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

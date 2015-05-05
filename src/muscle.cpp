@@ -10,7 +10,7 @@
  ************************************************************/
 
 /*MODIFICATIONS
-  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES captorS DE POSITION
+  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES captureS DE POSITION
   20/12/2002: AJOUT Du choix boucle ouverte boucle fermee
 */
 #define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__

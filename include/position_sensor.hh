@@ -1,5 +1,5 @@
 /****************************************
- * Fichier captor_position.hh          	*
+ * Fichier position_sensor.hh          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
@@ -8,9 +8,9 @@
 #define CAPTOR_POSITION
 
 
-#include <captor.hh>
+#include <sensor.hh>
 /********************************************************************
- *                   CLASS captor_position                        *
+ *                   CLASS position_sensor                        *
  ********************************************************************
  *                                                                  *
  *       This class provides all operations serving
@@ -19,26 +19,26 @@
  ********************************************************************/
 
 
-class captor_position: public captor
+class position_sensor: public sensor
 {
  private :
   double offset,pente;
 
  public :
   //constructors
-  captor_position (){}
-  captor_position (double,double);
+  position_sensor (){}
+  position_sensor (double,double);
 
-  //Lecture de la position de l'axe
-  double lire_position(void);
+  //read the position of the joints
+  double read_position(void);
 	double read_sensors_array(int);
-  /* recup attr. */
+  /* get the attributes. */
   card * get_card (void);
   double get_rapport(void);
   double get_offset();
   double get_pente();
 
-  /* modif attr. */
+  /* set the  attributes. */
   void set_offset(double);
   void set_pente(double);
 };

@@ -1,9 +1,9 @@
 /****************************************
- * Fichier captor.cpp          	*
+ * Fichier capture.cpp          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
-#include "captor.hh"
+#include "sensor.hh"
 
 /********************************************************************
 
@@ -19,7 +19,7 @@
 
 
 
- *   - chan : numero de voie utilise par le captor                 *
+ *   - chan : numero de voie utilise par le sensor                 *
 
 
 
@@ -27,7 +27,7 @@
 
  ********************************************************************/
 
-void captor::set_association(card *pcard,int chan)
+void sensor::set_association(card *pcard,int chan)
 {
   pcard = pcard;
   chanNumber = chan;
@@ -43,13 +43,13 @@ void captor::set_association(card *pcard,int chan)
 
  *    RETOURNE :                                                    *
 
- *                le numero de voie du captor		            *
+ *                le numero de voie du sensor		            *
 
  *                                                                  *
 
  ********************************************************************/
 
-int captor::get_channel()
+int sensor::get_channel()
 {
 	return(chanNumber);
 }
@@ -72,7 +72,7 @@ int captor::get_channel()
 
  ********************************************************************/
 
- card * captor::get_card(void)
+ card * sensor::get_card(void)
  {
  	return(pcard);
  }

@@ -62,7 +62,7 @@ class palonnier :public I_teleop
     	palonnier (card *,int,double);
 
     	//lecture de la position
-    	double lire_position(void);
+    	double read_position(void);
 
 };
 

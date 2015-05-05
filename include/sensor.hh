@@ -1,5 +1,5 @@
 /****************************************
- * Fichier captor.hh       	*
+ * Fichier sensor.hh       	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
@@ -8,23 +8,23 @@
 #define CAPTOR_HH
 
 #include <card.hh>
- /******* CLASSE  - GENERALISATION DES S *****/
+/******* CLASSE  - GENERALISATION DES S *****/
 
-class captor
+class sensor
 {
-	protected :
+protected :
   card * pcard;  //pointeur sur la card d'acquisition
- 	int chanNumber;  //voie correspondante sur la card d'acquisition
- 	//int *axis_number;
- 	public :
+  int chanNumber;  //voie correspondante sur la card d'acquisition
+  //int *axis_number;
+public :
 
-	//Association d'un card et d'un numero de voie au
-	void set_association(card *,int);
+  //Association d'un card et d'un numero de voie au
+  void set_association(card *,int);
 
-	//Accesseurs
-	int get_channel();
-	//void set_axisnum(int *index)
-	card * get_card();
+  //Accesseurs
+  int get_channel();
+  //void set_axisnum(int *index)
+  card * get_card();
 };
 
 #endif

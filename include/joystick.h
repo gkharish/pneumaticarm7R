@@ -53,11 +53,11 @@ voie_axeX,voie_axeY,voie_axeZ,	   //numeros de voie
 		 
 		/* Permet de lire toutes les entr�es d'un joystick */
 
-		double lire_position_x(void);
+		double read_position_x(void);
 
-		double lire_position_y(void);
-		double lire_position_z(void);
-		double lire_position_vitesse(void);
+		double read_position_y(void);
+		double read_position_z(void);
+		double read_position_vitesse(void);
 		bool lire_bouton_A(void);
 		bool lire_bouton_B(void);
 		bool lire_bouton_C(void);

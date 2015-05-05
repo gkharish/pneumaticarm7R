@@ -64,13 +64,13 @@ Actuator::Actuator (int chan1,int chan2 ,card* card)
 
  ********************************************************************/
 
-void Actuator::recevoir_commande (double commande)
+void Actuator::receive_command (double commande)
 
 {
 	double m1,m2;
 	m1 = 2.5 + commande ;
 	m2 = 2.5 - commande ;
-	recevoir_commande_decouple(m1,m2);
+	receive_command_decouple(m1,m2);
 }
 
 /********************************************************************
@@ -91,7 +91,7 @@ void Actuator::recevoir_commande (double commande)
 
  ********************************************************************/
 
-void Actuator::recevoir_commande_decouple (double val1,double val2)
+void Actuator::receive_command_decouple (double val1,double val2)
 
 {
 

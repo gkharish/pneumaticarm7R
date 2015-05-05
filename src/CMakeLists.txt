@@ -50,7 +50,6 @@ ADD_LIBRARY(${LIBRARY_NAME}
   modele.cpp
   muscle.cpp
   pneumatic_7arm_rt_thread.cpp
-
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )
 

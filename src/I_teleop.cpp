@@ -55,7 +55,7 @@ palonnier :: palonnier(card * card, int canal,double delta) {
  ********************************************************************/
 
  
-double palonnier::lire_position (void) {
+double palonnier::read_position (void) {
     double valeur;
     unsigned int val;
     //recuperation de la valeur

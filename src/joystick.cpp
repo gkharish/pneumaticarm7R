@@ -69,7 +69,7 @@ Historique des modifications
 
  ********************************************************************/
 
- double joystick::lire_position_x (void)
+ double joystick::read_position_x (void)
 
  {
 
@@ -100,7 +100,7 @@ Historique des modifications
 
  ********************************************************************/
 
- double joystick::lire_position_y (void)
+ double joystick::read_position_y (void)
 
  {
 
@@ -132,7 +132,7 @@ Historique des modifications
 
  ********************************************************************/
 
- double joystick::lire_position_z (void)
+ double joystick::read_position_z (void)
 
  {
 
@@ -163,7 +163,7 @@ Historique des modifications
 
  ********************************************************************/
 
- double joystick::lire_position_vitesse (void)
+ double joystick::read_position_vitesse (void)
 
  {
 
@@ -315,10 +315,10 @@ Historique des modifications
  
  int joystick::get_vitesse() {
  	
- 	if (lire_position_vitesse() <= 3.55 && lire_position_vitesse() > 3.30)
+ 	if (read_position_vitesse() <= 3.55 && read_position_vitesse() > 3.30)
  		return 0;
  	else 
- 		if (lire_position_vitesse() <= 4.75 && lire_position_vitesse() > 3.55)
+ 		if (read_position_vitesse() <= 4.75 && read_position_vitesse() > 3.55)
  			return 1;
  		else
  			return 2;

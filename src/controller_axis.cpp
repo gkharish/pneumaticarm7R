@@ -34,7 +34,7 @@ controller_axis::controller_axis (I_teleop* pjoy,
   aControllerAxisData.pjoystick = pjoy;
   aControllerAxisData.angle_repos = angle_init;
   aControllerAxisData.angle_reel = angle_init;
-  aControllerAxisData.sens_captor = s_cap;
+  aControllerAxisData.sens_capture = s_cap;
   aControllerAxisData.sens_pression = s_pre;
 
   aControllerAxisData.angle_th = angle_init;
@@ -94,7 +94,7 @@ void controller_axis::set_loop (int aloop)
 
 /********************************************************************
 
- *                          set_captor                            *
+ *                          set_capture                            *
 
  ********************************************************************
 
@@ -102,7 +102,7 @@ void controller_axis::set_loop (int aloop)
 
  *    PARAMETRES :                                                  *
 
- *                pcap  : pointeur sur un captor		    *
+ *                pcap  : pointeur sur un capture		    *
 
  *		  rap	: rapport mecanique			    *
 
@@ -110,15 +110,15 @@ void controller_axis::set_loop (int aloop)
 
  ********************************************************************/
 
-void controller_axis::set_captor (captor_position* pcap)
+void controller_axis::set_capture (position_sensor* pcap)
 {
-  pcaptor = pcap;
+  pcapture = pcap;
   //rapport=rap;
-  double var = pcaptor -> read_sensors_array(numero);//lire_position();
-  cout << "\n controller_axis.setcaptor read sensors array: " << var << endl;
+  double var = pcapture -> read_sensors_array(numero);//read_position();
+  cout << "\n controller_axis.setcapture read sensors array: " << var << endl;
   //  	double var1 = var - angle_repos;
-  //double offset_captor = fabs( var1);
-  //printf("\n controller_axis.setcaptor()3");
+  //double offset_capture = fabs( var1);
+  //printf("\n controller_axis.setcapture()3");
   //cet offset est recalcule plus tard, inutile ?
 }
 
@@ -130,7 +130,7 @@ void controller_axis::set_userpressure(double pres)
 
 /********************************************************************
 
- *                Lecture de la position du captor                 *
+ *                Lecture de la position du capture                 *
 
  ********************************************************************
 
@@ -144,35 +144,35 @@ void controller_axis::set_userpressure(double pres)
 
  ********************************************************************/
 
-double controller_axis::lire_position (void)
+double controller_axis::read_position (void)
 
 {
 
   double angle;
 
   /* recup�ration de la tension */
-  //angle = pcaptor->lire_position();
-  angle = pcaptor->read_sensors_array(numero);
+  //angle = pcapture->read_position();
+  angle = pcapture->read_sensors_array(numero);
 
   //std::cout << " read sensor array Angle is :" << angle << std::endl;
-  //Calcul de l'angle theorique en fonction de l'angle lu par le captor
+  //Calcul de l'angle theorique en fonction de l'angle lu par le capture
 
-  //Calcul different selon le sens de rotation du captor
+  //Calcul different selon le sens de rotation du capture
 
-  if (sens_captor == 1)
+  if (sens_capture == 1)
     {
 
       if (angle_repos > offset_lu)
-	angle =  angle + offset_captor ;
+	angle =  angle + offset_capture ;
       else
-	angle =  angle - offset_captor ;
+	angle =  angle - offset_capture ;
     }
   else
     {
       if (angle_repos > offset_lu)
-	angle = 360 - ( angle + offset_captor );
+	angle = 360 - ( angle + offset_capture );
       else
-	angle = 360 - ( angle - offset_captor );
+	angle = 360 - ( angle - offset_capture );
     }
   angle =  fmod( angle ,360);
 
@@ -180,10 +180,10 @@ double controller_axis::lire_position (void)
   if (angle <= 360 && angle > 180)
     angle = - (360 - angle);
 
-  /*std::cout << "Angle controller_axis:lireposition and rapport : " << offset_captor<<", "
+  /*std::cout << "Angle controller_axis:lireposition and rapport : " << offset_capture<<", "
     <<offset_lu<< ", "
     <<angle_repos<<", "
-    <<sens_captor <<", "
+    <<sens_capture <<", "
     <<angle <<", "
     << rapport <<","<< std::endl;*/
   //cout << "rapport" << rapport << endl;
@@ -194,7 +194,7 @@ double controller_axis::lire_position (void)
 
 /********************************************************************
 
- *                   	   get_captor      		            *
+ *                   	   get_capture      		            *
 
  ********************************************************************
 
@@ -202,15 +202,15 @@ double controller_axis::lire_position (void)
 
  *    RETOURNE :                                                    *
 
- *                un pointeur sur le captor	                    *
+ *                un pointeur sur le capture	                    *
 
  *                                                                  *
 
  ********************************************************************/
 
-captor_position * controller_axis::get_captor(void)
+position_sensor * controller_axis::get_capture(void)
 {
-  return(pcaptor);
+  return(pcapture);
 }
 
 /********************************************************************
@@ -317,7 +317,7 @@ double controller_axis::get_angle_reel (void)
 double controller_axis::get_angle_lire (void) // get te angle s read by controller from DAQ
 {
   double angle_lire;
-  angle_lire = (this ->lire_position());
+  angle_lire = (this ->read_position());
   return (angle_lire);
 }
 
@@ -382,8 +382,8 @@ void controller_axis::controller ()
 
   //angle_th = 60;
   // SECURITY CHECK
-  //double  angle_boundary = (this ->lire_position());
-  double  angle_boundary = pcaptor->read_sensors_array(numero);
+  //double  angle_boundary = (this ->read_position());
+  double  angle_boundary = pcapture->read_sensors_array(numero);
   cout << "\n Angle Boundary : "<< angle_boundary << endl;
   //On calcule la commande correspondant a l'angle theorique actuel
   if(angle_boundary < angle_max && angle_boundary > angle_min)
@@ -392,7 +392,7 @@ void controller_axis::controller ()
     }
   else
     {
-      pactuator->recevoir_commande(ControllerAxisData_.delta_repos);
+      pactuator->receive_command(ControllerAxisData_.delta_repos);
     }
   //cout << "inside controleur.controler()debug2" << endl;
   //On verifie que delta_repos ne depasse pas les limite
@@ -403,7 +403,7 @@ void controller_axis::controller ()
     {
       if (ControllerAxisData_.forward_saturation) ControllerAxisData_.forward_saturation = false;
       if (ControllerAxisData_.backward_saturation) ControllerAxisData_.backward_saturation = false;
-      pactuator->recevoir_commande(ControllerAxisData_.delta_repos+commande);
+      pactuator->receive_command(ControllerAxisData_.delta_repos+commande);
     }
   else
     {
@@ -451,7 +451,7 @@ void controller_axis::initialisation_muscles (double delta_init,double vitesse_p
       else
 	j = j + 2 * vitesse_pression;
 
-      pactuator -> recevoir_commande_decouple(i,j);
+      pactuator -> receive_command_decouple(i,j);
       //for (int k = 0;k< 400000;k++) {}
       // cout << "sysclkrateget value :" << sysClkRateGet ( ) << endl;
       taskDelay (sysClkRateGet ( ) / 32);
@@ -479,8 +479,8 @@ void controller_axis::initialisation_muscles (double delta_init,double vitesse_p
 
 void controller_axis::init_angles ()
 {
-  offset_lu = pcaptor -> get_offset();
-  offset_captor = fabs(offset_lu - angle_repos);
+  offset_lu = pcapture -> get_offset();
+  offset_capture = fabs(offset_lu - angle_repos);
 }
 
 /********************************************************************
@@ -500,7 +500,7 @@ void controller_axis::init_angles ()
 void controller_axis::initialisation_card ()
 {
   double i = 0;
-  pactuator->recevoir_commande_decouple(i,i);
+  pactuator->receive_command_decouple(i,i);
 }
 
 
@@ -537,7 +537,7 @@ void controller_axis::degonfle (double vitesse_pression)
  	i=0;
       if (j < 0)
  	j=0;
-      pactuator->recevoir_commande_decouple(i,j);
+      pactuator->receive_command_decouple(i,j);
       taskDelay (sysClkRateGet () / 32);
       //for (int t=0;t<100000;t++){}
     }
@@ -562,8 +562,8 @@ void controller_axis::degonfle (double vitesse_pression)
 
 void controller_axis::calculer_commande_BF ()
 {
-  //Lecture de l'angle reel mesure par la captor
-  angle_reel = (this ->lire_position());
+  //Lecture de l'angle reel mesure par la capture
+  angle_reel = (this ->read_position());
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *(ControllerAxisData_.angle_reel + ControllerAxisData_.angle_reel_prec) 
@@ -606,8 +606,8 @@ void controller_axis::calculer_commande_BF ()
 
 void controller_axis::calculer_commande_BO ()
 {
-  //Lecture de l'angle reel mesure par la captor
-  angle_reel = (this ->lire_position());
+  //Lecture de l'angle reel mesure par la capture
+  angle_reel = (this ->read_position());
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxisData_.angle_filtre = (P_ECHANT_S *

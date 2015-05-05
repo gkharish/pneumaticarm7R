@@ -41,8 +41,8 @@
 #include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
-#include "captor.hh"
-#include "captor_position.hh"
+#include "sensor.hh"
+#include "position_sensor.hh"
 #include "controller_axis.hh"
 #include "controller_tool.hh"
 #include "fichier.h"
@@ -136,7 +136,7 @@ class Pneumatic7ArmRtThread
   void InitControllers();
 
   /** ! Initialize sensors */
-  void InitializeSensors(); // fka init_captors
+  void InitializeSensors(); // fka init_captures
 
   /** ! Inflating the muscles */
   void Inflating (); // fka gonfler

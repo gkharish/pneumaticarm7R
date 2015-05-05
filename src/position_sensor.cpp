@@ -1,14 +1,14 @@
 /****************************************
- * Fichier captor_position.cpp         *
+ * Fichier position_sensor.cpp         *
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
 
 
 #include <iostream>
-#include "captor_position.hh"
+#include "position_sensor.hh"
 
-//sens du captor
+//sense of capture
 #define POSITIF  1
 #define NEGATIF -1
 #define NUL      0
@@ -17,7 +17,7 @@
 
 /********************************************************************
 
- *                          CONSTRUCTEUR                            *
+ *                          CONSTRUCTOR                            *
 
  ********************************************************************
 
@@ -26,15 +26,15 @@
  *    PARAMETRES :                                                  *
 
 
- *                off   : offset	                            *
+ *                  off   : offset	                                *
 
- *		  pen	: pente					    *
+ *		              pen	: pente					                            *
 
  *                                                                  *
 
  ********************************************************************/
 
-captor_position::captor_position (double off,double pen)
+position_sensor::position_sensor (double off,double pen)
 
 {
 
@@ -46,7 +46,7 @@ captor_position::captor_position (double off,double pen)
 
 /********************************************************************
 
- *                Lecture de la position du captor                 *
+ *                Lecture de la position du capture                 *
 
  ********************************************************************
 
@@ -60,7 +60,7 @@ captor_position::captor_position (double off,double pen)
 
  ********************************************************************/
 
-double captor_position::lire_position (void)
+double position_sensor::read_position (void)
 
 {
 
@@ -79,7 +79,7 @@ double captor_position::lire_position (void)
 
 }
 
-double captor_position::read_sensors_array (int ind)
+double position_sensor::read_sensors_array (int ind)
 
 {
 
@@ -89,7 +89,7 @@ double captor_position::read_sensors_array (int ind)
   /* recup�ration de la tension */
 
   //v1 = pcard->adconv(chanNumber);
-  //std::cout << "captor_position:read_sensors_array:" << ind << std::endl;
+  //std::cout << "position_sensor:read_sensors_array:" << ind << std::endl;
   v1 = pcard -> read_sensors(ind);
   //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
   //printf("valeur lue au can %d \r",v);
@@ -118,7 +118,7 @@ double captor_position::read_sensors_array (int ind)
 
  ********************************************************************/
 
-double captor_position::get_offset(void)
+double position_sensor::get_offset(void)
 {
   return(offset);
 }
@@ -138,7 +138,7 @@ double captor_position::get_offset(void)
 
  ********************************************************************/
 
-void captor_position::set_offset(double off)
+void position_sensor::set_offset(double off)
 {
   offset = off;
 }
@@ -160,7 +160,7 @@ void captor_position::set_offset(double off)
 
  ********************************************************************/
 
- double captor_position::get_pente(void)
+ double position_sensor::get_pente(void)
  {
  	return(pente);
  }
@@ -180,7 +180,7 @@ void captor_position::set_offset(double off)
 
  ********************************************************************/
 
-void captor_position::set_pente(double apente)
+void position_sensor::set_pente(double apente)
  {
  	pente = apente;
  }

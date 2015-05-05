@@ -113,7 +113,7 @@ void controleur_axe::set_ (_position* pcap)
 {
   	p = pcap;
   	//rapport=rap;
-  	double var = p -> read_sensors_array(numero);//lire_position();
+  	double var = p -> read_sensors_array(numero);//read_position();
   	cout << "\n controleur_axe.set read sensors array: " << var << endl;
         //  	double var1 = var - angle_repos;
   	//double offset_ = fabs( var1);
@@ -143,14 +143,14 @@ void controleur_axe::set_userpressure(double pres)
 
  ********************************************************************/
 
-double controleur_axe::lire_position (void)
+double controleur_axe::read_position (void)
 
 {
 
   double angle;
 
   /* recup�ration de la tension */
-  //angle = p->lire_position();
+  //angle = p->read_position();
   angle = p->read_sensors_array(numero);
 
   //std::cout << " read sensor array Angle is :" << angle << std::endl;
@@ -316,7 +316,7 @@ double controleur_axe::get_angle_reel (void)
 double controleur_axe::get_angle_lire (void) // get te angle s read by controller from DAQ
 {
   double angle_lire;
-  angle_lire = (this ->lire_position());
+  angle_lire = (this ->read_position());
   return (angle_lire);
 }
 
@@ -381,7 +381,7 @@ void controleur_axe::controller ()
 
   //angle_th = 60;
   // SECURITY CHECK
-  //double  angle_boundary = (this ->lire_position());
+  //double  angle_boundary = (this ->read_position());
   double  angle_boundary = p->read_sensors_array(numero);
   cout << "\n Angle Boundary : "<< angle_boundary << endl;
   //On calcule la commande correspondant a l'angle theorique actuel
@@ -391,7 +391,7 @@ void controleur_axe::controller ()
     }
   else
     {
-      pactionneur->recevoir_commande(ControllerAxeData_.delta_repos);
+      pactionneur->receive_command(ControllerAxeData_.delta_repos);
     }
   //cout << "inside controleur.controler()debug2" << endl;
   //On verifie que delta_repos ne depasse pas les limite
@@ -402,7 +402,7 @@ void controleur_axe::controller ()
     {
       if (ControllerAxeData_.forward_saturation) ControllerAxeData_.forward_saturation = false;
       if (ControllerAxeData_.backward_saturation) ControllerAxeData_.backward_saturation = false;
-      pactionneur->recevoir_commande(ControllerAxeData_.delta_repos+commande);
+      pactionneur->receive_command(ControllerAxeData_.delta_repos+commande);
     }
   else
     {
@@ -450,7 +450,7 @@ void controleur_axe::initialisation_muscles (double delta_init,double vitesse_pr
       else
 	j = j + 2 * vitesse_pression;
 
-      pactionneur -> recevoir_commande_decouple(i,j);
+      pactionneur -> receive_command_decouple(i,j);
       //for (int k = 0;k< 400000;k++) {}
       // cout << "sysclkrateget value :" << sysClkRateGet ( ) << endl;
       taskDelay (sysClkRateGet ( ) / 32);
@@ -499,7 +499,7 @@ void controleur_axe::init_angles ()
 void controleur_axe::initialisation_card ()
 {
   double i = 0;
-  pactionneur->recevoir_commande_decouple(i,i);
+  pactionneur->receive_command_decouple(i,i);
 }
 
 
@@ -536,7 +536,7 @@ void controleur_axe::degonfle (double vitesse_pression)
  	i=0;
       if (j < 0)
  	j=0;
-      pactionneur->recevoir_commande_decouple(i,j);
+      pactionneur->receive_command_decouple(i,j);
       taskDelay (sysClkRateGet () / 32);
       //for (int t=0;t<100000;t++){}
     }
@@ -562,7 +562,7 @@ void controleur_axe::degonfle (double vitesse_pression)
 void controleur_axe::calculer_commande_BF ()
 {
   //Lecture de l'angle reel mesure par la 
-  angle_reel = (this ->lire_position());
+  angle_reel = (this ->read_position());
   //std::cout << "\n angle reel inside calcler_commande_BF :" << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxeData_.angle_filtre = (P_ECHANT_S *(ControllerAxeData_.angle_reel + ControllerAxeData_.angle_reel_prec)
@@ -606,7 +606,7 @@ void controleur_axe::calculer_commande_BF ()
 void controleur_axe::calculer_commande_BO ()
 {
   //Lecture de l'angle reel mesure par la 
-  angle_reel = (this ->lire_position());
+  angle_reel = (this ->read_position());
   //cout << "\n angle read in openloop: " << angle_reel << endl;
   //on filtre l'angle mesure pour eviter les oscillations
   ControllerAxeData_.angle_filtre = (P_ECHANT_S *

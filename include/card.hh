@@ -1,4 +1,4 @@
- * Fichier Card.hh               	*
+ /* Fichier card.hh               	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/

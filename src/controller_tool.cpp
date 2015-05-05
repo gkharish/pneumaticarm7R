@@ -20,17 +20,17 @@
 
  *   PARAMETRES :                                                   *
 
- *               card  : pointeur sur une carte		            *
+ *               card  : pointeur sur une card		            *
 
- *               v1    : voie 1 de la pince sur la carte de commande*
- *		 v2    : voie 2 de la pince sur la carte de commande*
+ *               v1    : voie 1 de la pince sur la card de commande*
+ *		 v2    : voie 2 de la pince sur la card de commande*
  *                                                                  *
 
  ********************************************************************/
  
  
- controller_tool::controller_tool(carte * card,int v1,int v2) {
- 	pcarte = card;
+ controller_tool::controller_tool(card * card,int v1,int v2) {
+ 	pcard = card;
  	pince_ouverte = false;
  	voie_pince_1 = v1;
  	voie_pince_2 = v2;
@@ -53,10 +53,10 @@
  
  
  void controller_tool::initialiser () {
- 	/*pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
- 	pcarte->daconv(voie_pince_2,PRESSION_MIN_NUM);
+ 	/*pcard->daconv(voie_pince_1,PRESSION_MAX_NUM);
+ 	pcard->daconv(voie_pince_2,PRESSION_MIN_NUM);
  	taskDelay(sysClkRateGet());
- 	pcarte->daconv(voie_pince_1,PRESSION_MIN_NUM);*/
+ 	pcard->daconv(voie_pince_1,PRESSION_MIN_NUM);*/
  }
  
 
@@ -87,26 +87,26 @@
 	
 	/*//fin de l'impulsion d'ouverture 
  	if (etat_voie_2 == 1) {
- 		pcarte->daconv(voie_pince_2,PRESSION_MIN_NUM);
+ 		pcard->daconv(voie_pince_2,PRESSION_MIN_NUM);
  		etat_voie_2 = 0;
  	}
  	
  	//fin de l'impulsion de fermeture
  	if (etat_voie_1 == 1) {
- 		pcarte->daconv(voie_pince_1,PRESSION_MIN_NUM);
+ 		pcard->daconv(voie_pince_1,PRESSION_MIN_NUM);
  		etat_voie_1 = 0;
  	}
  	
  	//debut de l'impulsion d'ouverture
  	if (ouvrir_pince && !pince_ouverte) {
- 		pcarte->daconv(voie_pince_2,PRESSION_MAX_NUM); 		
+ 		pcard->daconv(voie_pince_2,PRESSION_MAX_NUM); 		
  		pince_ouverte = true;
  		etat_voie_2 = 1;
  	}
  	
  	//debut de l'impulsion de fermeture  
  	if (!ouvrir_pince && pince_ouverte) {
- 		pcarte->daconv(voie_pince_1,PRESSION_MAX_NUM);
+ 		pcard->daconv(voie_pince_1,PRESSION_MAX_NUM);
  		pince_ouverte = false;
  		etat_voie_1 = 1;
  		}*/

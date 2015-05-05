@@ -1,5 +1,5 @@
-/* CIODAC16.cpp - corps de la classe carteSortie */
-/* refCarte : CIO-DAC16-I de Computer boards*/
+/* CIODAC16.cpp - corps de la classe cardSortie */
+/* refcard : CIO-DAC16-I de Computer boards*/
 /* Erwan Guiochet - 2002 */
 
 /*
@@ -7,7 +7,7 @@ Historique des modifications
 ----------------------------
 
 */
-#include "CIODAC16.h"
+#include "CIODAC16.hh"
 #include <string.h>
 
 

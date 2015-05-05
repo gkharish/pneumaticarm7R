@@ -1,5 +1,5 @@
 /****************************************
- * Fichier controller_axis.h         	*
+ * Fichier controller_axis.hh         	*
  * Jeremie Guiochet			*
  * cree le 17/07/2002 par Mehdi SEFFAR	*
  ****************************************/
@@ -42,7 +42,7 @@
 #include "actuator.hh"
 #include "controller_tool.hh"
 #include "joystick.h"
-#include "capteur_position.h"
+#include "position_sensor.hh"
 #include "I_teleop.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -65,7 +65,7 @@ typedef struct controller_axis_data_s
   double angle_min_bound;
   double angle_max_bound;
   // Direction of the sensor
-  int sens_capteur;
+  int sens_captor;
   // Direction of the pressure
   int sens_pression;
   // PD gains
@@ -104,14 +104,14 @@ class controller_axis
   Actuator * pactuator;	//actuator associe
   I_teleop * pjoystick;     //joystick associe
   double zero_joy;		//position initiale du joystick
-  capteur_position *pcapteur;   //capteur de position associe
-  int sens_capteur;  //sens de rotation de l'axe par rapport au sens du capteur
+  captor_position *pcaptor;   //captor de position associe
+  int sens_captor;  //sens de rotation de l'axe par rapport au sens du captor
   int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
   double angle_repos,angle_reel, angle_max, angle_min;
   //reste constant pendant la phase de controle
-  double offset_capteur;  //difference entre la valeur initiale lue
-  // par le capteur et l'angle au repos theorique
-  double offset_lu; //valeur lue par le capteur a t =0
+  double offset_captor;  //difference entre la valeur initiale lue
+  // par le captor et l'angle au repos theorique
+  double offset_lu; //valeur lue par le captor a t =0
   double rapport;
   int boucle; // 0 pour boucle OUVERTE et 1 pour boucle FERMEE
   double user_pressure;
@@ -129,9 +129,10 @@ class controller_axis
 
  public :
 
-  //constructeurs
+  // Constructors
   controller_axis (){};
-  /*! Constructor 
+
+  /*! Constructor
     \param pjoy: Pointer towards the joystick structure (not supported anymore).
     \param lactuator: Pointer towards the actuator to controlled.
     \param num: Identifier of the joint
@@ -147,8 +148,8 @@ class controller_axis
                    Actuator *lactuator,
                    int num,
                    double angle_init,
-                   double angle_min_bound, 
-                   double angle_max_bound, 
+                   double angle_min_bound,
+                   double angle_max_bound,
                    int s_cap,
                    int s_pre,
                    double p,
@@ -156,14 +157,14 @@ class controller_axis
 
   void init_controller_axis (controller_axis_data & aControllerAxeData);
 
-  //Fonction d'association du capteur au controller d'axe
-  void set_capteur (capteur_position*);
+  //Fonction d'association du captor au controller d'axe
+  void set_captor (captor_position*);
 
   //Lecture de l'angle
   double lire_position(void);
 
-  //initialisation elctronique de la carte de commande
-  void initialisation_carte();
+  //initialisation elctronique de la card de commande
+  void initialisation_card();
 
   //Initialisation des muscles en position de repos
   void initialisation_muscles(double,double);
@@ -179,7 +180,7 @@ class controller_axis
 
   /** recuperation des attributs **/
   void init_angles (void);
-  capteur_position * get_capteur(void);
+  captor_position * get_captor(void);
   double get_rapport(void);
   double get_delta(void);
   double get_angle_desire();

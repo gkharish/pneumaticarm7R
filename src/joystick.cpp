@@ -27,18 +27,18 @@ Historique des modifications
 
  *    PARAMETRES :                                                  *
 
- *                pcard : pointeur sur une carte du type CIODAS6402 *
+ *                pcard : pointeur sur une card du type CIODAS6402 *
 
  *                + Numero de voie des divers elements		    *
  *                                                                  *
 
  ********************************************************************/
 
- joystick::joystick (carte * carte,int X, int Y, int Z, int A,int B, int C,int D, int acc,double delta)
+ joystick::joystick (card * card,int X, int Y, int Z, int A,int B, int C,int D, int acc,double delta)
 
  {
 
-  	pcarte = carte;
+  	pcard = card;
 
 	voie_bouton_a = A;
 
@@ -77,7 +77,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_axeX);
+	//val = pcard->adconv(voie_axeX);
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
 	return (valeur);
@@ -108,7 +108,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_axeY);
+	//val = pcard->adconv(voie_axeY);
 
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
@@ -140,7 +140,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_axeZ);
+	//val = pcard->adconv(voie_axeZ);
 	//conversion en tension
 	valeur = (val * UMAX) /4095.0;
 	return (valeur);
@@ -171,7 +171,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_vitesse);
+	//val = pcard->adconv(voie_vitesse);
 
 	//conversion en tension
 	valeur = (val * UMAX) /4095;
@@ -202,7 +202,7 @@ Historique des modifications
 	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_bouton_a);
+	//val = pcard->adconv(voie_bouton_a);
 
 	return (val<200);
 
@@ -231,7 +231,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_bouton_b);
+	//val = pcard->adconv(voie_bouton_b);
 
 	return (val<200);
 
@@ -260,7 +260,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_bouton_c);
+	//val = pcard->adconv(voie_bouton_c);
 
 	return (val<200);
  }
@@ -288,7 +288,7 @@ Historique des modifications
   	unsigned int val;
 	/* recup�ration de la valeur*/
 
-	//val = pcarte->adconv(voie_bouton_d);
+	//val = pcard->adconv(voie_bouton_d);
 
 	return (val<200);
 

@@ -1,39 +1,39 @@
 /****************************************
- * Fichier capteur_position.h          	*
+ * Fichier captor_position.hh          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
 
-#ifndef CAPTEUR_POSITION
-#define CAPTEUR_POSITION
+#ifndef CAPTOR_POSITION
+#define CAPTOR_POSITION
 
 
-#include <capteur.h>
+#include <captor.hh>
 /********************************************************************
- *                   CLASSE capteur_position                        *
+ *                   CLASS captor_position                        *
  ********************************************************************
  *                                                                  *
- *     Cette classe fournit toutes les operations servant 	    *
- *        a mesurer la position angulaire des axes		    *
+ *       This class provides all operations serving
+          to measure the angular position of the axes		            *
  *                                                                  *
  ********************************************************************/
 
 
-class capteur_position: public capteur
+class captor_position: public captor
 {
  private :
   double offset,pente;
 
  public :
-  //constructeurs
-  capteur_position (){}
-  capteur_position (double,double);
+  //constructors
+  captor_position (){}
+  captor_position (double,double);
 
   //Lecture de la position de l'axe
   double lire_position(void);
-		double read_sensors_array(int);
+	double read_sensors_array(int);
   /* recup attr. */
-  carte * get_carte (void);
+  card * get_card (void);
   double get_rapport(void);
   double get_offset();
   double get_pente();

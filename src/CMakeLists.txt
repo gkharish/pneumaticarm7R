@@ -36,8 +36,8 @@ SET(LIBRARY_NAME ${PROJECT_NAME})
 ADD_LIBRARY(${LIBRARY_NAME}
   SHARED
   actuator.cpp
-  capteur.cpp
-  capteur_position.cpp
+  sensor.cpp
+  position_sensor.cpp
   CIODAC16.cpp
   CIODAS64.cpp
   clientudp3.cpp

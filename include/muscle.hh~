@@ -1,7 +1,7 @@
 #ifndef MUSCLE_HH
 #define MUSCLE_HH
 
-/* Includes */
+* Includes */
 #include <iostream>
 #include <limits>
 #include <stdio.h>
@@ -22,20 +22,20 @@
 #include <istream>
 #include <math.h>
 
-#include "card.hh"
-#include "CIODAC16.hh"
-#include "CIODAS64.hh"
-#include "actuator.hh"
+#include "card.h"
+#include "CIODAC16.h"
+#include "CIODAS64.h"
+#include "actionneur.h"
 #include "I_teleop.h"
 #include "joystick.h"
-#include "captor.hh"
-#include "captor_position.hh"
-#include "controller_axis.hh"
-#include "controller_tool.hh"
+#include ".h"
+#include "_position.h"
+#include "controleur_axe.h"
+#include "controleur_outil.h"
 #include "fichier.h"
 #include "modele.h"
-#include "clientudp3.hh"
-#include "test_config.hh"
+#include "clientudp3.h"
+#include "test_config.h"
 #include <Eigen/Eigen>
 
 using namespace std;
@@ -43,14 +43,11 @@ using namespace Eigen;
 
 class Muscle
 {
-protected:
-  /*! Boolean for the end. */
-  bool end_;  // fin
 public:
-  void init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
+  void init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
 
-  void reset_muscle_i(controller_axis *controleur_i, double *vitesse);
+  void reset_muscle_i(controleur_axe *controleur_i, double *vitesse);
 
-  void trait_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
+  void trait_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse);
 };
 #endif /* MUSCLE_HH */

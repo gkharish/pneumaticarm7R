@@ -8,7 +8,7 @@
 #ifndef ACTUATOR
 #define ACTUATOR
 
-#include "carte.h"
+#include "card.hh"
 /********************************************************************
 
  *                        	DEFINES            	            *
@@ -43,11 +43,11 @@ class Actuator
 
 private :
 	int muscle1,muscle2; // num�ro de voix
-	carte * pcarte;
+	card * pcard;
 public :
 	//Constructors
 	Actuator (){}
-	Actuator (int,int, carte *);
+	Actuator (int,int, card *);
 
   //==========================================================
 	//=== Functions of commanding the actuators in presure ====

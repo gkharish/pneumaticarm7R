@@ -1,4 +1,4 @@
-/************************************************************
+</************************************************************
  *	       PROGRAMME DE TEST DE LA REALISATION	    *
  *		     DU CONTROLEUR DE ROBOT	            *
  ************************************************************
@@ -10,7 +10,7 @@
  ************************************************************/
 
 /*MODIFICATIONS
-  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES captorS DE POSITION
+  17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES S DE POSITION
   20/12/2002: AJOUT Du choix boucle ouverte boucle fermee
 */
 #define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__
@@ -21,16 +21,16 @@
 #endif
 
 
-#include <muscle.hh>
+
 void Muscle::
-init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse)
+init_muscle_i (controleur_axe *controleur_i, double * delta, double * vitesse)
 {
   controleur_i -> initialisation_muscles(*delta,*vitesse);
   //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void Muscle::
-reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
+reset_muscle_i (controleur_axe *controleur_i,  double * vitesse)
 {
   controleur_i -> degonfle(*vitesse);
   //signale a la tache principale la fin du degonflement des muscles
@@ -38,17 +38,18 @@ reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
 }
 
 void Muscle::
-trait_muscle_i (controller_axis *controleur_i,
-                double * delta,
+trait_muscle_i (controleur_axe *controleur_i,
+                double * ,//delta,
                 double * vitesse)
 {
+  double vit = *vitesse;
   //const char * buf = std::string("ok").c_str();
   //char * buffer = new char[2 * sizeof(double) + 2];
   //double pos_joy,coef;
-  if (!end_)
+  if (!fin_)
     {
       //double del = *delta;
-      controleur_i -> initialisation_muscles(*delta,*vitesse);
+      controleur_i -> controler();//initialisation_muscles(del,vit);
       /*if (!tele_op)
 	{
 	double del = *delta;
@@ -59,6 +60,6 @@ trait_muscle_i (controller_axis *controleur_i,
     }
   else
     {
-      controleur_i -> degonfle(*vitesse);
+      controleur_i -> degonfle(vit);
     }
 }

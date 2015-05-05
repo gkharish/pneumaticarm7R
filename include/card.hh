@@ -1,16 +1,15 @@
-/****************************************
- * Fichier Carte.h               	*
+ * Fichier Card.hh               	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
 
-/***** CLASSE CARTE : INTERFACE pour l'utilisation d'autre modele de carte ****/
-#ifndef CARTE_H
-#define CARTE_H
+/***** CLASSE card : INTERFACE pour l'utilisation d'autre modele de card ****/
+#ifndef CARD_HH
+#define CARD_HH
 #include <Eigen/Core>
 #include <math.h>
 using namespace Eigen;
-class carte 
+class card
 {
 public :
   virtual void daconv(int ,char ){}

@@ -1,13 +1,13 @@
 /****************************************
- * Fichier controller_tool.h          	*
+ * Fichier controller_tool.hh          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
- ****************************************/ 
+ ****************************************/
 
 #ifndef CONTROLLER_TOOL
 #define CONTROLLER_TOOL
 
-#include "carte.h"
+#include "card.hh"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
 /********************************************************
@@ -19,30 +19,30 @@
  *							*
  ********************************************************/
  class controller_tool {
- 	
- 	private : 
+
+ 	private :
  	bool pince_ouverte;   		// vraie si la pince est ouverte
- 	carte * pcarte;        		// carte de commande associee
- 	int voie_pince_1,voie_pince_2;  // voies correspondantes sur la carte de commande
+ 	card * pcard;        		// card de commande associee
+ 	int voie_pince_1,voie_pince_2;  // voies correspondantes sur la card de commande
  	int etat_voie_1,etat_voie_2;	// etat des voies (0 ou 1)
- 	
+
  	public :
- 	
+
  	//Constructeurs
  	controller_tool () {};
- 	controller_tool(carte *,int,int);
- 	
+ 	controller_tool(card *,int,int);
+
  	//Controle de la pince
  	void controler_pince(bool);
- 	
+
 	//Initialisation de la pince en position fermee
  	void initialiser (void);
- 	
+
  	//Accesseurs
  	double get_etat_pince();
  	double get_etat_voie_1();
  	double get_etat_voie_2();
  };
- 
- 
+
+
 #endif

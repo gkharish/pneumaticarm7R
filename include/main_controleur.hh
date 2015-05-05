@@ -1,7 +1,7 @@
 #ifndef MAIN_CONTROLEUR_H
 #define MAIN_CONTROLEUR_H
 
-/***** DEFINITION DE L'ADRESSAGE DES CARTES *****/
+/***** DEFINITION DE L'ADRESSAGE DES cardS *****/
 /*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
 /*         BASE_REG_CIODAS64 : CIO-DAS6402/16   */
 /************************************************/
@@ -9,7 +9,7 @@
 #define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
-#define VOIE_PINCE_1        14   // sorties de la carte de commande
+#define VOIE_PINCE_1        14   // sorties de la card de commande
 #define VOIE_PINCE_2        15   // reliees a la pince
 
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
@@ -41,7 +41,7 @@
 #define VOIE_7_1 10
 #define VOIE_7_2 11
 
-//Ports d'entree des joysticks et du palonnier sur la carte d'acquisition (CIODAS64)
+//Ports d'entree des joysticks et du palonnier sur la card d'acquisition (CIODAS64)
 #define VOIE_X_1          1
 #define VOIE_Y_1	  0
 #define VOIE_Z_1          3
@@ -87,7 +87,7 @@
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
 
-// Rapports mecaniques entre rotation des axes des capteurs et rotation reelle des articulations
+// Rapports mecaniques entre rotation des axes des s et rotation reelle des articulations
 // Determines par une mesure de la tension avec l articulation a 90 degres K=90/(Vmes*360/5)
 #define RAP_MECA_CAP_1    1.5
 #define RAP_MECA_CAP_2    1
@@ -98,14 +98,14 @@
 #define RAP_MECA_CAP_7    1
 
 
-//sens de rotation des capteurs par rapport au sens theorique
-#define SENS_CAPTEUR_1   1
-#define SENS_CAPTEUR_2   0
-#define SENS_CAPTEUR_3   0
-#define SENS_CAPTEUR_4   0
-#define SENS_CAPTEUR_5   0
-#define SENS_CAPTEUR_6   1
-#define SENS_CAPTEUR_7   0
+//sens de rotation des s par rapport au sens theorique
+#define SENS__1   1
+#define SENS__2   0
+#define SENS__3   0
+#define SENS__4   0
+#define SENS__5   0
+#define SENS__6   1
+#define SENS__7   0
 
 #define SENS_PRESSION_1   1
 #define SENS_PRESSION_2   1
@@ -154,16 +154,16 @@
 //#include "kernelLib.h"
 //#include "msgQLib.h"
 
-#include "carte.h"
-#include "CIODAC16.h"
-#include "CIODAS64.h"
+#include "card.hh"
+#include "CIODAC16.hh"
+#include "CIODAS64.hh"
 #include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
-#include "capteur.h"
-#include "capteur_position.h"
-#include "controleur_axe.h"
-#include "controleur_outil.h"
+#include "captor.hh"
+#include "captor_position.hh"
+#include "controller_axe.hh"
+#include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
 

@@ -33,11 +33,11 @@
 
  ********************************************************************/
 
-Actuator::Actuator (int chan1,int chan2 ,carte* carte)
+Actuator::Actuator (int chan1,int chan2 ,card* card)
 
 {
 
-	pcarte = carte;
+	pcard = card;
 
 	muscle1 = chan1;
 
@@ -102,9 +102,9 @@ void Actuator::recevoir_commande_decouple (double val1,double val2)
 
 
 		buffer = (val1);// * RAPPORT;
-		//pcarte->daconv(muscle1,(int)ceil(buffer));
-		//pcarte->daconv(muscle1, buffer);
-		pcarte -> send_command_array(muscle1, buffer);
+		//pcard->daconv(muscle1,(int)ceil(buffer));
+		//pcard->daconv(muscle1, buffer);
+		pcard -> send_command_array(muscle1, buffer);
 
 
 	}
@@ -119,9 +119,9 @@ void Actuator::recevoir_commande_decouple (double val1,double val2)
 
 		buffer = (val2) ;//* RAPPORT;
 
-		//pcarte->daconv(muscle2,(int)ceil(buffer));
-		//pcarte->daconv(muscle2, buffer);
-		pcarte -> send_command_array(muscle2, buffer);
+		//pcard->daconv(muscle2,(int)ceil(buffer));
+		//pcard->daconv(muscle2, buffer);
+		pcard -> send_command_array(muscle2, buffer);
 
 	}
 

@@ -13,7 +13,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include "port.h"
+#include "port.hh"
 
 #include <iostream>
 #define BUFLEN 2048

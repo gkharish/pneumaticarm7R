@@ -35,21 +35,21 @@
 #include <istream>
 #include <math.h>
 
-#include "carte.h"
-#include "CIODAC16.h"
-#include "CIODAS64.h"
+#include "card.hh"
+#include "CIODAC16.hh"
+#include "CIODAS64.hh"
 #include "actuator.hh"
 #include "I_teleop.h"
 #include "joystick.h"
-#include "capteur.h"
-#include "capteur_position.h"
+#include "captor.hh"
+#include "captor_position.hh"
 #include "controller_axis.hh"
 #include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
 #include "muscle.hh"
-#include "clientudp3.h"
-#include "test_config.h"
+#include "clientudp3.hh"
+#include "test_config.hh"
 #include <Eigen/Eigen>
 using namespace Eigen;
 class Pneumatic7ArmRtThread
@@ -99,7 +99,7 @@ class Pneumatic7ArmRtThread
   I_teleop * joy1_,*joy2_,* ppalonnier_;
 
   // tableau de capteurs
-  capteur_position sensors_[7];
+  position_sensor sensors_[7];
 
   // Angles measurements
   double angle[7];
@@ -136,7 +136,7 @@ class Pneumatic7ArmRtThread
   void InitControllers();
 
   /** ! Initialize sensors */
-  void InitializeSensors(); // fka init_capteurs
+  void InitializeSensors(); // fka init_captors
 
   /** ! Inflating the muscles */
   void Inflating (); // fka gonfler

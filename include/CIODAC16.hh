@@ -1,5 +1,5 @@
-/* CIODAC16.h - entetes de la classe carteSortie */
-/* refCarte : CIO-DAC16-I de Computer boards*/
+/* CIODAC16.hh - Entities of the CLASS of Output card CIODAC16 */
+/* refcard : CIO-DAC16-I de Computer boards*/
 /* Erwan Guiochet - 2002 */
 
 #ifndef CIODAC
@@ -31,9 +31,9 @@
  *				INCLUDES				*
  *									*
  ************************************************************************/
-#include "carte.h"
-#include "clientudp3.h"
-#include "port.h"
+#include "card.hh"
+#include "clientudp3.hh"
+#include "port.hh"
 //#include "sysLib.h"
 #include <vxworks/vxworks.h>
 #define MODULE_LICENSE(x)
@@ -115,7 +115,7 @@ typedef struct udppacket_countersreset              // clientheader = '1';
 } client_packet_countersreset;
 
 
-class CIODAC16 : public carte//, public  ClientUDP
+class CIODAC16 : public card//, public  ClientUDP
 {
  public :
   CIODAC16();//:  ClientUDP()

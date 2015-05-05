@@ -43,13 +43,13 @@ class joystick
 
         	int
 voie_axeX,voie_axeY,voie_axeZ,	   //numeros de voie	
-        	voie_vitesse,voie_bouton_a,voie_bouton_b,  //sur la carte d'acquisition
+        	voie_vitesse,voie_bouton_a,voie_bouton_b,  //sur la card d'acquisition
         	voie_bouton_c,voie_bouton_d; 		
 	public :
 
 		//constructeurs
 		joystick (){}
-		joystick(carte *,int,int,int,int,int,int,int,int,double); 
+		joystick(card *,int,int,int,int,int,int,int,int,double); 
 		 
 		/* Permet de lire toutes les entr�es d'un joystick */
 

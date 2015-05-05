@@ -22,7 +22,7 @@ double I_teleop:: get_seuil() {
 
  *    PARAMETRES :                                                  *
 
- *                pcard : pointeur sur une carte du type CIODAS6402 *
+ *                pcard : pointeur sur une card du type CIODAS6402 *
 
  *                + Numero du canal	                            *
  *                                                                  *
@@ -30,8 +30,8 @@ double I_teleop:: get_seuil() {
  ********************************************************************/
 
  
-palonnier :: palonnier(carte * card, int canal,double delta) {
-     pcarte = card;
+palonnier :: palonnier(card * card, int canal,double delta) {
+     pcard = card;
      channel = canal;
      seuil= delta;
      UMAX = 5.0;
@@ -59,7 +59,7 @@ double palonnier::lire_position (void) {
     double valeur;
     unsigned int val;
     //recuperation de la valeur
-    //val = pcarte->adconv(channel);
+    //val = pcard->adconv(channel);
     //conversion en tension
     valeur = (val * UMAX) / 4095.0;
     return valeur;

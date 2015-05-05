@@ -1,5 +1,5 @@
-/* CIODAS64.h - entetes de la classe CIODAS64 */
-/* refCarte : CIO-DAS6402/12 */
+/* CIODAS64.hh - Entities of the CLASS of Inout card CIODAS64 */
+/* refcard : CIO-DAS6402/12 */
 /* Erwan Guiochet - 2002 */
 
 
@@ -21,7 +21,7 @@
 #define STATUS_REG      (BASE_REG_CIODAS64+8)  	/* Registre des status                 	*/
 #define PACER_CNTRL     (BASE_REG_CIODAS64+9)  	/* Control des Interruptions & Pacer  	*/
 #define TRIG_CNTRL	(BASE_REG_CIODAS64+10) 	/* Registre de configuration du trigger	*/
-#define COMP_CNTRL     	(BASE_REG_CIODAS64+11) 	/* Registre de configuration de la carte*/
+#define COMP_CNTRL     	(BASE_REG_CIODAS64+11) 	/* Registre de configuration de la card*/
 
 #define COMPTEUR_0  	(BASE_REG_CIODAS64+12) 	/* Registre du Compteur 0 	    	*/
 #define COMPTEUR_1  	(BASE_REG_CIODAS64+13) 	/* Registre du compteur 1 	    	*/
@@ -98,7 +98,7 @@
 #define PRETRIG			0x09		/* Stop pacing a certain number of conversion*/
 
 /****************************************************************************************/
-/*			REGISTRE DE CONFIGURATION DE LA CARTE				*/
+/*			REGISTRE DE CONFIGURATION DE LA card				*/
 /****************************************************************************************/
 #define DMA_1			0x00		/* R�glage sue le DMA 1			*/
 #define DMA_3			0x80		/* Reglage sur le DMA 3			*/
@@ -126,9 +126,9 @@
  *   			    	   CLASSE CIODAS64			      		*
  *   			    						      		*
  ****************************************************************************************/
-#include "carte.h"
-#include "clientudp3.h"
-#include "port.h"
+#include "card.hh"
+#include "clientudp3.hh"
+#include "port.hh"
 #include <stdlib.h>
 #define BUFLEN 2048
 #include <iostream>
@@ -174,7 +174,7 @@ typedef struct udppacket_error                      // serverheader = 'c';
 }client_packet_error;
 
 
-class CIODAS64 : public carte//, public ClientUDP
+class CIODAS64 : public card//, public ClientUDP
 {
  public :
   CIODAS64();//: ClientUDP()

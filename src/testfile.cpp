@@ -1,5 +1,5 @@
 // Setup the flags.
-#include "test_config.h"
+#include "test_config.hh"
 
 test::test():
   DEFAULT_FLAG(0),

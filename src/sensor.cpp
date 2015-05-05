@@ -1,9 +1,9 @@
 /****************************************
- * Fichier capteur.cpp          	*
+ * Fichier captor.cpp          	*
  * Mehdi SEFFAR				*
  * cree le 17/07/2002  			*
  ****************************************/
-#include "capteur.h"
+#include "captor.hh"
 
 /********************************************************************
 
@@ -15,11 +15,11 @@
  * PARAMETRES :  	                                            *
 
 
- *   - pcarte : pointeur sur la carte effectuant l'operation adconv *	                                            *
+ *   - pcard : pointeur sur la card effectuant l'operation adconv *	                                            *
 
 
 
- *   - chan : numero de voie utilise par le capteur                 *
+ *   - chan : numero de voie utilise par le captor                 *
 
 
 
@@ -27,9 +27,9 @@
 
  ********************************************************************/
 
-void capteur::set_association(carte *pcard,int chan)
+void captor::set_association(card *pcard,int chan)
 {
-  pcarte = pcard;
+  pcard = pcard;
   chanNumber = chan;
 }
 
@@ -43,13 +43,13 @@ void capteur::set_association(carte *pcard,int chan)
 
  *    RETOURNE :                                                    *
 
- *                le numero de voie du capteur		            *
+ *                le numero de voie du captor		            *
 
  *                                                                  *
 
  ********************************************************************/
 
-int capteur::get_channel()
+int captor::get_channel()
 {
 	return(chanNumber);
 }
@@ -58,7 +58,7 @@ int capteur::get_channel()
 
 /********************************************************************
 
- *                   	     get_carte        		            *
+ *                   	     get_card        		            *
 
  ********************************************************************
 
@@ -66,13 +66,13 @@ int capteur::get_channel()
 
  *    RETOURNE :                                                    *
 
- *                un pointeur sur la carte	                    *
+ *                un pointeur sur la card	                    *
 
  *                                                                  *
 
  ********************************************************************/
 
- carte * capteur::get_carte(void)
+ card * captor::get_card(void)
  {
- 	return(pcarte);
+ 	return(pcard);
  }

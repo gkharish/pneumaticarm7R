@@ -1,13 +1,13 @@
 /****************************************
  * Fichier I_teleop.h           	*
  * Mehdi SEFFAR				*
- ****************************************/ 
+ ****************************************/
 
 #ifndef I_TELEOP
 #define I_TELEOP
- 
-#include "carte.h" 
- 
+
+#include "card.hh" 
+
 /********************************************************************
 
  *                          Classe I_teleop                         *
@@ -22,14 +22,14 @@
 
  *		  		        			    *
  ********************************************************************/
-  
+
 class I_teleop
 {
    protected :
-   	 carte * pcarte;
-// pointeur sur carte d'acquisition
+   	 card * pcard;
+// pointeur sur card d'acquisition
    	 double UMAX ;   // tension d'alimentation
-	 double seuil;   // seuil de prise en compte d'un mouvement 
+	 double seuil;   // seuil de prise en compte d'un mouvement
    public :
    	double get_seuil();
 };
@@ -49,21 +49,21 @@ class I_teleop
 
  *		  		        			    *
  ********************************************************************/
-  
+
 
 class palonnier :public I_teleop
 {
     private:
-    	int channel; //voie correspondante sur la carte d'acquisition
-    	
+    	int channel; //voie correspondante sur la card d'acquisition
+
     public :
     	//constructeurs
     	palonnier () {}
-    	palonnier (carte *,int,double);
-    	
+    	palonnier (card *,int,double);
+
     	//lecture de la position
     	double lire_position(void);
-    
+
 };
 
 #endif

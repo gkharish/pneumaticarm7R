@@ -45,8 +45,8 @@ SET(${PROJECT_NAME}_HEADERS
 	include/joystick.h
 	include/modele.h
 	include/port.hh
-	#include/main_controleur.hh
-  #include/test_config.hh
+	include/main_controleur.hh
+  include/test_config.hh
 
 )
 SET(CXX_DISABLE_WERROR TRUE)
@@ -58,7 +58,7 @@ ADD_REQUIRED_DEPENDENCY ("ncurses")
 
 SETUP_PROJECT()
 
-#SEARCH_FOR_BOOST()
+SEARCH_FOR_BOOST()
 SEARCH_FOR_EIGEN()
 
 ADD_SUBDIRECTORY(src)

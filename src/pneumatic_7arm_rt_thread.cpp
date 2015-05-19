@@ -11,7 +11,7 @@
 
 /*MODIFICATIONS
   17/12/2002: AJOUT DES RAPPORTS MECANIQUES POUR LES sensorS DE POSITION
-  20/12/2002: AJOUT Du choix boucle ouverte boucle fermee
+  20/12/2002: AJOUT Du choix boucle ouverte boucle fermee.
 */
 
 

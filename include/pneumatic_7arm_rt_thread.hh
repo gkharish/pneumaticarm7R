@@ -52,7 +52,7 @@
 #include "test_config.hh"
 #include <Eigen/Eigen>
 using namespace Eigen;
-class Pneumatic7ArmRtThread
+class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
 {
   int loop_;
   double control_command_;

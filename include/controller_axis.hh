@@ -104,13 +104,9 @@ class controller_axis
  private :
   controller_axis_data ControllerAxisData_;
   int numero;			//numero de l'axe
-  Actuator * pactuator;	//actuator associe
-  I_teleop * pjoystick;     //joystick associe
   double zero_joy;		//position initiale du joystick
   position_sensor *psensor;   //sensor de position associe
-  int sens_sensor;  //sens de rotation de l'axe par rapport au sens du sensor
-  int sens_pression;  //sens de rotation de l'axe par rapport a la variation de la pression
-  double angle_repos,angle_reel, angle_max, angle_min;
+  //double angle_repos,angle_reel, angle_max, angle_min;
   //reste constant pendant la phase de controle
   double offset_sensor;  //difference entre la valeur initiale lue
   // par le sensor et l'angle au repos theorique
@@ -124,7 +120,6 @@ class controller_axis
   double derivee_erreur;
   double tab_erreur [10];		//sauvegarde des 10 dernieres erreurs
   double commande;
-  double angle_th; 	//angle theorique
   void calculer_commande_BF(void);   //calcul de la commande en Boucle fermee
   void calculer_commande_BO(void);   //calcul de la commande en Boucle Ouverte
   void pressure_commande (void);         //calcul de la commande en Boucle prescmd

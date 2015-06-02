@@ -27,9 +27,9 @@
 
  ********************************************************************/
 
-void sensor::set_association(ioboards *pioboards,int chan)
+void sensor::set_association(ioboards *lpioboards,int chan)
 {
-  pioboards = pioboards;
+  pioboards = lpioboards;
   chanNumber = chan;
 }
 

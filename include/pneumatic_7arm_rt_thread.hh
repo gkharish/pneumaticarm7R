@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <vector>
 
 #include <native/task.h>
 #include <native/timer.h>
@@ -68,7 +69,7 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   bool PRES_INDIVIDUAL_FLAG;
 
   // Axis controlers
-  controller_axis controllers_[7];
+  std::vector<controller_axis *> controllers_;
 
     // Muscle class object
   Muscle pneumatic_muscle;
@@ -93,7 +94,7 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   int num_joints_;
 
   // Actuators
-  Actuator actuators_[7];
+  std::vector<Actuator *> actuators_;
 
   // Joysticks
   I_teleop * joy1_,*joy2_,* ppalonnier_;

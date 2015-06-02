@@ -46,7 +46,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   fichier.cpp
   I_teleop.cpp
   joystick.cpp
-  testfile.cpp
+  test_config.cpp
   modele.cpp
   muscle.cpp
   pneumatic_7arm_rt_thread.cpp

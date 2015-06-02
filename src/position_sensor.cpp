@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "position_sensor.hh"
+#include <debug.hh>
 
 // Sign of sensor
 #define POSITIF  1
@@ -69,7 +70,7 @@ double position_sensor::read_position (void)
 
   //v1 = pioboards->adconv(chanNumber);
   //v1 = pioboards -> read_sensors(*axis_num);
-  std::cout << "Value read b cap_pos_lire:" << v1 << std::endl;
+  ODEBUGL("Value read b cap_pos_lire:" << v1,3);
   /* calcul de l'angle */
 
   angle = v1*180/3.14;//((double)v * 360)/4095;
@@ -85,17 +86,15 @@ double position_sensor::read_sensors_array (int ind)
   double angle=0;
   //  unsigned int v=0;
   double v1;
-  /* recup�ration de la tension */
+  /* Reading the potentionmeter value */
 
-  //v1 = pioboards->adconv(chanNumber);
-  //std::cout << "position_sensor:read_sensors_array:" << ind << std::endl;
+  ODEBUGL("position_sensor:read_sensors_array:" << ind,3);
   v1 = pioboards -> read_sensors(ind);
-  //std::cout << "\n Value read by the IO board:" << v1 << std::endl;
-  //printf("valeur lue au can %d \r",v);
-  /* calcul de l'angle */
+  ODEBUGL("\n Value read by the IO board:" << v1,3);
+  /* Computing the angle */
 
   angle = v1*18; // 1volt from potentiometers = 18 degrees //*180/3.14;//((double)v * 360)/4095;
-  //std::cout << "angle cap_pos_read_sensor_array"<<ind<<": " << angle << std::endl;
+  ODEBUGL("angle cap_pos_read_sensor_array"<<ind<<": " << angle ,3);
   return (angle);
 
 }

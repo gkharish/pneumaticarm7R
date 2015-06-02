@@ -43,11 +43,11 @@ class Actuator
 
 private :
   int muscle1,muscle2; // num�ro de voix
-  ioboards * pioboards;
+  ioboards * pioboards_;
 
 public :
   //Constructors
-  Actuator (){}
+  Actuator (){muscle1=-1;muscle2=-1;pioboards_=0;}
   Actuator (int,int, ioboards *);
 
   //==========================================================

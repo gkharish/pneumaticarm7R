@@ -56,8 +56,27 @@ void NCursesUI::HandlingKeyboard()
     }
 
 }
+
+void NCursesUI::CreateSharedMemory()
+{
+  // Attached the shared memory to a memory segment.
+  shmaddr_ = CreateSharedMemoryForPneumaticArm(false);
+}
+
+void NCursesUI::UpdateSharedMemory()
+{
+  unsigned int index =0;
+  for(unsigned int i=0;i<14;i++)
+    control_[i] = shmaddr_[index++];
+
+  for(unsigned int i=0;i<7;i++)
+    potentiometer_[i] = shmaddr_[index++];
+
+}
+
 void NCursesUI::Init()
 {
+  
   pthread_create(&handle_keyboard_,
                  NULL,
                  FunctionHandlingKeyboard,(void *)this);
@@ -71,8 +90,6 @@ bool NCursesUI::DisplayInformation()
 					 * the number of colums of the screen */
   wrefresh(main_win_);
   
-  double potentiometer[7]={ 1.23, 0.07, -2.0, 2.24, 3.04, -1.04, -2.06};
-  double control[7]={ 100,200,300,400,500,600,700};
   getmaxyx(main_win_,row,col);
 
   {

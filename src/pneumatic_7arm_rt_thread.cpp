@@ -4,9 +4,10 @@
  ************************************************************
  * Cree par : Erwan GUIOCHET/ Mehdi Seffar / JEREMIE GUIOCHET*
  * Date     : 02/07/2002 				    *
- * Derniere modification de M.Seffar: 20/09/2002
+ * Derniere modification de M.Seffar: 20/09/2002            *
  * REPRIS PAR J. GUIOCHET le 15/12/2002			    *
- * VERSION
+ * VERSION                                                  *
+ * Modified by G. Kumar and O. Stasse in 2015               *
  ************************************************************/
 
 /*MODIFICATIONS
@@ -191,11 +192,16 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 #include <time.h>
 #include <sstream>
 #include <fstream>
 #include <istream>
 #include <math.h>
+
 
 /****** REAL TIME INCLUDES *****/
 #include <vxworks/vxworks.h>
@@ -218,8 +224,11 @@
 #include "modele.h"
 #include "clientudp3.hh"
 #include "test_config.hh"
+#include "shared_memory.hh"
 
 #include <pneumatic_7arm_rt_thread.hh>
+
+#define LOG_FILENAME "/var/log/pneumatic_arm.shm"
 
 using namespace std;
 using namespace Eigen;
@@ -246,9 +255,7 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   sensors_array_(7),
   actuators_(7),
   joy1_(0), joy2_(0),ppalonnier_(0),
-  temps_(0.0),
-  saisie_(0),
-  increm_(0),
+  shmaddr_(0),
   fin_(false),
   tele_op_(false),
   sortie_(false)
@@ -287,15 +294,12 @@ void Pneumatic7ArmRtThread::
 init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse)
 {
   controleur_i -> initialisation_muscles(*delta,*vitesse);
-  //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void Pneumatic7ArmRtThread::
 reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
 {
   controleur_i -> degonfle(*vitesse);
-  //signale a la tache principale la fin du degonflement des muscles
-  //msgQSend(*msgq_i,"ok",2,WAIT_FOREVER,MSG_PRI_NORMAL);
 }
 
 void Pneumatic7ArmRtThread::
@@ -305,9 +309,6 @@ trait_muscle_i (controller_axis *controleur_i,
 {
   if ((delta==0) || (vitesse==0))
     return;
-  //const char * buf = std::string("ok").c_str();
-  //char * buffer = new char[2 * sizeof(double) + 2];
-  //double pos_joy,coef;
   if (!fin_)
     {
       //double del = *delta;
@@ -366,39 +367,25 @@ void Pneumatic7ArmRtThread::InitControllers()
 
   for(unsigned int i=0;i<7;i++)
     {
-      ODEBUGL("Initialization controller "<< i,4);
       // Bind actuators and controllers
       controllers_[i]=new controller_axis(joys[i],actuators_[i], i,
 					  rest_angles[i], min_angles[i],max_angles[i],
 					  sensor_directions[i], pressure_directions[i], p_gains[i],d_gains[i]);
-      ODEBUGL("Creation of controller ok for "<< i,4);
       // Initialize electronic boards
       controllers_[i]->initialisation_ioboards();
-      ODEBUGL("Initialization IOBOARDS ok for "<< i,4);
     }
 
-  ODEBUGL("\n init()debug8 \n",3);
+
   //start the NI module to send data
   ciodac16_ -> daconv(1, '0');
-  ODEBUGL("\n init()debug8.1 \n",3);
-
   ciodas64_ -> adconv(1);
-  ODEBUGL("\n init()debug8.2\n",3);
-  ODEBUGL("/n init() recv data:adconv:" ,4);
-
   ciodac16_ -> daconv(1, '1');
-  ODEBUGL("\n init()debug8.3\n",3);
 
   // Bind controllers and sensors
   ciodas64_ -> adconv(1);
-  ODEBUGL("/n init() recv data:adconv:" ,4);
-  ODEBUGL("\n init()debug9 \n",3);
   controllers_[0]->set_sensor(sensors_+4);
-  ODEBUGL("\n init()debug10 \n",3);
   controllers_[1]->set_sensor(sensors_+2);
-  ODEBUGL("\n init()debug11 \n",3);
   controllers_[2]->set_sensor(sensors_+6);
-  ODEBUGL("\n init()debug12 \n",3);
   controllers_[3]->set_sensor(sensors_);
   controllers_[4]->set_sensor(sensors_+1);
   controllers_[5]->set_sensor(sensors_+3);
@@ -470,6 +457,8 @@ void Pneumatic7ArmRtThread::Initializing()
   InitControllers();
   ODEBUGL("After controllers initialization",4);
 
+  // Init shared memory
+  CreateSharedMemory();
 }
 
 /********************************************************
@@ -664,8 +653,6 @@ void principale(void *arg)
  *							*
  *	principale () = tache principale		*
  *							*
- *routine appelee par debut() apres
- *l initialisation					*
  ********************************************************/
 void Pneumatic7ArmRtThread::PrincipalTask ()
 {
@@ -761,7 +748,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
       if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)
 	{
-	  RobotControler();
+          UpdateSharedMemory();
 	}
       if(INFLATING_FLAG == 1 && CONTROL_MODE_PRES_FLAG == 0 && CONTROL_MODE_NOPRES_FLAG == 0)
 	{
@@ -863,5 +850,64 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
     std::cerr << "Failed of RT Task delete" << endl;
   else 
     { ODEBUG("END of RT taslk delete"); }
+  
+  CloseSharedMemory();
+}
+
+/*****************************************
+ * Create Shared Memory                  *
+ *****************************************
+ * The shared memory is linked with the  *
+ * file /var/log/pneumatic_arm.shm       *
+ * 
+ *****************************************/
+void Pneumatic7ArmRtThread::CreateSharedMemory()
+{
+  // Update and/or create the file.
+  ofstream aof;
+  aof.open(SHM_LOG_FILENAME,
+           std::ofstream::out | std::ofstream::app);
+  struct timeval current_time;
+  gettimeofday(&current_time,0);
+    
+  aof << current_time.tv_sec << "." << current_time.tv_usec << std::endl;
+  aof.close();
+  
+  // Attached the shared memory to a memory segment.
+  shmaddr_ = CreateSharedMemoryForPneumaticArm(true);
+}
+
+void Pneumatic7ArmRtThread::UpdateSharedMemory()
+{
+  // Write desired pressure
+  for(unsigned int i=0,j=0;i<14;i+=2,j++)
+    {
+      double m1,m2;
+      m1 = shmaddr_[i];
+      m2 = shmaddr_[i+1];
+
+      actuators_[i]->receive_command_decouple(m1,m2);
+    }
+
+  // Read position
+  for(unsigned int i=15;i<22;i++)
+    {
+      shmaddr_[i] = controllers_[i-15]->get_angle_lire();
+    }
+}
+
+void Pneumatic7ArmRtThread::CloseSharedMemory()
+{
+  shmdt(shmaddr_);
+
+  // Update the file.
+  ofstream aof;
+  aof.open(SHM_LOG_FILENAME,
+           std::ofstream::out | std::ofstream::app);
+  struct timeval current_time;
+  gettimeofday(&current_time,0);
+    
+  aof << " - " << current_time.tv_sec << "." << current_time.tv_usec << std::endl;
+  aof.close();
 
 }

@@ -68,23 +68,24 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   bool INFLATING_FLAG;
   bool PRES_INDIVIDUAL_FLAG;
 
-  // Axis controlers
+  /// \brief Axis controlers
   std::vector<controller_axis *> controllers_;
 
-    // Muscle class object
+  /// \brief Muscle class object
   Muscle pneumatic_muscle;
-  // Gripper controler
+  /// \brief Gripper controler
   controller_tool controller_gripper_;
 
-  // Network connection.
+  /// \brief  Network connection.
   ClientUDP *clientUDP;
 
   test *test1;
-  // IO Boards
+  /*@{ IO Boards */
   CIODAC16 *ciodac16_;
   CIODAS64 *ciodas64_;
+  /*@} */
 
-  // Informations to be send to the NIC module
+  /// \brief Informations to be send to the NIC module
   VectorXd recving_Data_;
   VectorXd CTRL_FLAG;
   VectorXd pressure_command_array_;
@@ -93,39 +94,27 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
 
   int num_joints_;
 
-  // Actuators
+  /// \brief Actuators
   std::vector<Actuator *> actuators_;
 
-  // Joysticks
+  /// \brief Joysticks
   I_teleop * joy1_,*joy2_,* ppalonnier_;
 
-  // tableau de capteurs
+  /// \brief Array of sensors
   position_sensor sensors_[7];
 
-  // Angles measurements
+  /// \brief Angles measurements
   double angle[7];
   double erreur[7];
   double angle_read;
-  //watchdog
-  WDOG_ID tempo;
 
+  /// \brief Reference to the shared memory */
+  int shmid_;
+  /// \brief Address to the shared memory */
+  double * shmaddr_;
+  
 
-  //taches
-  long int  main1,tgo,
-    tache_arret,tache_controle_mvt,tache_controle_outil,
-    tache_init_1,tache_init_2,tache_init_3,
-    tache_init_4,tache_init_5,tache_init_6,tache_init_7,
-    tache_joy,
-    tache_muscle_1,tache_muscle_2,tache_muscle_3,
-    tache_muscle_4,tache_muscle_5,tache_muscle_6,tache_muscle_7,
-    tache_fin_1,tache_fin_2,tache_fin_3,
-    tache_fin_4,tache_fin_5,tache_fin_6,tache_fin_7;
-
-
-  /* divers */
-  double temps_;
-  int saisie_ ,increm_ ;
-  char debut_;
+  /** \brief Miscelleanous */
   bool fin_ ,tele_op_ ;
   bool sortie_;
   char * buffer_joy_[7];
@@ -157,6 +146,17 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   /** ! Main Controler for the whole robot */
   void RobotControler(); // fka controler
 
+  /** @{ Shared memory related methods*/
+  /// \brief Create shared memory. 
+  void CreateSharedMemory();
+
+  /// \brief Update shared memory
+  void UpdateSharedMemory();
+
+  /// \brief Free the shared memroy
+  void CloseSharedMemory();
+
+  /** @} */
 public:
   Pneumatic7ArmRtThread();
 

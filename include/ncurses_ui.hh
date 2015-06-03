@@ -30,11 +30,17 @@ public:
   bool DisplayInformation();
   void HandlingKeyboard();
   void Init();
+  void CreateSharedMemory();
+  void UpdateSharedMemory();
 
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
   WINDOW * main_win_;
   pthread_t handle_keyboard_;
   bool end_of_loop_;
+  double * shmaddr_;
+  double potentiometer_[7];
+  double control_[14];
+
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

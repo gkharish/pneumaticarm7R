@@ -49,6 +49,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   test_config.cpp
   modele.cpp
   muscle.cpp
+  shared_memory.cpp
   pneumatic_7arm_rt_thread.cpp
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )

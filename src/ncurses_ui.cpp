@@ -1,8 +1,13 @@
-#include <ncurses_ui.hh>
-
+/* System includes */
 #include <string>
 #include <iostream>
 #include <sstream>
+
+/* Ncurses includes */
+#include <ncurses_ui.hh>
+
+/* Local framework. */
+#include <shared_memory.hh>
 
 void * FunctionHandlingKeyboard(void *argc)
 {
@@ -61,12 +66,14 @@ void NCursesUI::CreateSharedMemory()
 {
   // Attached the shared memory to a memory segment.
   shmaddr_ = CreateSharedMemoryForPneumaticArm(false);
+  if (shmaddr_!=0)
+    UpdateSharedMemory();
 }
 
 void NCursesUI::UpdateSharedMemory()
 {
   unsigned int index =0;
-  for(unsigned int i=0;i<14;i++)
+  for(unsigned int i=0;i<16;i++)
     control_[i] = shmaddr_[index++];
 
   for(unsigned int i=0;i<7;i++)
@@ -76,7 +83,7 @@ void NCursesUI::UpdateSharedMemory()
 
 void NCursesUI::Init()
 {
-  
+  CreateSharedMemory();
   pthread_create(&handle_keyboard_,
                  NULL,
                  FunctionHandlingKeyboard,(void *)this);
@@ -94,7 +101,7 @@ bool NCursesUI::DisplayInformation()
 
   {
     std::ostringstream oss;
-    oss << "Time :" << counter*0.01;
+    oss << "Time :" << (double)counter*0.01;
     std::string as = oss.str();
     mvwprintw(main_win_,1,col/2,"%s",as.c_str());
   }
@@ -107,13 +114,13 @@ bool NCursesUI::DisplayInformation()
     {
       {
         std::ostringstream oss;
-        oss << potentiometer[i]+((double)rand()/(double)RAND_MAX)*0.1;
+        oss << potentiometer_[i];
         std::string as = oss.str();
         mvwprintw(main_win_,3+i,2,"%s",as.c_str());
       }
       {
         std::ostringstream oss;
-        oss << control[i]+((double)rand()/(double)RAND_MAX)*100.0;
+        oss << control_[i];
         std::string as = oss.str();
         mvwprintw(main_win_,3+i,col/2,"%s",as.c_str());
       }

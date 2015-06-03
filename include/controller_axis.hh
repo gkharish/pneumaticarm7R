@@ -103,7 +103,6 @@ class controller_axis
 
  private :
   controller_axis_data ControllerAxisData_;
-  int numero;			//numero de l'axe
   double zero_joy;		//position initiale du joystick
   position_sensor *psensor;   //sensor de position associe
   //double angle_repos,angle_reel, angle_max, angle_min;

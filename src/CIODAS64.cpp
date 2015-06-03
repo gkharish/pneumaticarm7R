@@ -12,6 +12,7 @@
 */
 
 #include "CIODAS64.hh"
+#include <debug.hh>
 
 /****************************************************************************************
  * 											*
@@ -35,7 +36,7 @@
  ****************************************************************************************/
 CIODAS64::CIODAS64()
 {
-
+  memset(recv_buffer,0,BUFLEN);
 }
 
 CIODAS64::~CIODAS64()
@@ -51,7 +52,6 @@ void CIODAS64::adconv(int )
 
   //cout << "\n cioas64:adconv()debug1.2 " ;
 
-  memset(recv_buffer,0,BUFLEN);
   client_obj->client_recv(recv_buffer, BUFLEN);
 
   recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
@@ -150,8 +150,8 @@ double CIODAS64::read_sensors(int axis_num)
   int index = axis_num;
   //cout << "\n cioads64:read_sensors()1 " << index;
   //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-  val1 = (*recv_packet_DAQ).data[7- index];
-  //cout << "\n cioads64:read_sensors()2 " << val1;
+  val1 = (*recv_packet_DAQ).data[6- index];
+  ODEBUGL(axis_num << " - cioads64:read_sensors() " << (double)val1 << " ",3);
 
   //float val2 = rand() % 10;
   //cout << "\n random  value in read_sensors: " << val2/10 << endl;

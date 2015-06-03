@@ -748,7 +748,11 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
       if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)
 	{
+	  ciodas64_ -> adconv(1);
+	  ciodas64_ -> logudpdata();
+
           UpdateSharedMemory();
+	  ciodac16_ -> daconv(1, '1');
 	}
       if(INFLATING_FLAG == 1 && CONTROL_MODE_PRES_FLAG == 0 && CONTROL_MODE_NOPRES_FLAG == 0)
 	{
@@ -879,6 +883,7 @@ void Pneumatic7ArmRtThread::CreateSharedMemory()
 
 void Pneumatic7ArmRtThread::UpdateSharedMemory()
 {
+
   // Write desired pressure
   for(unsigned int i=0,j=0;i<14;i+=2,j++)
     {
@@ -886,13 +891,14 @@ void Pneumatic7ArmRtThread::UpdateSharedMemory()
       m1 = shmaddr_[i];
       m2 = shmaddr_[i+1];
 
-      actuators_[i]->receive_command_decouple(m1,m2);
+      actuators_[j]->receive_command_decouple(m1,m2);
     }
 
   // Read position
-  for(unsigned int i=15;i<22;i++)
+  for(unsigned int i=16;i<23;i++)
     {
-      shmaddr_[i] = controllers_[i-15]->get_angle_lire();
+      shmaddr_[i] = controllers_[i-16]->get_angle_lire();
+      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],0);
     }
 }
 

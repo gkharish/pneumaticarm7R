@@ -13,6 +13,7 @@ int main(void)
       usleep(10000);
 
       // Display window
+      ancursesui.UpdateSharedMemory();
       if (ancursesui.DisplayInformation())
         loop=false;
     }

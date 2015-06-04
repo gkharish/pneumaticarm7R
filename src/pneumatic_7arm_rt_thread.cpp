@@ -248,6 +248,7 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CONTROL_MODE_PRES_FLAG(0),
   INFLATING_FLAG(0),
   PRES_INDIVIDUAL_FLAG(0),
+  timeofsimulation(10),
   controllers_(7),
   recving_Data_(15),
   CTRL_FLAG(7),
@@ -412,6 +413,7 @@ void Pneumatic7ArmRtThread::Initializing()
   CONTROL_MODE_PRES_FLAG = test1 -> get_CONTROL_MODE_PRES_FLAG();
   INFLATING_FLAG = test1 -> get_INFLATING_FLAG();
   PRES_INDIVIDUAL_FLAG = test1 -> get_PRES_INDIVIDUAL_FLAG();
+  timeofsimulation=test1 -> get_timeofsimulation();
   for(int lpctr =0; lpctr < 7; lpctr++)
     {
       CTRL_FLAG(lpctr) = test1 -> get_CTRL_FLAG(lpctr);
@@ -485,7 +487,7 @@ void Pneumatic7ArmRtThread::InitializeSensors ()
   for(unsigned int i=0;i<7;i++)
     controllers_[i]->init_angles();
 
-  printf("\n Done init_sensors() \n");
+  //printf("\n Done init_sensors() \n");
 
   ciodac16_ -> daconv(1, header);
 }
@@ -658,11 +660,8 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 {
 
   /* variables used in the principal program */
-  //int whileloop_counter = 0, error_counter = 0, loop = 0;
-  int timeofsimulation_s = 30; /* time in seconds*/
   int FLAG = 1;
- // initconfigData.timeofsimulation = 30;  /*  The time of simulation in seconds*/
-  //initconfigDATA.PRES_INDIVIDUAL_FLAG
+
   RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
@@ -703,7 +702,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       std::cin >> depres; //scanf("%s",tmp);
       std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
       Deflating();
-      timeofsimulation_s = 2; /* time in seconds*/
+      timeofsimulation= 2; /* time in seconds*/
 #endif
     }
 
@@ -764,7 +763,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 	}
 
       previous = now;
-      if(t >= timeofsimulation_s)
+      if(t >= timeofsimulation)
 	{
 	  FLAG = 0;
 	  ODEBUG("\n END of Loop");

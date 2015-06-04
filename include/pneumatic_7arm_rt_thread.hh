@@ -68,6 +68,7 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   bool INFLATING_FLAG;
   bool PRES_INDIVIDUAL_FLAG;
   int FINITE_STATE_;
+  int timeofsimulation;
   /// \brief Axis controlers
   std::vector<controller_axis *> controllers_;
 

@@ -8,6 +8,7 @@ test::test():
   CONTROL_MODE_PRES_FLAG(1),
   INFLATING_FLAG(0),
   PRES_INDIVIDUAL_FLAG(0),
+  timeofsimulation(30),
   NUM_JOINTS(1),
   MAN_PRES(0),
   MAN_PRES_ALL(0),
@@ -177,4 +178,8 @@ bool test::get_INFLATING_FLAG()
 bool test::get_PRES_INDIVIDUAL_FLAG()
 {
   return(PRES_INDIVIDUAL_FLAG);
+}
+int test::get_timeofsimulation()
+{
+    return(timeofsimulation);
 }

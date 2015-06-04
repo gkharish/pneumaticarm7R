@@ -26,6 +26,7 @@ class test
     bool CONTROL_MODE_PRES_FLAG;
     bool INFLATING_FLAG;
     bool PRES_INDIVIDUAL_FLAG;
+    int timeofsimulation;
     //Setup the control parameters
     int NUM_JOINTS;     // Enter the value between 1 to 7
     bool MAN_PRES;      // Manual Pressure ON = 1 and OFF = 0
@@ -65,7 +66,7 @@ class test
     bool get_CONTROL_MODE_PRES_FLAG();
     bool get_INFLATING_FLAG();
     bool get_PRES_INDIVIDUAL_FLAG();
-
+    int get_timeofsimulation();
 };
 
 #endif

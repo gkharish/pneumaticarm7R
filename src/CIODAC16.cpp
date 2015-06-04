@@ -10,8 +10,6 @@
 
 #include <string>
 
-#define DEBUG_LEVEL 5
-
 #include <debug.hh>
 
 #include <CIODAC16.hh>
@@ -45,7 +43,7 @@ void CIODAC16::daconv(int  , char header)
 
   if(header == '1')
     {
-      //std::cout << "CIOD16:daconv:header=1: error1" <<std::endl;
+      ODEBUGL("CIOD16:daconv:header=1: error1",4);
 
       send_packet.CLIENT_HEADER[0] = '1';
       send_packet.CLIENT_HEADER[1] = '1';
@@ -65,7 +63,7 @@ void CIODAC16::daconv(int  , char header)
       struct udppacket_control *asp_control = &send_packet;
 
 #ifndef NDEBUG
-#if DEBUG_LEVEL > 2
+#if DEBUG_LEVEL > 3
       ODEBUGL("\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control,2);
 
 
@@ -95,8 +93,13 @@ void CIODAC16::daconv(int  , char header)
       buffer_send = (char*)&send_packet_init;
 
       client_obj -> client_send(buffer_send, sizeof(send_packet_init));
-      //struct udppacket_init *asp_control1 = &send_packet_init;
-      //std::cout << "\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1 << std::endl;
+#ifndef NDEBUG
+#if DEBUG_LEVEL > 3
+
+      struct udppacket_init *asp_control1 = &send_packet_init;
+      ODEBUGL("\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1,3);
+#endif
+#endif
       ODEBUGL("command raw packet \n",3);
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 2
@@ -170,10 +173,10 @@ void CIODAC16::pressure_inidividualmuscle(int index, double pres)
   buffer_send = (char*)&send_packet;
   client_obj->client_send(buffer_send, sizeof(send_packet));
   struct udppacket_control *asp_control = &send_packet;
-  std::cout << "\n  CIODAC16 message: CONTROL_CMD to inidividual muscles : " << *asp_control << std::endl;
+  ODEBUGL("\n  CIODAC16 message: CONTROL_CMD to inidividual muscles : " << *asp_control,3);
 
 #ifndef NDEBUG
-#if DEBUG_LEVEL > 2
+#if DEBUG_LEVEL > 3
   #warning "Compile here"
       for(unsigned int lp =0; lp < sizeof(send_packet); lp++  )
 	{

@@ -19,6 +19,9 @@ void * FunctionHandlingKeyboard(void *argc)
 NCursesUI::NCursesUI():
   end_of_loop_(false)
 {
+  for(unsigned int i=0;i<16;i++)
+    control_[i] = 0.0;
+
   /* start the curses mode */
   initscr();				
   /* No waiting for the keyboard. */
@@ -92,12 +95,12 @@ void NCursesUI::UpdateSharedMemory()
 {
   unsigned int index =0;
   for(unsigned int i=0;i<16;i++)
-    control_[i] = shmaddr_[index++];
+    shmaddr_[index++] = control_[i];
 
   for(unsigned int i=0;i<7;i++)
     potentiometer_[i] = shmaddr_[index++];
 
-    shmaddr_[23] = this -> get_FINITE_STATE();
+  shmaddr_[23] = this -> get_FINITE_STATE();
 }
 
 void NCursesUI::Init()

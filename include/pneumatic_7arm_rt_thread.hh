@@ -153,6 +153,12 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   /// \brief Update shared memory
   void UpdateSharedMemory();
 
+  /// \Read the potentiometers and Finite state
+  void ReadStatus();
+
+  ///\Apply the desired pressure to the muscles
+  void ApplyPressure();
+
   /// \brief Free the shared memroy
   void CloseSharedMemory();
 

@@ -105,16 +105,19 @@ void CIODAS64::adconv(int )
   if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
     {
       recv_packet_DAQ = (udppacket_DAQ *)recv_buffer ;
-      //cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
+      
+      ODEBUGL("\n Sensor's data: ",3);//<<(*recv_packet_DAQ);
+#ifndef NDEBUG
+#if DEBUG_LEVEL > 3
 
-      cout << "\n Sensor's data: " << endl;//<<(*recv_packet_DAQ);
       printf("%x %u %f %f %f %f %f %f %f \n ",
 	     (*recv_packet_DAQ).SERVER_HEADER[0],
 	     ( (*recv_packet_DAQ).label), (*recv_packet_DAQ).data[0],
 	     (*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],
 	     (*recv_packet_DAQ).data[3], (*recv_packet_DAQ).data[4],
 	     (*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6]);
-
+#endif
+#endif
       //cout << (*recv_packet_DAQ).data[0];
       //struct udppacket_DAQ daq = recv_packet_DAQ;
       //std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;

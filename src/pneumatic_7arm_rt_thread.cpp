@@ -247,7 +247,7 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CONTROL_MODE_NOPRES_FLAG(0),
   CONTROL_MODE_PRES_FLAG(0),
   INFLATING_FLAG(0),
-  PRES_INDIVIDUAL_FLAG(1),
+  PRES_INDIVIDUAL_FLAG(0),
   controllers_(7),
   recving_Data_(15),
   CTRL_FLAG(7),
@@ -661,7 +661,8 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   //int whileloop_counter = 0, error_counter = 0, loop = 0;
   int timeofsimulation_s = 30; /* time in seconds*/
   int FLAG = 1;
-
+ // initconfigData.timeofsimulation = 30;  /*  The time of simulation in seconds*/
+  //initconfigDATA.PRES_INDIVIDUAL_FLAG
   RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
@@ -686,7 +687,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       sleep(5);
       ODEBUG("\n ..... INFLATING should be completed  .....");
     }
-  if(FINITE_STATE_ == 4)
+  if(PRES_INDIVIDUAL_FLAG == 1)
     {
 #ifndef NDEBUG
       int index_pres_indiv;
@@ -711,7 +712,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 #ifndef NDEBUG
       char tmp;
       printf("\n ..... CONTROL MODE Begins   .....");
-
+/*
       printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol, or p for open loop pressure command and confirm (ok3, tmp) : ");
       std::cin >> tmp; //scanf("%s",tmp);
 
@@ -719,6 +720,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       if (strcmp(&tmp,"o")==0) {loop_=BOUCLE_OUVERTE;}
       if (strcmp(&tmp,"f")==0) {loop_=BOUCLE_FERMEE;}
       if (strcmp(&tmp,"p")==0)  {loop_=BOUCLE_PRESCMD; cout << "loop_ pressure is set :"  << loop_;}
+      */
 #endif
     }
 
@@ -741,8 +743,9 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       present_time  = round((double)now/1.0e9);
       t = present_time - time_start_loop;
       time_diff = now - previous;
-      ODEBUG("\n time difference :" << (double)time_diff/(double)1.0e6);
-      UpdateSharedMemory();
+      ODEBUGL("\n time difference :" << (double)time_diff/(double)1.0e6, 3);
+      ReadStatus();
+      ApplyPressure(); 
 
       if(FINITE_STATE_ == 3)
 	{
@@ -750,13 +753,10 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 	  Calibration();
 	}
 
+
       if(FINITE_STATE_==1)
 	{
-	  ciodas64_ -> adconv(1);
-	  ciodas64_ -> logudpdata();
-
-          UpdateSharedMemory();
-	  ciodac16_ -> daconv(1, '1');
+          ApplyPressure(); 
 	}
       if(FINITE_STATE_==2)
 	{
@@ -897,16 +897,39 @@ void Pneumatic7ArmRtThread::UpdateSharedMemory()
 
       actuators_[j]->receive_command_decouple(m1,m2);
     }
-
-  // Read position
-  for(unsigned int i=16;i<23;i++)
-    {
-      shmaddr_[i] = controllers_[i-16]->get_angle_lire();
-      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],0);
-    }
-  FINITE_STATE_= (int) shmaddr_[23];
 }
 
+void Pneumatic7ArmRtThread::ApplyPressure()
+{
+  // Write desired pressure
+  for(unsigned int i=0,j=0;i<14;i+=2,j++)
+    {
+      double m1,m2;
+      m1 = shmaddr_[i];
+      m2 = shmaddr_[i+1];
+
+      actuators_[j]->receive_command_decouple(m1,m2);
+      ODEBUGL("Muscle " << i << " = " << m1 << " , " <<m2, 3 );
+    } 
+  ciodac16_ -> daconv(1, '1');
+
+ }
+
+
+void Pneumatic7ArmRtThread::ReadStatus()
+{
+  // Read position
+  ciodas64_ -> adconv(1);
+  ciodas64_ -> logudpdata();
+
+ for(unsigned int i=16;i<23;i++)
+    {
+      shmaddr_[i] = controllers_[i-16]->get_angle_lire();
+      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
+    }
+  FINITE_STATE_= (int) shmaddr_[23];
+  ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);
+}
 void Pneumatic7ArmRtThread::CloseSharedMemory()
 {
   shmdt(shmaddr_);

@@ -32,7 +32,7 @@ public:
   void Init();
   void CreateSharedMemory();
   void UpdateSharedMemory();
-
+  int get_FINITE_STATE();
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
   WINDOW * main_win_;
@@ -41,6 +41,6 @@ protected:
   double * shmaddr_;
   double potentiometer_[7];
   double control_[14];
-
+  int FINITE_STATE;
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

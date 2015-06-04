@@ -670,6 +670,8 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
+  UpdateSharedMemory();
+
   if(CALIBRATION_FLAG == 1)
     {
       ODEBUG("\n CALIBRATION MODE ON ...... \n");
@@ -684,7 +686,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       sleep(5);
       ODEBUG("\n ..... INFLATING should be completed  .....");
     }
-  if(PRES_INDIVIDUAL_FLAG == 1)
+  if(FINITE_STATE_ == 4)
     {
 #ifndef NDEBUG
       int index_pres_indiv;
@@ -740,13 +742,15 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       t = present_time - time_start_loop;
       time_diff = now - previous;
       ODEBUG("\n time difference :" << (double)time_diff/(double)1.0e6);
-      if(CALIBRATION_FLAG == 1)
+      UpdateSharedMemory();
+
+      if(FINITE_STATE_ == 3)
 	{
 	  ciodas64_ -> adconv(1);
 	  Calibration();
 	}
 
-      if(CONTROL_MODE_NOPRES_FLAG == 1 || CONTROL_MODE_PRES_FLAG == 1)
+      if(FINITE_STATE_==1)
 	{
 	  ciodas64_ -> adconv(1);
 	  ciodas64_ -> logudpdata();
@@ -754,7 +758,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
           UpdateSharedMemory();
 	  ciodac16_ -> daconv(1, '1');
 	}
-      if(INFLATING_FLAG == 1 && CONTROL_MODE_PRES_FLAG == 0 && CONTROL_MODE_NOPRES_FLAG == 0)
+      if(FINITE_STATE_==2)
 	{
 	  ODEBUG("\n You have Inflated the muscles!");
 	}
@@ -900,6 +904,7 @@ void Pneumatic7ArmRtThread::UpdateSharedMemory()
       shmaddr_[i] = controllers_[i-16]->get_angle_lire();
       ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],0);
     }
+  FINITE_STATE_= (int) shmaddr_[23];
 }
 
 void Pneumatic7ArmRtThread::CloseSharedMemory()

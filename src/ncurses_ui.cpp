@@ -57,8 +57,26 @@ void NCursesUI::HandlingKeyboard()
         {
           loop=false;
           end_of_loop_=true;
+          FINITE_STATE = 5;
+        }
+      if (c=='1')
+        {                   
+          FINITE_STATE = 1;
+        }
+      if (c=='2')
+        {                   
+          FINITE_STATE = 2;
+        }
+       if (c=='3')
+        {                   
+          FINITE_STATE = 3;
+        } 
+       if (c=='4')
+        {                   
+          FINITE_STATE = 4;
         }
     }
+
 
 }
 
@@ -79,6 +97,7 @@ void NCursesUI::UpdateSharedMemory()
   for(unsigned int i=0;i<7;i++)
     potentiometer_[i] = shmaddr_[index++];
 
+    shmaddr_[23] = this -> get_FINITE_STATE();
 }
 
 void NCursesUI::Init()
@@ -129,7 +148,10 @@ bool NCursesUI::DisplayInformation()
   counter++;
   return end_of_loop_;
 }
-
+int NCursesUI::get_FINITE_STATE()
+{
+    return(FINITE_STATE);
+}
 NCursesUI::~NCursesUI()
 {
  endwin();

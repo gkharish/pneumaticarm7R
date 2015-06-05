@@ -216,6 +216,7 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CONTROL_MODE_NOPRES_FLAG(0),
   CONTROL_MODE_PRES_FLAG(0),
   INFLATING_FLAG(0),
+  PRES_INDIVIDUAL_FLAG(0),
   timeofsimulation(10),
   recving_Data_(15),
   CTRL_FLAG(7),
@@ -416,21 +417,24 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
+  if (PRES_INDIVIDUAL_FLAG)
+    {
 #ifndef NDEBUG
-  int index_pres_indiv;
-  double pres_pres_indiv;
-  char depres;
-  cout << "\n Select the muscle number: "<< endl;
-  std::cin >> index_pres_indiv; //scanf("%s",tmp);
-  cout << "\n Enter the pressure value: " << endl;
-  std::cin >> pres_pres_indiv;
-  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-  ciodac16_ -> pressure_inidividualmuscle(index_pres_indiv-1, pres_pres_indiv);
-  printf("\n Type Any letter to depressurize : ");
-  std::cin >> depres; //scanf("%s",tmp);
-  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-  
+      int index_pres_indiv;
+      double pres_pres_indiv;
+      char depres;
+      cout << "\n Select the muscle number: "<< endl;
+      std::cin >> index_pres_indiv; //scanf("%s",tmp);
+      cout << "\n Enter the pressure value: " << endl;
+      std::cin >> pres_pres_indiv;
+      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+      ciodac16_ -> pressure_inidividualmuscle(index_pres_indiv-1, pres_pres_indiv);
+      printf("\n Type Any letter to depressurize : ");
+      std::cin >> depres; //scanf("%s",tmp);
+      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+      
 #endif
+    }
 
   now = rt_timer_read();
   time_start_loop  = round((double)now/1.0e9);
@@ -573,16 +577,8 @@ void Pneumatic7ArmRtThread::CreateSharedMemory()
 
 void Pneumatic7ArmRtThread::UpdateSharedMemory()
 {
-
-  // Write desired pressure
-  for(unsigned int i=0,j=0;i<14;i+=2,j++)
-    {
-      double m1,m2;
-      m1 = shmaddr_[i];
-      m2 = shmaddr_[i+1];
-
-      actuators_[j]->receive_command_decouple(m1,m2);
-    }
+  ApplyPressure();
+  ReadStatus();
 }
 
 void Pneumatic7ArmRtThread::ApplyPressure()
@@ -610,8 +606,8 @@ void Pneumatic7ArmRtThread::ReadStatus()
 
  for(unsigned int i=16;i<23;i++)
     {
-      shmaddr_[i] = sensors_[i].read_sensors_array();
-      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],0);
+      shmaddr_[i] = sensors_[i-16].read_sensors_array();
+      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
     }
   FINITE_STATE_= (int) shmaddr_[23];
   ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);

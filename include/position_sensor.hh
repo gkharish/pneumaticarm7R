@@ -22,27 +22,30 @@
 class position_sensor: public sensor
 {
  private :
-  double offset,pente;
+  double offset_,slope_;
+  // Index in the sensor array.
+  int index_; 
 
  public :
   //constructors
   position_sensor (){}
-  position_sensor (double,double);
+  position_sensor (double,double, int);
 
   //read the position of the joints
   double read_position(void);
-  double read_sensors_array(int);
+  double read_sensors_array();
 
   /* recup attr. */
   ioboards * get_ioboards (void);
 
   double get_rapport(void);
   double get_offset();
-  double get_pente();
+  double get_slope();
 
   /* set the  attributes. */
   void set_offset(double);
-  void set_pente(double);
+  void set_slope(double);
+  void set_index(int);
 };
 
 #endif

@@ -161,8 +161,6 @@ class controller_axis
   //reading the potentiometer
   double read_position(void);
 
-  //initializing elctronic ioboards for control command
-  void initialisation_ioboards();
 
   //Initializing the muscles in resting position (zero-configuration)
   void initialisation_muscles(double,double);

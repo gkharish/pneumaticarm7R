@@ -27,21 +27,19 @@
  *    PARAMETRES :                                                  *
 
 
- *                  off   : offset	                                *
+ *                  off   : offset_	                                *
 
- *		              pen	: pente					                            *
+ *		              pen	: slope					                            *
 
  *                                                                  *
 
  ********************************************************************/
 
-position_sensor::position_sensor (double off,double pen)
-
+position_sensor::position_sensor (double off,double pen, int index_index)
 {
-
-
-  offset = off;
-  pente = pen;
+  offset_ = off;
+  slope_ = pen;
+  index_ = index_index;
 }
 
 
@@ -68,7 +66,7 @@ double position_sensor::read_position (void)
   float v1=0.0;
   /* recup�ration de la tension */
 
-  //v1 = pioboards->adconv(chanNumber);
+  //v1 = pioboards->adconv(chanIndex);
   //v1 = pioboards -> read_sensors(*axis_num);
   ODEBUGL("Value read b cap_pos_lire:" << v1,3);
   /* calcul de l'angle */
@@ -79,8 +77,7 @@ double position_sensor::read_position (void)
 
 }
 
-double position_sensor::read_sensors_array (int ind)
-
+double position_sensor::read_sensors_array ()
 {
 
   double angle=0;
@@ -88,13 +85,13 @@ double position_sensor::read_sensors_array (int ind)
   double v1;
   /* Reading the potentionmeter value */
 
-  ODEBUGL("position_sensor:read_sensors_array:" << ind,3);
-  v1 = pioboards -> read_sensors(ind);
+  ODEBUGL("position_sensor:read_sensors_array:" << index_,3);
+  v1 = pioboards -> read_sensors(index_);
   ODEBUGL("\n Value read by the IO board:" << v1,3);
   /* Computing the angle */
 
   angle = v1*18; // 1volt from potentiometers = 18 degrees //*180/3.14;//((double)v * 360)/4095;
-  ODEBUGL("angle cap_pos_read_sensor_array"<<ind<<": " << angle ,3);
+  ODEBUGL("angle cap_pos_read_sensor_array"<<index_<<": " << angle ,3);
   return (angle);
 
 }
@@ -118,7 +115,7 @@ double position_sensor::read_sensors_array (int ind)
 
 double position_sensor::get_offset(void)
 {
-  return(offset);
+  return(offset_);
 }
 /********************************************************************
 
@@ -138,13 +135,13 @@ double position_sensor::get_offset(void)
 
 void position_sensor::set_offset(double off)
 {
-  offset = off;
+  offset_ = off;
 }
 
 
 /********************************************************************
 
- *                   	     get_pente       		            *
+ *                   	     get_slope       		            *
 
  ********************************************************************
 
@@ -152,19 +149,19 @@ void position_sensor::set_offset(double off)
 
  *    RETOURNE :                                                    *
 
- *                valeur de la pente		                    *
+ *                valeur de la slope_		                    *
 
  *                                                                  *
 
  ********************************************************************/
 
- double position_sensor::get_pente(void)
+ double position_sensor::get_slope(void)
  {
- 	return(pente);
+ 	return(slope_);
  }
 /********************************************************************
 
- *                   	     set_pente       		            *
+ *                   	     set_slope       		            *
 
  ********************************************************************
 
@@ -172,13 +169,18 @@ void position_sensor::set_offset(double off)
 
  *    RETOURNE :                                                    *
 
- *                valeur de la pente		                    *
+ *                valeur de la slope		                    *
 
  *                                                                  *
 
  ********************************************************************/
 
-void position_sensor::set_pente(double apente)
+void position_sensor::set_slope(double aslope)
  {
- 	pente = apente;
+ 	slope_ = aslope;
  }
+
+void position_sensor::set_index(int aindex)
+{
+  index_ = aindex;
+}

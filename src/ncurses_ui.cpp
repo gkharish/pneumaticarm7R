@@ -16,8 +16,9 @@ void * FunctionHandlingKeyboard(void *argc)
   return NULL;
 }
  
-NCursesUI::NCursesUI():
-  end_of_loop_(false)
+NCursesUI::NCursesUI(Controller &aController):
+  end_of_loop_(false),
+  Controller_(aController)
 {
   for(unsigned int i=0;i<16;i++)
     control_[i] = 0.0;
@@ -46,6 +47,17 @@ NCursesUI::NCursesUI():
   
   main_win_ = newwin(LINES,COLS, 0,0);
 
+  // Initialize pressure for all motors.
+  double PressureForMuscles[16] = {
+    1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0};
+    
+  for(unsigned int i=0;i<16;i++)
+    Controller_.SetApplyControl(i,
+                                PressureForMuscles[i]);
+
 }
 
 
@@ -62,22 +74,27 @@ void NCursesUI::HandlingKeyboard()
           end_of_loop_=true;
           FINITE_STATE = 5;
         }
-      if (c=='1')
+      if (c=='s')
         {                   
-          FINITE_STATE = 1;
+          Controller_.StartingRealTimeThread();
         }
-      if (c=='2')
+      if ((c>='1') && (c<='9'))
         {                   
-          FINITE_STATE = 2;
+          unsigned int idx = c-'1';
+          if (Controller_.GetApplyControl(idx))
+            Controller_.SetApplyControl(idx,false);
+          else
+            Controller_.SetApplyControl(idx,true);
         }
-       if (c=='3')
+      if ((c>='A') && (c<='F'))
         {                   
-          FINITE_STATE = 3;
-        } 
-       if (c=='4')
-        {                   
-          FINITE_STATE = 4;
+          unsigned int idx = 10+c-'A';
+          if (Controller_.GetApplyControl(idx))
+            Controller_.SetApplyControl(idx,false);
+          else
+            Controller_.SetApplyControl(idx,true);
         }
+
     }
 
 

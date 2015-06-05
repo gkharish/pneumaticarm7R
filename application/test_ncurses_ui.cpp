@@ -1,10 +1,12 @@
 #include <ncurses_ui.hh>
 #include <unistd.h>
+#include <controller.hh>
 
 int main(void)
 {
-  NCursesUI ancursesui;
-
+  Controller aController;
+  NCursesUI ancursesui(aController);
+    
   ancursesui.Init();
   bool loop=true;
   while(loop)

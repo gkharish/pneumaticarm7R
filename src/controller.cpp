@@ -77,9 +77,19 @@ void Controller::SetUserControl(unsigned int idx, double control)
   user_controls_[idx] = control;
 }
 
+double Controller::GetUserControl(unsigned int idx)
+{
+  return user_controls_[idx];
+}
+
 void Controller::SetApplyControl(unsigned int idx, bool apply_control)
 {
   apply_controls_[idx] = apply_control;
+}
+
+bool Controller::GetApplyControl(unsigned int idx)
+{
+  return apply_controls_[idx];
 }
 
 void Controller::StartingRealTimeThread()

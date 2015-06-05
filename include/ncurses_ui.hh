@@ -16,14 +16,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-
 #include <ncurses.h>			/* ncurses.h includes stdio.h */
-//#include <pneumatic_7arm_rt_thread.hh>
+
+#include <controller.hh>
 
 class NCursesUI
 {
 public:
-  NCursesUI();
+  NCursesUI(Controller & aController);
   ~NCursesUI();
 
   // Return false if finished
@@ -33,6 +33,7 @@ public:
   void CreateSharedMemory();
   void UpdateSharedMemory();
   int get_FINITE_STATE();
+  
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
   WINDOW * main_win_;
@@ -42,5 +43,6 @@ protected:
   double potentiometer_[7];
   double control_[14];
   int FINITE_STATE;
+  Controller & Controller_;
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

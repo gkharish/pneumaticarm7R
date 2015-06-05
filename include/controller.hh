@@ -10,6 +10,7 @@
 #define _PNEUMATIC_ARM_7R_CONTROLLER_HH_
 
 #include <vector>
+#include <native/task.h>
 
 class Controller 
 {
@@ -31,8 +32,15 @@ public:
       i.e. set the desired pressure */
   void SetUserControl(unsigned int idx, double control);
 
+  /** \brief Set the user control law,
+      i.e. set the desired pressure */
+  double GetUserControl(unsigned int idx);
+
   /** \brief Set if a given muscle may or not be activated. */
   void SetApplyControl(unsigned int idx, bool apply_control);
+
+  /** \brief Get if a given muscle may is activated. */
+  bool GetApplyControl(unsigned int idx);
   
 protected:
   // Pointer to the shared memory
@@ -40,6 +48,7 @@ protected:
   
   // Pointer of the graph entity 
   RT_TASK principal_task_;
+
   // Positions values 
   std::vector<double> positions_;
 

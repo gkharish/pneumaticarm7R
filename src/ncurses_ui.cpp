@@ -95,7 +95,7 @@ void NCursesUI::UpdateSharedMemory()
 {
   unsigned int index =0;
   for(unsigned int i=0;i<16;i++)
-    shmaddr_[index++] = control_[i];
+    control_[i] = shmaddr_[index++];
 
   for(unsigned int i=0;i<7;i++)
     potentiometer_[i] = shmaddr_[index++];

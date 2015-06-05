@@ -41,6 +41,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   CIODAC16.cpp
   CIODAS64.cpp
   clientudp3.cpp
+  controller.cpp
   controller_axis.cpp
   controller_tool.cpp
   fichier.cpp

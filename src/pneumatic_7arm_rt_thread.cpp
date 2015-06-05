@@ -409,7 +409,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   /* variables used in the principal program */
   int FLAG = 1;
 
-  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
+  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e6;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
   //udppacket_control send_packet;

@@ -69,8 +69,6 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   bool PRES_INDIVIDUAL_FLAG;
   int FINITE_STATE_;
   int timeofsimulation;
-  /// \brief Axis controlers
-  std::vector<controller_axis *> controllers_;
 
   /// \brief Muscle class object
   Muscle pneumatic_muscle;
@@ -98,9 +96,6 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   /// \brief Actuators
   std::vector<Actuator *> actuators_;
 
-  /// \brief Joysticks
-  I_teleop * joy1_,*joy2_,* ppalonnier_;
-
   /// \brief Array of sensors
   position_sensor sensors_[7];
 
@@ -123,29 +118,11 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   /** ! Initialize actuators */
   void InitActuators();
 
-  /** ! Initialize controllers */
-  void InitControllers();
+  /** ! Init IO boards */
+  void InitIOboards();
 
   /** ! Initialize sensors */
   void InitializeSensors(); // fka init_sensors
-
-  /** ! Inflating the muscles */
-  void Inflating (); // fka gonfler
-
-  /** ! Deflating the muscles */
-  void Deflating (); // fka gonfler
-
-  /** ! Calibration */
-  void Calibration(); // fka caliberation
-
-  /** ! Reference generator */
-  void ReferenceGenerator(); // fka reference_generator
-
-  /** ! Main Controler for each axis */
-  void Controler(); // fka controler
-
-  /** ! Main Controler for the whole robot */
-  void RobotControler(); // fka controler
 
   /** @{ Shared memory related methods*/
   /// \brief Create shared memory. 

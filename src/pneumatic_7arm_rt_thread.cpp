@@ -18,12 +18,6 @@
 
 #include <debug.hh>
 
-/***** DEFINITION DE L'ADRESSAGE DES ioboardsS *****/
-/*         BASE_REG_CIODAC16 : CIO-DAC16-I 	*/
-/*         BASE_REG_CIODAS64 : CIO-DAS6402/16   */
-/************************************************/
-#define BASE_REG_CIODAC16	0x200
-#define BASE_REG_CIODAS64	0x250
 
 /***** DEFINITION DES INFOS CONCERNANT LA GACHETTE *****/
 #define VOIE_PINCE_1        14   // sorties de la ioboards de commande
@@ -32,15 +26,6 @@
 #define PRESSION_MAX_NUM 4095  // pression maximale numerique
 #define PRESSION_MIN_NUM    0  // pression minimale numerique
 
-
-//infos d'initialisations des pressions correspondant a la position initiale du bras
-#define DELTA_INIT_AXE_1 -1.4//-1.4
-#define DELTA_INIT_AXE_2 -2.5 //-2.5
-#define DELTA_INIT_AXE_3  0.0
-#define DELTA_INIT_AXE_4  1.8
-#define DELTA_INIT_AXE_5  0.2
-#define DELTA_INIT_AXE_6 -0.6
-#define DELTA_INIT_AXE_7 -0.2
 
 //Outputports  of actuators of output ioboards (CIODAC16)
 #define VOIE_1_1  0	//2
@@ -58,21 +43,6 @@
 #define VOIE_7_1 13	//10
 #define VOIE_7_2 14	//11
 
-//Ports d'entree des joysticks et du palonnier sur la ioboards d'acquisition (CIODAS64)
-#define VOIE_X_1          1
-#define VOIE_Y_1	  0
-#define VOIE_Z_1          3
-#define VOIE_VITESSE_1    2
-#define VOIE_X_2	  7
-#define VOIE_Y_2	  6I
-#define VOIE_Z_2	  45
-#define VOIE_BOUTTON_A_2  5
-#define VOIE_PALONNIER   23
-#define VOIE_INUTILISEE  -1
-
-//seuil de prise en compte des mouvements du joystick et du palonnier
-#define SEUIL_JOY  0.65
-#define SEUIL_PAL  0.25
 
 //Informations concernant la vitesse du mouvement
 #define COEF_LENT        0.5    //coefficients de rapidite du
@@ -218,7 +188,6 @@
 #include "joystick.h"
 #include "sensor.hh"
 #include "position_sensor.hh"
-#include "controller_axis.hh"
 #include "controller_tool.hh"
 #include "fichier.h"
 #include "modele.h"
@@ -247,7 +216,6 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CONTROL_MODE_NOPRES_FLAG(0),
   CONTROL_MODE_PRES_FLAG(0),
   INFLATING_FLAG(0),
-  PRES_INDIVIDUAL_FLAG(0),
   timeofsimulation(10),
   controllers_(7),
   recving_Data_(15),
@@ -255,7 +223,6 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   pressure_command_array_(7),
   sensors_array_(7),
   actuators_(7),
-  joy1_(0), joy2_(0),ppalonnier_(0),
   shmaddr_(0),
   fin_(false),
   tele_op_(false),
@@ -269,64 +236,17 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   ciodas64_ = new CIODAS64();
 
   // Creating position sensors.
+  unsigned int mapfromIO2chain[7] = {4,2,6,0,1,3,5};
   for (int i = 0; i<7;i++)
     {
-
-      //construction des sensors
+      // Set offset and slope
       sensors_[i].set_offset(0);
-      sensors_[i].set_pente(0);
-
+      sensors_[i].set_slope(0);
+      sensors_[i].set_index(mapfromIO2chain[i]);
     }
 
 }
 
-/********************************************************
- *							*
- *	trait_musclei ()	i = 1..7		*
- *							*
- *	Routine appelee par les taches 	                *
- *	d'initialisation, de controle et de finalisation*
- *      des axes.					*
- *      Trois  executions differentes correspondant aux *
- *	trois etapes.			                *
- ********************************************************/
-
-void Pneumatic7ArmRtThread::
-init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse)
-{
-  controleur_i -> initialisation_muscles(*delta,*vitesse);
-}
-
-void Pneumatic7ArmRtThread::
-reset_muscle_i (controller_axis *controleur_i,  double * vitesse)
-{
-  controleur_i -> degonfle(*vitesse);
-}
-
-void Pneumatic7ArmRtThread::
-trait_muscle_i (controller_axis *controleur_i,
-                double * delta,
-                double * vitesse)
-{
-  if ((delta==0) || (vitesse==0))
-    return;
-  if (!fin_)
-    {
-      //double del = *delta;
-      controleur_i -> initialisation_muscles(*delta,*vitesse);
-      /*if (!tele_op)
-	{
-	double del = *delta;
-	controleur_i -> initialisation_muscles(del,vit);
-	//msgQSend(msgq2,buf,2,WAIT_FOREVER,MSG_PRI_NORMAL);
-	}*/
-
-    }
-  else
-    {
-      controleur_i -> degonfle(*vitesse);
-    }
-}
 
 /*** SiGNAL catch  **/
 
@@ -355,25 +275,13 @@ void Pneumatic7ArmRtThread::InitActuators()
 
 }
 
-void Pneumatic7ArmRtThread::InitControllers()
+void Pneumatic7ArmRtThread::InitIOboards()
 {
-  double rest_angles[7] = { ANGLE_REPOS_1, ANGLE_REPOS_2, ANGLE_REPOS_3, ANGLE_REPOS_4, ANGLE_REPOS_5, ANGLE_REPOS_6, ANGLE_REPOS_7};
-  double min_angles[7] = { ANGLE_MIN_1, ANGLE_MIN_2, ANGLE_MIN_3, ANGLE_MIN_4, ANGLE_MIN_5, ANGLE_MIN_6, ANGLE_MIN_7};
-  double max_angles[7] = { ANGLE_MAX_1, ANGLE_MAX_2, ANGLE_MAX_3, ANGLE_MAX_4, ANGLE_MAX_5, ANGLE_MAX_6, ANGLE_MAX_7};
-  int sensor_directions[7] = {SENS_sensor_1,SENS_sensor_2,SENS_sensor_3,SENS_sensor_4,SENS_sensor_5,SENS_sensor_6,SENS_sensor_7};
-  int pressure_directions[7] = {SENS_PRESSION_1,SENS_PRESSION_2,SENS_PRESSION_3,SENS_PRESSION_4,SENS_PRESSION_5,SENS_PRESSION_6,SENS_PRESSION_7};
-  double p_gains[7] = {P_AXE_1,P_AXE_2,P_AXE_3,P_AXE_4,P_AXE_5,P_AXE_6,P_AXE_7};
-  double d_gains[7] = {D_AXE_1,D_AXE_2,D_AXE_3,D_AXE_4,D_AXE_5,D_AXE_6,D_AXE_7};
-  I_teleop * joys[7] = {joy1_, joy1_, joy1_, joy2_, ppalonnier_,joy2_,joy2_};
-
-  for(unsigned int i=0;i<7;i++)
+  // Set the actuator command to zero.
+  for (unsigned int i=0;i<7;i++)
     {
-      // Bind actuators and controllers
-      controllers_[i]=new controller_axis(joys[i],actuators_[i], i,
-					  rest_angles[i], min_angles[i],max_angles[i],
-					  sensor_directions[i], pressure_directions[i], p_gains[i],d_gains[i]);
-      // Initialize electronic boards
-      controllers_[i]->initialisation_ioboards();
+      double cmd=0.0;
+      actuators_[i]->receive_command_decouple(cmd,cmd);
     }
 
 
@@ -384,13 +292,6 @@ void Pneumatic7ArmRtThread::InitControllers()
 
   // Bind controllers and sensors
   ciodas64_ -> adconv(1);
-  controllers_[0]->set_sensor(sensors_+4);
-  controllers_[1]->set_sensor(sensors_+2);
-  controllers_[2]->set_sensor(sensors_+6);
-  controllers_[3]->set_sensor(sensors_);
-  controllers_[4]->set_sensor(sensors_+1);
-  controllers_[5]->set_sensor(sensors_+3);
-  controllers_[6]->set_sensor(sensors_+5);
 }
 
 void Pneumatic7ArmRtThread::Initializing()
@@ -455,8 +356,8 @@ void Pneumatic7ArmRtThread::Initializing()
   InitActuators();
   ODEBUGL("After Actuator initialization",4);
 
-  // Init axis controllers.
-  InitControllers();
+  // Init IO boards.
+  InitIOboards();
   ODEBUGL("After controllers initialization",4);
 
   // Init shared memory
@@ -481,167 +382,13 @@ void Pneumatic7ArmRtThread::InitializeSensors ()
   ciodas64_ -> adconv(1);
 
   for (int i = 1;i < 8;i++)
-    sensors_[i-1].set_offset( sensors_[i-1].read_sensors_array(i) );
+    sensors_[i-1].set_offset( sensors_[i-1].read_sensors_array() );
 
-  ODEBUGL("\n inside init_sensors()2 \n",3);
-  for(unsigned int i=0;i<7;i++)
-    controllers_[i]->init_angles();
-
-  //printf("\n Done init_sensors() \n");
+  ODEBUG("Done init_sensors() ");
 
   ciodac16_ -> daconv(1, header);
 }
 
-/********************************************************
- *							*
- *	 Inflating()					*
- *                                                      *
- * Simultaneously inflating all the muscles.            *
- *							*
- ********************************************************/
-
-void Pneumatic7ArmRtThread::
-Inflating(void)
-{
-  double  vit=VITESSE_PRESSION;
-  double d[7] = {DELTA_INIT_AXE_1,
-                 DELTA_INIT_AXE_2,
-                 DELTA_INIT_AXE_3,
-                 DELTA_INIT_AXE_4,
-                 DELTA_INIT_AXE_5,
-                 DELTA_INIT_AXE_6,
-                 DELTA_INIT_AXE_7};
-
-  // Initialize muscles
-  for(unsigned int motorID=0;motorID<7;motorID++)
-    init_muscle_i(controllers_[motorID], d+motorID, &vit);
-
-  char header = '1';
-
-  ciodac16_ -> daconv(1, header);
-  ciodas64_ -> adconv(1);
-}
-
-
-/********************************************************
- *							*
- *	Deflating ()					*
- *							*
- * Deflating all the muscles.                           *
- *							*
- ********************************************************/
-
-void Pneumatic7ArmRtThread::
-Deflating(void)
-{
-
-  //Variables locales
-  double  vit = VITESSE_PRESSION;
-
-  // Lancement en parallele des taches de degonflement des muscles
-  for(unsigned int motorID=0;motorID<7;motorID++)
-    reset_muscle_i(controllers_[motorID], &vit);
-
-  char header = '1';
-  ciodac16_ -> daconv(1, header);
-  ciodas64_ -> adconv(1);
-
-}
-
-/********************************************************
- *							*
- *	Calibration ()					*
- *							*
- *
- ********************************************************/
-void Pneumatic7ArmRtThread::
-Calibration()
-{
-  for(unsigned int i=0;i<7;i++)
-    sensors_array_(i) = controllers_[i]->get_angle_lire();
-
-  ODEBUG("\n received sensors data : ");
-#ifndef NDEBUG 
-#if DEBUG_LEVEL<1
-  for(int loop_sensors_array_ = 0; loop_sensors_array_ <7; loop_sensors_array_++)
-    cout << sensors_array_(loop_sensors_array_) << endl;
-#endif /* DEBUG_LEVEL <1 */
-#endif
-
-  for(unsigned int i=0;i<7;i++)
-    sensorlog_ << sensors_array_(i) << "\t";
-  sensorlog_ << endl;
-}
-
-void Pneumatic7ArmRtThread::
-ReferenceGenerator()
-{
-  for(unsigned int i=0;i<7;i++)
-    controllers_[i]->get_reference_angle(COEF_LENT, VITESSE_ANGLE);
-}
-
-/********************************************************
- *							*
- *	controler ()					*
- *							*
- *methode associee a la tache de controle des axes du   *
- *robot							*
- ********************************************************/
-
-void Pneumatic7ArmRtThread::
-Controler()
-{
-
-
-  ODEBUGL("\n jusqu'ici tout va bien 13 controler",3);
-
-  double  vit = VITESSE_PRESSION;
-  //Lancement en parallele des taches de controle des axes
-
-  ciodas64_ -> adconv(1);
-  Calibration();
-  ciodas64_ -> logudpdata();
-  ReferenceGenerator();
-
-  /* Add here all 7 axis control*/
-  for(unsigned int motorID=0;motorID<7;motorID++)
-    {
-      if(CTRL_FLAG(motorID)==1)
-        {
-          controllers_[motorID]->set_loop(loop_);
-          ODEBUGL("\n loop_" << loop_ ,3);
-          if(loop_ == 2)
-            {
-              controllers_[motorID]->set_userpressure(pressure_command_array_(motorID));
-              ODEBUGL("inside loop_  = 2",3);
-            }
-          control_command_ = controllers_[motorID]->get_commande();
-          angle_read = controllers_[motorID]->get_angle_reel();
-          ODEBUGL("controlcommand1: " << control_command_ ,3);
-          ODEBUGL("\n angle read CTRL_FLAG 1 :" << angle_read ,3);
-          trait_muscle_i(controllers_[motorID], &control_command_, &vit);
-        }
-    }
-
-  ODEBUGL("\n Angle read position " << angle_read,3);
-
-  ciodac16_ -> daconv(1, '1');
-
-}
-
-
-/********************************************************
- *							*
- *	controler_robot ()				*
- *							*
- *routine appelee par la tache principale main qui lance*
- *les deux taches de controle et d'attente clavier	*
- ********************************************************/
-void Pneumatic7ArmRtThread::
-RobotControler()
-{
-  Controler();
-}
 
 void principale(void *arg)
 {
@@ -670,61 +417,21 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
-  UpdateSharedMemory();
-
-  if(CALIBRATION_FLAG == 1)
-    {
-      ODEBUG("\n CALIBRATION MODE ON ...... \n");
-    }
-  if(INFLATING_FLAG == 1)
-    {
-      ODEBUG("\n ..... INFLATING THE MUSCLES   .....");
-      
-      //Appel a la fonction de gonflement des muscles
-      Inflating();
-
-      sleep(5);
-      ODEBUG("\n ..... INFLATING should be completed  .....");
-    }
-  if(PRES_INDIVIDUAL_FLAG == 1)
-    {
 #ifndef NDEBUG
-      int index_pres_indiv;
-      double pres_pres_indiv;
-      char depres;
-      cout << "\n Select the muscle number: "<< endl;
-      std::cin >> index_pres_indiv; //scanf("%s",tmp);
-      cout << "\n Enter the pressure value: " << endl;
-      std::cin >> pres_pres_indiv;
-      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      ciodac16_ -> pressure_inidividualmuscle(index_pres_indiv-1, pres_pres_indiv);
-      printf("\n Type Any letter to depressurize : ");
-      std::cin >> depres; //scanf("%s",tmp);
-      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      Deflating();
-      timeofsimulation= 2; /* time in seconds*/
+  int index_pres_indiv;
+  double pres_pres_indiv;
+  char depres;
+  cout << "\n Select the muscle number: "<< endl;
+  std::cin >> index_pres_indiv; //scanf("%s",tmp);
+  cout << "\n Enter the pressure value: " << endl;
+  std::cin >> pres_pres_indiv;
+  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+  ciodac16_ -> pressure_inidividualmuscle(index_pres_indiv-1, pres_pres_indiv);
+  printf("\n Type Any letter to depressurize : ");
+  std::cin >> depres; //scanf("%s",tmp);
+  std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
+  timeofsimulation_s = 2; /* time in seconds*/
 #endif
-    }
-
-  if(CONTROL_MODE_PRES_FLAG == 1 || CONTROL_MODE_NOPRES_FLAG == 1)
-    {
-#ifndef NDEBUG
-      char tmp;
-      printf("\n ..... CONTROL MODE Begins   .....");
-/*
-      printf("\n Type o for OPEN LOOP control, or f for CLOSED LOOP conttrol, or p for open loop pressure command and confirm (ok3, tmp) : ");
-      std::cin >> tmp; //scanf("%s",tmp);
-
-      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      if (strcmp(&tmp,"o")==0) {loop_=BOUCLE_OUVERTE;}
-      if (strcmp(&tmp,"f")==0) {loop_=BOUCLE_FERMEE;}
-      if (strcmp(&tmp,"p")==0)  {loop_=BOUCLE_PRESCMD; cout << "loop_ pressure is set :"  << loop_;}
-      */
-#endif
-    }
-
-
-  //printf(" \n APPLY THE PRESSURE   \n");
 
   now = rt_timer_read();
   time_start_loop  = round((double)now/1.0e9);
@@ -742,32 +449,22 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       present_time  = round((double)now/1.0e9);
       t = present_time - time_start_loop;
       time_diff = now - previous;
-      ODEBUGL("\n time difference :" << (double)time_diff/(double)1.0e6, 3);
-      ReadStatus();
-      ApplyPressure(); 
+      ODEBUG("\n time difference :" << (double)time_diff/(double)1.0e6);
 
-      if(FINITE_STATE_ == 3)
-	{
-	  ciodas64_ -> adconv(1);
-	  Calibration();
-	}
+      // Receiving information from NIC module
+      ciodas64_ -> adconv(1);
+      ciodas64_ -> logudpdata();
+      
+      UpdateSharedMemory();
 
-
-      if(FINITE_STATE_==1)
-	{
-          ApplyPressure(); 
-	}
-      if(FINITE_STATE_==2)
-	{
-	  ODEBUG("\n You have Inflated the muscles!");
-	}
+      // Sending desired pressure
+      ciodac16_ -> daconv(1, '1');
 
       previous = now;
       if(t >= timeofsimulation)
 	{
 	  FLAG = 0;
 	  ODEBUG("\n END of Loop");
-
 	}
     } //while (ok2) finish
   sensorlog_.close();
@@ -777,7 +474,6 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   ODEBUG("outside while loop ok2");
   ODEBUG("\n ..... DEFLATING THE MUSCLES   .....");
 
-  Deflating();
   sleep(5);
   ODEBUG("\n ..... DEFLATING should be completed  .....");
   //Appel a la fonction de degonflement des muscles
@@ -789,19 +485,11 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   //ciodac16_ -> ~ClientUDP();
 
-  // Calling controllers destructors
-  for(unsigned int i=0;i<7;i++)
-    controllers_[i]->~controller_axis();
-
   // Calling actuators destructors.
   for(unsigned int i=0;i<7;i++)
     actuators_[i]->~Actuator();
 
   controller_gripper_.~controller_tool();
-
-  joy1_->~I_teleop();
-  joy2_->~I_teleop();
-  ppalonnier_->~I_teleop();
 
   ciodac16_->~CIODAC16();
   ciodas64_->~CIODAS64();
@@ -923,8 +611,8 @@ void Pneumatic7ArmRtThread::ReadStatus()
 
  for(unsigned int i=16;i<23;i++)
     {
-      shmaddr_[i] = controllers_[i-16]->get_angle_lire();
-      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
+      shmaddr_[i] = sensors_[i].read_sensors_array();
+      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],0);
     }
   FINITE_STATE_= (int) shmaddr_[23];
   ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);

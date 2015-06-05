@@ -122,7 +122,7 @@ void controller_axis::set_sensor (position_sensor* pcap)
 {
   psensor = pcap;
   //rapport=rap;
-  double var = psensor -> read_sensors_array(ControllerAxisData_.numero);//read_position();
+  double var = psensor -> read_sensors_array();//read_position();
   ODEBUGL("\n controller_axis.setsensor read sensors array: " << var,3);
   double var1 = var - ControllerAxisData_.angle_repos;
   double offset_sensor = fabs( var1);
@@ -154,7 +154,7 @@ double controller_axis::read_position (void)
 {
 
   double angle;
-  angle = psensor->read_sensors_array(ControllerAxisData_.numero);
+  angle = psensor->read_sensors_array();
 
   //std::cout << " read sensor array Angle is :" << angle << std::endl;
   //Calcul de l'angle theorique en fonction de l'angle lu par le sensor
@@ -374,7 +374,7 @@ void controller_axis::controller ()
   //ControllerAxisData_.angle_th = 60;
   // SECURITY CHECK
   //double  angle_boundary = (this ->read_position());
-  double  angle_boundary = psensor->read_sensors_array(ControllerAxisData_.numero);
+  double  angle_boundary = psensor->read_sensors_array();
   cout << "\n Angle Boundary : "<< angle_boundary << endl;
   //On calcule la commande correspondant a l'angle theorique actuel
   if(angle_boundary < ControllerAxisData_.angle_max_bound && 
@@ -475,25 +475,6 @@ void controller_axis::init_angles ()
   offset_sensor = fabs(offset_lu - ControllerAxisData_.angle_repos);
 }
 
-/********************************************************************
-
- *                   	   initialisation_ioboards    	            *
-
- ********************************************************************
-
- *                                                                  *
-
- *    	  	Mise a zero des pressions des muscles   	    *
-
- *                                                                  *
-
- ********************************************************************/
-
-void controller_axis::initialisation_ioboards ()
-{
-  double i = 0;
-  ControllerAxisData_.pactuator->receive_command_decouple(i,i);
-}
 
 
 

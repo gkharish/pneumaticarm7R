@@ -5,7 +5,7 @@
 int main(void)
 {
   Controller aController;
-  NCursesUI ancursesui(aController);
+  NCursesUI ancursesui(&aController);
     
   ancursesui.Init();
   bool loop=true;

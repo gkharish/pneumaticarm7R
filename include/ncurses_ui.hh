@@ -23,7 +23,7 @@
 class NCursesUI
 {
 public:
-  NCursesUI(Controller & aController);
+  NCursesUI(Controller * aController);
   ~NCursesUI();
 
   // Return false if finished
@@ -33,7 +33,8 @@ public:
   void CreateSharedMemory();
   void UpdateSharedMemory();
   int get_FINITE_STATE();
-  
+  static const int NB_CONTROLS=16;
+
 protected:
   //Pneumatic7ArmRtThread pneumaticArm_;
   WINDOW * main_win_;
@@ -41,8 +42,8 @@ protected:
   bool end_of_loop_;
   double * shmaddr_;
   double potentiometer_[7];
-  double control_[14];
+  double control_[NB_CONTROLS];
   int FINITE_STATE;
-  Controller & Controller_;
+  Controller * Controller_;
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

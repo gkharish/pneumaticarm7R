@@ -416,7 +416,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
-  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
+  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(100000));
   if (PRES_INDIVIDUAL_FLAG)
     {
 #ifndef NDEBUG
@@ -441,7 +441,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   InitializeSensors();
 
-  while (FLAG)
+  while (1)
     {
       rt_task_wait_period(NULL);
 
@@ -584,14 +584,12 @@ void Pneumatic7ArmRtThread::UpdateSharedMemory()
 void Pneumatic7ArmRtThread::ApplyPressure()
 {
   // Write desired pressure
-  for(unsigned int i=0,j=0;i<14;i+=2,j++)
+  for(unsigned int muscle_j=0;muscle_j<14;muscle_j++)
     {
-      double m1,m2;
-      m1 = shmaddr_[i];
-      m2 = shmaddr_[i+1];
+      double pressure =  shmaddr_[muscle_j];
 
-      actuators_[j]->receive_command_decouple(m1,m2);
-      ODEBUGL("Muscle " << i << " = " << m1 << " , " <<m2, 3 );
+      ciodac16_->send_command_array(muscle_j, pressure);
+      ODEBUGL("Muscle " << muscle_j << " = " << pressure, 3 );
     } 
   ciodac16_ -> daconv(1, '1');
 

@@ -8,6 +8,7 @@
 
 /* Local framework. */
 #include <shared_memory.hh>
+#include <debug.hh>
 
 void * FunctionHandlingKeyboard(void *argc)
 {
@@ -16,11 +17,12 @@ void * FunctionHandlingKeyboard(void *argc)
   return NULL;
 }
  
-NCursesUI::NCursesUI(Controller &aController):
-  end_of_loop_(false),
-  Controller_(aController)
+NCursesUI::NCursesUI(Controller *aController):
+  end_of_loop_(false)
 {
-  for(unsigned int i=0;i<16;i++)
+  ODEBUGL(" Controler:" << aController,3);
+  Controller_ = aController;
+  for(unsigned int i=0;i<NB_CONTROLS;i++)
     control_[i] = 0.0;
 
   /* start the curses mode */
@@ -48,15 +50,22 @@ NCursesUI::NCursesUI(Controller &aController):
   main_win_ = newwin(LINES,COLS, 0,0);
 
   // Initialize pressure for all motors.
-  double PressureForMuscles[16] = {
+  double PressureForMuscles[NB_CONTROLS] = {
     1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0, 1.0,
-    1.0};
-    
-  for(unsigned int i=0;i<16;i++)
-    Controller_.SetApplyControl(i,
-                                PressureForMuscles[i]);
+    1.1, 1.1, 1.1, 1.1, 1.1,
+    2.0, 1.2, 1.2, 2.0, 
+    1.0, 1.0};
+  
+  ODEBUGL(" Controler:" << Controller_,3);
+  if (Controller_!=0)
+    {
+      for(unsigned int i=0;i<NB_CONTROLS;i++)
+	{
+	  ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
+	  Controller_->SetUserControl(i,
+				      PressureForMuscles[i]);
+	}
+    }
 
 }
 
@@ -75,24 +84,31 @@ void NCursesUI::HandlingKeyboard()
           FINITE_STATE = 5;
         }
       if (c=='s')
-        {                   
-          Controller_.StartingRealTimeThread();
+        {            
+	  if (Controller_!=0)
+	    Controller_->StartingRealTimeThread();
         }
       if ((c>='1') && (c<='9'))
-        {                   
-          unsigned int idx = c-'1';
-          if (Controller_.GetApplyControl(idx))
-            Controller_.SetApplyControl(idx,false);
-          else
-            Controller_.SetApplyControl(idx,true);
+        {                
+	  if  (Controller_!=0)
+	    {
+	      unsigned int idx = c-'1';
+	      if (Controller_->GetApplyControl(idx))
+		Controller_->SetApplyControl(idx,false);
+	      else
+		Controller_->SetApplyControl(idx,true);
+	    }
         }
-      if ((c>='A') && (c<='F'))
-        {                   
-          unsigned int idx = 10+c-'A';
-          if (Controller_.GetApplyControl(idx))
-            Controller_.SetApplyControl(idx,false);
-          else
-            Controller_.SetApplyControl(idx,true);
+      if ((c>='a') && (c<='f'))
+        {    
+	  if (Controller_!=0)
+	    {
+	      unsigned int idx = 9+c-'a';
+	      if (Controller_->GetApplyControl(idx))
+		Controller_->SetApplyControl(idx,false);
+	      else
+		Controller_->SetApplyControl(idx,true);
+	    }
         }
 
     }
@@ -111,7 +127,7 @@ void NCursesUI::CreateSharedMemory()
 void NCursesUI::UpdateSharedMemory()
 {
   unsigned int index =0;
-  for(unsigned int i=0;i<16;i++)
+  for(unsigned int i=0;i<NB_CONTROLS;i++)
     control_[i] = shmaddr_[index++];
 
   for(unsigned int i=0;i<7;i++)
@@ -161,8 +177,16 @@ bool NCursesUI::DisplayInformation()
         std::ostringstream oss;
         oss << control_[i];
         std::string as = oss.str();
-        mvwprintw(main_win_,3+i,col/2,"%s",as.c_str());
+        mvwprintw(main_win_,3+i,col/2,"%f",control_[i]);
       }
+
+      {
+        std::ostringstream oss;
+        oss << control_[i+7];
+        std::string as = oss.str();
+        mvwprintw(main_win_,3+i,col/2+10,"%f",control_[i+7]);
+      }
+
     }
 
   counter++;

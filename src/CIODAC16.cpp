@@ -48,10 +48,10 @@ void CIODAC16::daconv(int  , char header)
       send_packet.CLIENT_HEADER[0] = '1';
       send_packet.CLIENT_HEADER[1] = '1';
 
-      send_array[0] = 0;
+      /*      send_array[0] = 0;
       send_array[1] = 0;
       send_array[2] = 0;
-      send_array[3] = 0;
+      send_array[3] = 0; */
       send_array[14] = 0;
       send_array[15] = 0;
       for(int loop =0; loop < 16; loop++)

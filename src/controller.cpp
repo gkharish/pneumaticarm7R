@@ -30,6 +30,7 @@ Controller::Controller()
     {
       apply_controls_[i] = false;
       user_controls_[i] = 0.0;
+      controls_[i]=0.0;
     }
 
   InitSharedMemory();
@@ -57,7 +58,7 @@ void Controller::ApplyControlLaw()
       ComputeControlLaw();
       
       for(unsigned int i=0;i<16;i++)
-        shmaddr_[i] = controls_[i];
+	shmaddr_[i] = controls_[i];
     }
 }
 
@@ -111,18 +112,6 @@ void Controller::StartingRealTimeThread()
   else 
     { ODEBUGL("END of RT Start",3); }
 
-  pause();
-
-  ODEBUGL("END of Pause",3);
-
-  n = rt_task_delete(&principal_task_);
-  
-  if (n!=0)
-    std::cerr << "Failed of RT Task delete" << std::endl;
-  else 
-    { ODEBUG("END of RT taslk delete"); }
-  
-  CloseSharedMemory();
 }
 
 void Controller::InitSharedMemory()

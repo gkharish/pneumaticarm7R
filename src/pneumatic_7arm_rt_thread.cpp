@@ -217,7 +217,6 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   CONTROL_MODE_PRES_FLAG(0),
   INFLATING_FLAG(0),
   timeofsimulation(10),
-  controllers_(7),
   recving_Data_(15),
   CTRL_FLAG(7),
   pressure_command_array_(7),
@@ -430,7 +429,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   printf("\n Type Any letter to depressurize : ");
   std::cin >> depres; //scanf("%s",tmp);
   std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-  timeofsimulation_s = 2; /* time in seconds*/
+  
 #endif
 
   now = rt_timer_read();

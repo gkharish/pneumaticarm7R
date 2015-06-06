@@ -32,7 +32,7 @@ public:
       i.e. set the desired pressure */
   void SetUserControl(unsigned int idx, double control);
 
-  /** \brief Set the user control law,
+  /** \brief get the user control law,
       i.e. set the desired pressure */
   double GetUserControl(unsigned int idx);
 

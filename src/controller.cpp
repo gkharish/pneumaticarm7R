@@ -25,6 +25,7 @@ Controller::Controller()
   controls_.resize(16);
   apply_controls_.resize(16);
   user_controls_.resize(16);
+  JOINT_NUM_.resize(7);
 
   for(unsigned int i=0;i<16;i++)
     {
@@ -45,7 +46,7 @@ void Controller::ApplyControlLaw()
 {
   RTIME   TASK_PERIOD = 1.0e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
-
+ int loop = 0;
   while(CONTROLLER_STATE_)
     {
       // Waiting the next iteration
@@ -55,22 +56,64 @@ void Controller::ApplyControlLaw()
       for(unsigned int i=0;i<7;i++)
         positions_[i] = shmaddr_[index++];
       
+      ReferenceGenerator(loop*TASK_PERIOD/1.0e-9);
       ComputeControlLaw();
       
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
+
+      loop++;
     }
 }
 
 void Controller::ComputeControlLaw()
 {
-  for(unsigned int i=0;i<16;i++)
+  if(CONTROL_TYPE_= = 1)
+    for(unsigned int i=0;i<16;i++)
     {
       if (apply_controls_[i] ==true)
         controls_[i] = user_controls_[i];
       else 
         controls_[i] = 0.0;
     }
+  if(CONTROL_TYPE_ == 2)
+  {
+    
+    for (unsigned int i =0; i <7; i++)
+     {
+       if(JOINT_NUM_[i] == true)
+        {
+           double error_now = ref_traj - position _[i];
+           double error_derivative = error_now - error_prev;
+           error_prev = error_now;  
+           pid_control(error_now, error_derivative,i);
+        }
+       else
+        {
+           controls_[i] =0.0;
+           controls_[i+1] = 0.0;
+        }
+     }
+  }
+
+
+}
+
+double Controller::PidController(double error, double error_derivative, int joint_num)
+{
+    controls_[2*joint_num-1] = MeanPressure(joint_num) + 
+                                        Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+
+    controls_[2*joint_num] = MeanPressure(joint_num) - 
+                                        Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+
+}
+
+void Controller::ReferenceGenerator(long double timestep)
+{
+    
+    ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*timestep
+
 }
 
 void Controller::SetUserControl(unsigned int idx, double control)

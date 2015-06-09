@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <native/task.h>
+#include <math.h>
 
 class Controller 
 {
@@ -41,7 +42,13 @@ public:
 
   /** \brief Get if a given muscle may is activated. */
   bool GetApplyControl(unsigned int idx);
-  
+  /** \ PID controller design  */
+  double PidController(double error, double error_derivative , int joint num);
+
+  double GetPidParameter();
+  void SetPidParameter();
+  double  MeanPressure(int);
+  double ReferenceGenerator(long double timestep);
 protected:
   // Pointer to the shared memory
   double * shmaddr_;
@@ -60,6 +67,17 @@ protected:
 
   // User specificied controls.
   std::vector<bool> user_controls_;
+  std::vector<bool>JOINT_NUM_;
+
+  //Pid Controller parameter
+  std::vector<double>Pid_factor_;
+  std::vector<double>P_;
+  std::vector<double>D_;
+
+  //ReferenceGenerator parameter
+  ref_init_;
+  ref_final_;
+  ref_traj_;
 
   /** ! Initialize the shared memory. */
   void InitSharedMemory();
@@ -69,5 +87,6 @@ protected:
 
   /** ! Controller state */
   int CONTROLLER_STATE_;
+  int CONTROLLER_TYPE_;
 };
 #endif /* _PNEUMATIC_ARM_7R_CONTROLLER_HH_ */

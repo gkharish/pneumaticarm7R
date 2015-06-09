@@ -88,28 +88,20 @@ void NCursesUI::HandlingKeyboard()
 	  if (Controller_!=0)
 	    Controller_->StartingRealTimeThread();
         }
-      if ((c>='1') && (c<='9'))
+      if ((c>='1') && (c<='7'))
         {                
 	  if  (Controller_!=0)
 	    {
-	      unsigned int idx = c-'1';
-	      if (Controller_->GetApplyControl(idx))
-		Controller_->SetApplyControl(idx,false);
-	      else
-		Controller_->SetApplyControl(idx,true);
-	    }
+	      unsigned int idx =2* c;
+              unsigned int idx1 = c;
+              Controller_->SetApplyControl(idx,true);
+	      Controller_->SetApplyControl(idx-1,true);
+              JOINT_NUM_[idx1] = true;
+              Controller_ -> SetMeanPressure(idx1);
+            }
+
         }
-      if ((c>='a') && (c<='f'))
-        {    
-	  if (Controller_!=0)
-	    {
-	      unsigned int idx = 9+c-'a';
-	      if (Controller_->GetApplyControl(idx))
-		Controller_->SetApplyControl(idx,false);
-	      else
-		Controller_->SetApplyControl(idx,true);
-	    }
-        }
+     
 
     }
 

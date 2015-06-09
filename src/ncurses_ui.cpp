@@ -92,12 +92,13 @@ void NCursesUI::HandlingKeyboard()
         {                
 	  if  (Controller_!=0)
 	    {
-	      unsigned int idx =2* c;
-              unsigned int idx1 = c;
+	      unsigned int idx =2* c-1;
+              unsigned int idx1 = c-1;
               Controller_->SetApplyControl(idx,true);
 	      Controller_->SetApplyControl(idx-1,true);
-              JOINT_NUM_[idx1] = true;
-              Controller_ -> SetMeanPressure(idx1);
+              
+              Controller_ -> SetJointNum(idx1);
+              //Controller_ -> SetMeanPressure(idx1);
             }
 
         }

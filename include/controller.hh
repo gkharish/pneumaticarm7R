@@ -11,7 +11,8 @@
 
 #include <vector>
 #include <native/task.h>
-#include <math.h>
+#include <cmath>
+using namespace std;
 
 class Controller 
 {
@@ -21,7 +22,8 @@ public:
 
   /** !\brief Start the control real time thread */
   void StartingRealTimeThread();
-
+  /** \ Set Joint numbe rto be controlled */
+  void SetJointNum(int);
   /** \brief Apply the control law. */
   void ApplyControlLaw();
 
@@ -43,12 +45,13 @@ public:
   /** \brief Get if a given muscle may is activated. */
   bool GetApplyControl(unsigned int idx);
   /** \ PID controller design  */
-  double PidController(double error, double error_derivative , int joint num);
-
-  double GetPidParameter();
-  void SetPidParameter();
+  void  PidController(double error, double error_derivative , int joint_num);
+  //double GetPidParameter();
+  //void SetPidParameter();
   double  MeanPressure(int);
-  double ReferenceGenerator(long double timestep);
+ /** \ Reference generator function   */
+  double GetDesiredPosition();
+  void  ReferenceGenerator(long double timestep);
 protected:
   // Pointer to the shared memory
   double * shmaddr_;
@@ -68,17 +71,20 @@ protected:
   // User specificied controls.
   std::vector<bool> user_controls_;
   std::vector<bool>JOINT_NUM_;
-
+  // User Specified Mean Pressure
+  std::vector<double>mean_pressure_;
   //Pid Controller parameter
   std::vector<double>Pid_factor_;
   std::vector<double>P_;
   std::vector<double>D_;
 
   //ReferenceGenerator parameter
-  ref_init_;
-  ref_final_;
-  ref_traj_;
-
+  double ref_init_;
+  double ref_final_;
+  double ref_traj_;
+  double ref_slope_;
+  double desired_position_;
+  double error_prev_;
   /** ! Initialize the shared memory. */
   void InitSharedMemory();
 

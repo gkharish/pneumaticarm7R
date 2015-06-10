@@ -80,7 +80,7 @@ protected:
   std::vector<double>Pid_factor_;
   std::vector<double>P_;
   std::vector<double>D_;
-
+  std::vector<double>delta;
   //ReferenceGenerator parameter
   double ref_init_;
   double ref_final_;

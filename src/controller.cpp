@@ -28,20 +28,21 @@ Controller::Controller()
   user_controls_.resize(16);
   JOINT_NUM_.resize(7);
   mean_pressure_.resize(7);
+  delta.resize(7);
 
   /** \ Pid controller parameter intialization  */
   Pid_factor_.resize(7);
   P_.resize(7);
   D_.resize(7);
   //Here parameters are inititalized to test jont num 4 the elbow joint 
-  P_[3] = 1.4;
+  P_[3] = 0.02;
   D_[3] = 0;
-  Pid_factor_[3] = -1;
+  Pid_factor_[3] = 1;
   mean_pressure_[3] = 1;
   
   /** \ Refernce generator paramter intialization  */
   desired_position_ = 45;   // Value is in degree
-  ref_slope_ = 10;
+  ref_slope_ = 1;
   ref_traj_ = 0;
   /** \ Mean Pressure */
 
@@ -148,12 +149,17 @@ void Controller::ComputeControlLaw()
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
     
-    double delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+    double update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
    // cout << "Delta :" << delta;
-    controls_[2*(joint_num+1)-1] = MeanPressure(joint_num) + delta;
-    controls_[2*(joint_num+1)] = MeanPressure(joint_num) - delta;
-    
-    ODEBUGL("Pid command : " << delta,1);
+    controls_[2*(joint_num+1)-1] = MeanPressure(joint_num) + delta[joint_num];
+    controls_[2*(joint_num+1)] = MeanPressure(joint_num) - (delta[joint_num]);
+    if (delta[joint_num] <=2)
+        delta[joint_num] = 2;
+    else
+         delta[joint_num] = delta[joint_num]+update_delta;
+
+              
+    ODEBUGL("Pid command : " << delta[joint_num],1);
 
 
 }

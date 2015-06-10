@@ -103,6 +103,28 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   double angle[7];
   double erreur[7];
   double angle_read;
+    
+  // Angles maximum and minimum reached by joints
+  #define ANGLE_MIN_1    	-12.0
+  #define ANGLE_MAX_1    90.0
+
+  #define ANGLE_MIN_2    -15.0
+  #define ANGLE_MAX_2    90.0
+
+  #define ANGLE_MIN_3   -90.0
+  #define ANGLE_MAX_3    50.0
+
+  #define ANGLE_MIN_4    -5.0
+  #define ANGLE_MAX_4   130.0
+
+  #define ANGLE_MIN_5   -90.0
+  #define ANGLE_MAX_5    90.0
+
+  #define ANGLE_MIN_6   -30.0
+  #define ANGLE_MAX_6    30.0
+
+  #define ANGLE_MIN_7   -30.0
+  #define ANGLE_MAX_7    30.0
 
   /// \brief Reference to the shared memory */
   int shmid_;
@@ -159,7 +181,7 @@ public:
   void reset_muscle_i(controller_axis *controleur_i, double *vitesse);
 
   void trait_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
-
+  
 
 };
 #endif /* _PNEMUATIC_7ARM_RT_THREAD_HH_ */

@@ -106,8 +106,9 @@ void NCursesUI::HandlingKeyboard()
         {                
 	  if  (Controller_!=0)
 	    {
-	      unsigned int idx =2* c-1;
-              unsigned int idx1 = c-1;
+	     // unsigned int idx =2* c-1;
+              unsigned int idx1 = c-'1';
+              unsigned int idx = 2*idx1+1;
               Controller_->SetApplyControl(idx,true);
 	      Controller_->SetApplyControl(idx-1,true);
               

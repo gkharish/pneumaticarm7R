@@ -128,12 +128,13 @@ class CIODAC16 : public ioboards//, public  ClientUDP
   udppacket_control send_packet;
   udppacket_countersreset send_packet_countersreset, send_packet_digitaloutputcontrol;
   udppacket_init send_packet_init;
-
+  bool boundary_error_;
   //VectorXd send_array;
   double send_array[16];
   double get_send_array();
   ClientUDP* client_obj;
   void get_client(ClientUDP* parent_client);
+  void SetBoundaryError(bool);
 };
 
 #endif

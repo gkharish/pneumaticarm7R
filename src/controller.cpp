@@ -60,9 +60,10 @@ Controller::~Controller()
 {
 }
 
-void Controller::SetJointNum(int i)
+void Controller::SetJointNum(unsigned int i)
 {
     JOINT_NUM_[i] = true;
+    cout << "Setting Joint NUm :" << i << endl;
 }
 
 void Controller::SetControllerType(int i)
@@ -118,14 +119,14 @@ void Controller::ComputeControlLaw()
     }
   if(CONTROLLER_TYPE_ == 2)
   {
-    ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
-    JOINT_NUM_[3] = true;
+    //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
+   // JOINT_NUM_[3] = true;
     for (unsigned int i =0; i <7; i++)
      {
        if(JOINT_NUM_[i] == true)
         {
           
-            cout << "Inside Joint num:" << endl;
+            cout << "Inside Joint num:" << i << endl;
             double error_now = ref_traj_ - positions_[i];
            double error_derivative = error_now - error_prev_;
            error_prev_ = error_now;  

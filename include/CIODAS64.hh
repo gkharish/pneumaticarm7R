@@ -113,6 +113,30 @@
 #define IN_2_5V			0x02		/* Entr�e de 0 � 2.5 V ou +-2.5V	*/
 #define IN_1_25V		0x03		/* Entr�e de 0 � 1.25 V ou +-1.25V 	*/
 
+
+// Angles maximum and minimum reached by joints
+#define ANGLE_MIN_1    	-12.0
+#define ANGLE_MAX_1    90.0
+
+#define ANGLE_MIN_2    -15.0
+#define ANGLE_MAX_2    90.0
+
+#define ANGLE_MIN_3   -90.0
+#define ANGLE_MAX_3    50.0
+
+#define ANGLE_MIN_4    -5.0
+#define ANGLE_MAX_4   130.0
+
+#define ANGLE_MIN_5   -90.0
+#define ANGLE_MAX_5    90.0
+
+#define ANGLE_MIN_6   -30.0
+#define ANGLE_MAX_6    30.0
+
+#define ANGLE_MIN_7   -30.0
+#define ANGLE_MAX_7    30.0
+
+
 /****************************************************************************************
  *   			    						      		*
  *					INCLUDE				      		*
@@ -193,6 +217,11 @@ class CIODAS64 : public ioboards//, public ClientUDP
   void get_client(ClientUDP* parent_client);
   void openlogudpdata();
   void logudpdata();
+
+  //Boundary limit
+  double ANGLE_MIN_[7];
+  double ANGLE_MAX_[7];
+  bool CheckBoundaryLimit();
 };
 
 #endif

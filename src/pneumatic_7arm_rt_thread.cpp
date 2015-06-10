@@ -74,28 +74,6 @@
 #define ANGLE_REPOS_6    0.0
 #define ANGLE_REPOS_7    0.0
 
-// Angles maximum and minimum reached by joints
-#define ANGLE_MIN_1    	-12.0
-#define ANGLE_MAX_1    90.0
-
-#define ANGLE_MIN_2    -15.0
-#define ANGLE_MAX_2    90.0
-
-#define ANGLE_MIN_3   -90.0
-#define ANGLE_MAX_3    50.0
-
-#define ANGLE_MIN_4    -5.0
-#define ANGLE_MAX_4   130.0
-
-#define ANGLE_MIN_5   -90.0
-#define ANGLE_MAX_5    90.0
-
-#define ANGLE_MIN_6   -30.0
-#define ANGLE_MAX_6    30.0
-
-#define ANGLE_MIN_7   -30.0
-#define ANGLE_MAX_7    30.0
-
 
 // Rapports mecaniques entre rotation des axes des sensors et rotation reelle des articulations
 // Determines par une mesure de la tension avec l articulation a 90 degres K=90/(Vmes*360/5)
@@ -288,7 +266,10 @@ void Pneumatic7ArmRtThread::InitIOboards()
 
 
   ciodas64_ -> adconv(1);
-  ciodac16_ -> daconv(1, '1');
+  if(ciodas64_->CheckBoundaryLimit() == false)
+         ciodac16_ -> daconv(1, '1');
+  else
+      cout << "Boundary Limit reached, IOboards not initialized" << endl;
 
   // Bind controllers and sensors
   ciodas64_ -> adconv(1);
@@ -440,7 +421,9 @@ while (1)
       // Receiving information from NIC module
       ciodas64_ -> adconv(1);
       ciodas64_ -> logudpdata();
-      
+      if(ciodas64_->CheckBoundaryLimit() == true)
+            ciodac16_->SetBoundaryError(true);
+
       UpdateSharedMemory();
 
       // Sending desired pressure

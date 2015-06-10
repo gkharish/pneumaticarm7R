@@ -31,12 +31,16 @@
  ************************************************************************/
 CIODAC16::CIODAC16()
 {
+    boundary_error_ = false;
 }
 
 CIODAC16::~CIODAC16()
 {
 }
-
+void CIODAC16::SetBoundaryError(bool idx)
+{
+    boundary_error_ = idx;
+}
 void CIODAC16::daconv(int  , char header)
 {
   char* buffer_send;
@@ -44,23 +48,35 @@ void CIODAC16::daconv(int  , char header)
   if(header == '1')
     {
       ODEBUGL("CIOD16:daconv:header=1: error1",4);
+     if(boundary_error_ == false)
+       {
+         send_packet.CLIENT_HEADER[0] = '1';
+         send_packet.CLIENT_HEADER[1] = '1';
 
-      send_packet.CLIENT_HEADER[0] = '1';
-      send_packet.CLIENT_HEADER[1] = '1';
-
-      /*      send_array[0] = 0;
-      send_array[1] = 0;
-      send_array[2] = 0;
-      send_array[3] = 0; */
-      send_array[14] = 0;
-      send_array[15] = 0;
-      for(int loop =0; loop < 16; loop++)
+         /*      send_array[0] = 0;
+         send_array[1] = 0;
+         send_array[2] = 0;
+         send_array[3] = 0; */
+         send_array[14] = 0;
+         send_array[15] = 0;
+         for(int loop =0; loop < 16; loop++)
+            {
+	      send_packet.control_cmd[loop] = (unsigned short)(13107.0*send_array[loop]);
+            }
+        buffer_send = (char*)&send_packet;
+       }
+         
+      else
+      {
+        for(int loop =0; loop < 16; loop++)
 	{
-	  send_packet.control_cmd[loop] = (unsigned short)(13107.0*send_array[loop]);
+	  send_packet.control_cmd[loop] = 0.0;
 	}
-      buffer_send = (char*)&send_packet;
-      client_obj->client_send(buffer_send, sizeof(send_packet));
-      struct udppacket_control *asp_control = &send_packet;
+        buffer_send = (char*)&send_packet;
+        cout<< "BOUNDARY ERROR ------- /_\!!!"  << endl;
+      }
+     client_obj->client_send(buffer_send, sizeof(send_packet));
+     struct udppacket_control *asp_control = &send_packet;
 
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3
@@ -144,24 +160,10 @@ void CIODAC16::pressure_inidividualmuscle(int index, double pres)
 {
   send_packet.CLIENT_HEADER[0] = '1';
   send_packet.CLIENT_HEADER[1] = '1';
-  send_array[0] = 0;
-  send_array[1] = 0.0;
-  send_array[2] = 0.0;
-  send_array[3] = 0.0;
-  send_array[4] = 0;
-  send_array[5] = 0;
-  send_array[6] = 0;
-  send_array[7] = 0;
-  send_array[8] = 0;
-  send_array[9] = 0;
-  send_array[10] = 0;
-  send_array[11] = 0;
-  send_array[12] = 0;
-  send_array[13] = 0;
-  send_array[14] = 0;
-  send_array[15] = 0;
-  //*buffer_send = send_packet.CLIENT_HEADER;
-  //buffer_send++;
+  for(unsigned int i =0; i <16; i++)
+      send_array[i]=0.0;
+ //*buffer_send = send_packet.CLIENT_HEADER;
+ //buffer_send++;
 
   for(int loop =0; loop < 16; loop++)
     {

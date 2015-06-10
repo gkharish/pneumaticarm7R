@@ -23,7 +23,7 @@ public:
   /** !\brief Start the control real time thread */
   void StartingRealTimeThread();
   /** \ Set Joint numbe rto be controlled */
-  void SetJointNum(int);
+  void SetJointNum(unsigned int);
   /** \brief Apply the control law. */
   void ApplyControlLaw();
 

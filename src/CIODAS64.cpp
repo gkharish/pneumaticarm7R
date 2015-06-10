@@ -37,6 +37,30 @@
 CIODAS64::CIODAS64()
 {
   memset(recv_buffer,0,BUFLEN);
+
+// Angles maximum and minimum reached by joints
+ANGLE_MIN_[0] =  -12.0;
+ANGLE_MAX_[0] =  90.0;
+
+ANGLE_MIN_[1] =  -15.0;
+ANGLE_MAX_[1] =   90.0;
+
+ANGLE_MIN_[2] =  -90;
+ANGLE_MAX_[2] =   50.0;
+
+ANGLE_MIN_[3] =   -5.0;
+ANGLE_MAX_[3] =   130.0;
+
+ANGLE_MIN_[4] =  -90.0;
+ANGLE_MAX_[4] =   90.0;
+
+ANGLE_MIN_[5] =  -30.0;
+ANGLE_MAX_[5] =   30.0;
+
+ANGLE_MIN_[6] =  -30.0;
+ANGLE_MAX_[6] =   30.0;
+
+
 }
 
 CIODAS64::~CIODAS64()
@@ -46,63 +70,11 @@ CIODAS64::~CIODAS64()
 
 void CIODAS64::adconv(int )
 {
-  //cout << "\n ciodas64:adconv()debug1 " ;
-  //	unsigned int val;
-  //	float val1;
-
-  //cout << "\n cioas64:adconv()debug1.2 " ;
-
-  client_obj->client_recv(recv_buffer, BUFLEN);
+   client_obj->client_recv(recv_buffer, BUFLEN);
 
   recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
 
-  /*int lind=0;
-  //printf("Sensor raw packet \n");
-  {
-  unsigned char auc=recv_buffer[lind];
-  printf("0x%02x ",auc);
-  lind+=4;
-  }
-
-  {
-  unsigned int TheTrueLabel;
-  char * cTheTrueLabel= (char *)&TheTrueLabel;
-
-  cTheTrueLabel[0]=recv_buffer[4];
-  cTheTrueLabel[1]=recv_buffer[5];
-  cTheTrueLabel[2]=recv_buffer[6];
-  cTheTrueLabel[3]=recv_buffer[7];
-
-  printf("( 0x%02x%02x%02x%02x , %d, %d) ",
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  (*recv_packet_DAQ).label,
-  TheTrueLabel);
-  }
-  for(int lp =0; lp < 7; lp++  )
-  {
-  float TheTrueFloat;
-  char * cTheTrueFloat= (char *)&TheTrueFloat;
-
-  cTheTrueFloat[0]=recv_buffer[lind];
-  cTheTrueFloat[1]=recv_buffer[lind+1];
-  cTheTrueFloat[2]=recv_buffer[lind+2];
-  cTheTrueFloat[3]=recv_buffer[lind+3];
-
-
-  //printf("\t( 0x%02x%02x%02x%02x, %f )",
-  printf("\t%f",
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  (unsigned char)recv_buffer[lind++],
-  TheTrueFloat);
-  }
-  printf("\n");*/
-
-  if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
+ if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
     {
       recv_packet_DAQ = (udppacket_DAQ *)recv_buffer ;
       
@@ -145,6 +117,20 @@ void CIODAS64::adconv(int )
 
   //return(recv_data);
 }
+
+bool CIODAS64::CheckBoundaryLimit()
+{
+    bool flag = false;
+    for (unsigned int i =0; i < 7; i++)
+    {
+
+    if ( ((*recv_packet_DAQ).data[i]< ANGLE_MIN_[i]) && ((*recv_packet_DAQ).data[i] > ANGLE_MAX_[i]))
+        flag = true;
+    }
+
+    return(flag);
+}
+
 
 double CIODAS64::read_sensors(int axis_num)
 {

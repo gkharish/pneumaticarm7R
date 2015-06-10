@@ -44,6 +44,9 @@ public:
 
   /** \brief Get if a given muscle may is activated. */
   bool GetApplyControl(unsigned int idx);
+
+  /** \ Get COntroller Type */
+  void SetControllerType(int idx);
   /** \ PID controller design  */
   void  PidController(double error, double error_derivative , int joint_num);
   //double GetPidParameter();

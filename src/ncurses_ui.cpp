@@ -73,6 +73,9 @@ NCursesUI::NCursesUI(Controller *aController):
 void NCursesUI::HandlingKeyboard()
 {
   bool loop=true;
+  cout << "Enter 'c' for close lop, 'm' for manual command mode and q for exit: " << endl;
+  cout << "\n Please enter Joint number to be controlled: " << endl;
+  int  controller_type_flag = 0;
   while(loop)
     {
       // Reading key.
@@ -82,13 +85,24 @@ void NCursesUI::HandlingKeyboard()
           loop=false;
           end_of_loop_=true;
           FINITE_STATE = 5;
+        }            
+      if (c=='c') 
+        { 
+           Controller_->SetControllerType(2);
+           controller_type_flag = 1;
         }
+       if (c=='m')
+         {
+             Controller_->SetControllerType(1);
+             controller_type_flag = 0;
+           
+         }
       if (c=='s')
-        {            
-	  if (Controller_!=0)
-	    Controller_->StartingRealTimeThread();
-        }
-      if ((c>='1') && (c<='7'))
+        {
+         if (Controller_!=0)
+              Controller_->StartingRealTimeThread();
+         }
+      if ((controller_type_flag==1) && (c>='1') && (c<='7'))
         {                
 	  if  (Controller_!=0)
 	    {
@@ -102,8 +116,30 @@ void NCursesUI::HandlingKeyboard()
             }
 
         }
-     
+        
+      if ((controller_type_flag==0) && (c>='a') && (c<='f'))
+        {    
+           if (Controller_!=0)
+             {
+                unsigned int idx = 9+c-'a';
+                if (Controller_->GetApplyControl(idx))
+                      Controller_->SetApplyControl(idx,false);
+                else
+                      Controller_->SetApplyControl(idx,true);
+              }
 
+        }
+      if((controller_type_flag==0) && (c>='1') && (c<='9'))
+         {
+            if(Controller_!=0)
+              {
+                unsigned int idx = c-'1';
+                if (Controller_->GetApplyControl(idx))
+                      Controller_->SetApplyControl(idx,false);
+                else
+                      Controller_->SetApplyControl(idx,true);
+               }
+         }
     }
 
 

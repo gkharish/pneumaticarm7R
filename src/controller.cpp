@@ -35,13 +35,14 @@ Controller::Controller()
   D_.resize(7);
   //Here parameters are inititalized to test jont num 4 the elbow joint 
   P_[3] = 1.4;
+  D_[3] = 0;
   Pid_factor_[3] = -1;
   mean_pressure_[3] = 1;
-  CONTROLLER_TYPE_ = 2;
   
   /** \ Refernce generator paramter intialization  */
   desired_position_ = 45;   // Value is in degree
   ref_slope_ = 10;
+  ref_traj_ = 0;
   /** \ Mean Pressure */
 
   for(unsigned int i=0;i<16;i++)
@@ -58,18 +59,27 @@ Controller::Controller()
 Controller::~Controller()
 {
 }
+
 void Controller::SetJointNum(int i)
 {
     JOINT_NUM_[i] = true;
 }
+
+void Controller::SetControllerType(int i)
+{
+    CONTROLLER_TYPE_ = i;
+}
+
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 1.0e6;//1000000; ..present,
+  RTIME   TASK_PERIOD = 1.0e8;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
+
   for(unsigned int i=0; i <7; i++)
     {
-
+        unsigned index1 = 16;
+        positions_[i] = shmaddr_[index1++];
          if(JOINT_NUM_[i] == true)
             ref_init_ = positions_[i];
         ref_final_ = GetDesiredPosition();
@@ -108,20 +118,25 @@ void Controller::ComputeControlLaw()
     }
   if(CONTROLLER_TYPE_ == 2)
   {
-    
+    ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
+    JOINT_NUM_[3] = true;
     for (unsigned int i =0; i <7; i++)
      {
        if(JOINT_NUM_[i] == true)
         {
-           double error_now = ref_traj_ - positions_[i];
+          
+            cout << "Inside Joint num:" << endl;
+            double error_now = ref_traj_ - positions_[i];
            double error_derivative = error_now - error_prev_;
            error_prev_ = error_now;  
+           ODEBUGL("error_now: " << error_now,1);
+           std::cout << "error_prev:" << error_prev_ << endl;
            PidController(error_now, error_derivative,i);
         }
        else
         {
-           controls_[i] =0.0;
-           controls_[i+1] = 0.0;
+           controls_[2*(i+1)-1] =0.0;
+           controls_[2*(i+1)] = 0.0;
         }
      }
   }
@@ -131,12 +146,13 @@ void Controller::ComputeControlLaw()
 
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
-    controls_[2*(joint_num+1)-1] = MeanPressure(joint_num) + 
-                                        Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
-
-    controls_[2*(joint_num+1)] = MeanPressure(joint_num) - 
-                                        Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
-    ODEBUGL("Pid command : " << Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative), 1);
+    
+    double delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+   // cout << "Delta :" << delta;
+    controls_[2*(joint_num+1)-1] = MeanPressure(joint_num) + delta;
+    controls_[2*(joint_num+1)] = MeanPressure(joint_num) - delta;
+    
+    ODEBUGL("Pid command : " << delta,1);
 
 
 }
@@ -161,7 +177,7 @@ void Controller::ReferenceGenerator(long double timestep)
      else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
    }
-    ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
+   // ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 
 double Controller::GetDesiredPosition()

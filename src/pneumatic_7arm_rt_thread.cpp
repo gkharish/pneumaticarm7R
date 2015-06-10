@@ -277,7 +277,9 @@ void Pneumatic7ArmRtThread::InitActuators()
 
 void Pneumatic7ArmRtThread::InitIOboards()
 {
-  // Set the actuator command to zero.
+  //start the NI module to send data
+  ciodac16_ -> daconv(1, '0');
+ // Set the actuator command to zero.
   for (unsigned int i=0;i<7;i++)
     {
       double cmd=0.0;
@@ -285,8 +287,6 @@ void Pneumatic7ArmRtThread::InitIOboards()
     }
 
 
-  //start the NI module to send data
-  ciodac16_ -> daconv(1, '0');
   ciodas64_ -> adconv(1);
   ciodac16_ -> daconv(1, '1');
 
@@ -409,39 +409,22 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   /* variables used in the principal program */
   int FLAG = 1;
 
-  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e6;//1000000; ..present,
+  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
   //udppacket_control send_packet;
 
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
-  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(100000));
-  if (PRES_INDIVIDUAL_FLAG)
-    {
-#ifndef NDEBUG
-      int index_pres_indiv;
-      double pres_pres_indiv;
-      char depres;
-      cout << "\n Select the muscle number: "<< endl;
-      std::cin >> index_pres_indiv; //scanf("%s",tmp);
-      cout << "\n Enter the pressure value: " << endl;
-      std::cin >> pres_pres_indiv;
-      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      ciodac16_ -> pressure_inidividualmuscle(index_pres_indiv-1, pres_pres_indiv);
-      printf("\n Type Any letter to depressurize : ");
-      std::cin >> depres; //scanf("%s",tmp);
-      std::cin.clear(); std::cin.ignore(std::numeric_limits<streamsize>::max(),'\n');
-      
-#endif
-    }
+  rt_task_set_periodic(NULL, TM_NOW, TASK_PERIOD);
+
 
   now = rt_timer_read();
   time_start_loop  = round((double)now/1.0e9);
 
   InitializeSensors();
 
-  while (1)
+while (1)
     {
       rt_task_wait_period(NULL);
 
@@ -461,7 +444,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       UpdateSharedMemory();
 
       // Sending desired pressure
-      ciodac16_ -> daconv(1, '1');
+     // ciodac16_ -> daconv(1, '1');
 
       previous = now;
       if(t >= timeofsimulation)
@@ -476,7 +459,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   ODEBUG("outside while loop ok2");
   ODEBUG("\n ..... DEFLATING THE MUSCLES   .....");
-
+  InitIOboards();
   sleep(5);
   ODEBUG("\n ..... DEFLATING should be completed  .....");
   //Appel a la fonction de degonflement des muscles
@@ -607,8 +590,8 @@ void Pneumatic7ArmRtThread::ReadStatus()
       shmaddr_[i] = sensors_[i-16].read_sensors_array();
       ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
     }
-  FINITE_STATE_= (int) shmaddr_[23];
-  ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);
+  //FINITE_STATE_= (int) shmaddr_[23];
+ // ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);
 }
 void Pneumatic7ArmRtThread::CloseSharedMemory()
 {

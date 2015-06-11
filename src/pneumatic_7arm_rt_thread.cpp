@@ -214,7 +214,9 @@ Pneumatic7ArmRtThread::Pneumatic7ArmRtThread():
   ciodas64_ = new CIODAS64();
 
   // Creating position sensors.
-  unsigned int mapfromIO2chain[7] = {4,2,6,0,1,3,5};
+  //unsigned int mapfromIO2chain[7] = {4,2,6,0,1,3,5};
+    unsigned int mapfromIO2chain[7] = {0,1,2,3,4,5,6};
+
   for (int i = 0; i<7;i++)
     {
       // Set offset and slope
@@ -397,7 +399,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   sensorlog_.open("sensorlog.txt");
   //int i = 0;
-  rt_task_set_periodic(NULL, TM_NOW, TASK_PERIOD);
+  rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
 
 
   now = rt_timer_read();
@@ -435,6 +437,8 @@ while (1)
 	  FLAG = 0;
 	  ODEBUG("\n END of Loop");
 	}
+      if (FINITE_STATE_ == 5)
+            InitIOboards();
     } //while (ok2) finish
   sensorlog_.close();
 
@@ -573,7 +577,7 @@ void Pneumatic7ArmRtThread::ReadStatus()
       shmaddr_[i] = sensors_[i-16].read_sensors_array();
       ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
     }
-  //FINITE_STATE_= (int) shmaddr_[23];
+  FINITE_STATE_= (int) shmaddr_[23];
  // ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);
 }
 void Pneumatic7ArmRtThread::CloseSharedMemory()

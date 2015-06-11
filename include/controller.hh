@@ -44,7 +44,8 @@ public:
 
   /** \brief Get if a given muscle may is activated. */
   bool GetApplyControl(unsigned int idx);
-
+ /** \ Reset flag to set the control value to zero */
+  void ResetControl(bool);
   /** \ Get COntroller Type */
   void SetControllerType(int idx);
   /** \ PID controller design  */
@@ -81,6 +82,7 @@ protected:
   std::vector<double>P_;
   std::vector<double>D_;
   std::vector<double>delta;
+  bool reset_control_;
   //ReferenceGenerator parameter
   double ref_init_;
   double ref_final_;

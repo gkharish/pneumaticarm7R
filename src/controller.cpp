@@ -35,13 +35,14 @@ Controller::Controller()
   P_.resize(7);
   D_.resize(7);
   //Here parameters are inititalized to test jont num 4 the elbow joint 
-  P_[3] = 0.02;
+  P_[3] = 0.002;
   D_[3] = 0;
-  Pid_factor_[3] = 1;
+  Pid_factor_[3] = -1;
   mean_pressure_[3] = 1;
+  // mean_pressure_[]
   
   /** \ Refernce generator paramter intialization  */
-  desired_position_ = 45;   // Value is in degree
+  desired_position_ = -45;   // Value is in degree
   ref_slope_ = 1;
   ref_traj_ = 0;
   /** \ Mean Pressure */
@@ -113,7 +114,7 @@ void Controller::ComputeControlLaw()
   if(CONTROLLER_TYPE_== 1)
     for(unsigned int i=0;i<16;i++)
     {
-      if (apply_controls_[i] ==true)
+      if (apply_controls_[i] ==true && reset_control_ ==false)
         controls_[i] = user_controls_[i];
       else 
         controls_[i] = 0.0;
@@ -121,10 +122,10 @@ void Controller::ComputeControlLaw()
   if(CONTROLLER_TYPE_ == 2)
   {
     //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
-   // JOINT_NUM_[3] = true;
-    for (unsigned int i =0; i <7; i++)
-     {
-       if(JOINT_NUM_[i] == true)
+   // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
+   for (unsigned int i =0; i<7; i++)
+    {
+      if (JOINT_NUM_[i] == true && reset_control_==false)  
         {
           
             cout << "Inside Joint num:" << i << endl;
@@ -137,8 +138,8 @@ void Controller::ComputeControlLaw()
         }
        else
         {
-           controls_[2*(i+1)-1] =0.0;
-           controls_[2*(i+1)] = 0.0;
+           controls_[2*i] =0.0;
+           controls_[2*i+1] = 0.0;
         }
      }
   }
@@ -146,19 +147,31 @@ void Controller::ComputeControlLaw()
 
 }
 
+void Controller::ResetControl(bool idx)
+{
+    reset_control_ = idx;
+}
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
-    
-    double update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
-   // cout << "Delta :" << delta;
-    controls_[2*(joint_num+1)-1] = MeanPressure(joint_num) + delta[joint_num];
-    controls_[2*(joint_num+1)] = MeanPressure(joint_num) - (delta[joint_num]);
-    if (delta[joint_num] <=2)
+   double update_delta;
+   double error_acceptable_ = 2;
+   if (error >= error_acceptable_ || error <= -error_acceptable_)
+     {
+        update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+   
+    // cout << "Delta :" << delta;
+   if (delta[joint_num] >=2)
         delta[joint_num] = 2;
+    else if (delta[joint_num] <= -2)
+        delta[joint_num] = -2;
     else
          delta[joint_num] = delta[joint_num]+update_delta;
+     }
 
-              
+    controls_[2*joint_num] = MeanPressure(joint_num) + delta[joint_num];
+    controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
+    cout << "Update delta:     " <<update_delta << endl;
+                  
     ODEBUGL("Pid command : " << delta[joint_num],1);
 
 
@@ -174,7 +187,7 @@ void Controller::ReferenceGenerator(long double timestep)
    {
      if(ref_traj_ >= ref_final_)
          ref_traj_ = ref_final_;
-     else
+else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
    }
  if(ref_init_ >  ref_final_)

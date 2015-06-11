@@ -33,6 +33,7 @@ public:
   void CreateSharedMemory();
   void UpdateSharedMemory();
   int get_FINITE_STATE();
+  bool GetEndofLoop();
   static const int NB_CONTROLS=16;
 
 protected:

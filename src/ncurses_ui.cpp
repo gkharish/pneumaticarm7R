@@ -52,7 +52,7 @@ NCursesUI::NCursesUI(Controller *aController):
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
     1.0, 1.0, 1.0, 1.0, 1.0,
-    1.1, 1.1, 1.1, 1.1, 1.1,
+    1.1, 1.1, 2.1, 1.1, 1.1,
     2.0, 1.2, 1.2, 2.0, 
     1.0, 1.0};
   
@@ -73,20 +73,18 @@ NCursesUI::NCursesUI(Controller *aController):
 void NCursesUI::HandlingKeyboard()
 {
   bool loop=true;
-  cout << "Enter 'c' for close lop, 'm' for manual command mode and q for exit: " << endl;
+  cout << "Enter 'l' for close loop, 'm' for manual command mode and q for exit: " << endl;
   cout << "\n Please enter Joint number to be controlled: " << endl;
   int  controller_type_flag = 0;
   while(loop)
     {
       // Reading key.
       int c = getch();
-      if (c=='q')
-        {
-          loop=false;
-          end_of_loop_=true;
-          FINITE_STATE = 5;
-        }            
-      if (c=='c') 
+     if (c=='r') 
+        { 
+           Controller_->ResetControl(true);
+        }
+      if (c=='l') 
         { 
            Controller_->SetControllerType(2);
            controller_type_flag = 1;
@@ -108,7 +106,7 @@ void NCursesUI::HandlingKeyboard()
 	    {
 	     // unsigned int idx =2* c-1;
               unsigned int idx1 = c-'1';
-              //cout << "idx1                                    :" << idx1<< endl;
+              cout << "idx1                                    :" << idx1<< endl;
               unsigned int idx = 2*idx1+1;
               Controller_->SetApplyControl(idx,true);
 	      Controller_->SetApplyControl(idx-1,true);
@@ -124,6 +122,9 @@ void NCursesUI::HandlingKeyboard()
            if (Controller_!=0)
              {
                 unsigned int idx = 9+c-'a';
+
+              cout << "idx manual                                   :" << idx<< endl;
+              
                 if (Controller_->GetApplyControl(idx))
                       Controller_->SetApplyControl(idx,false);
                 else
@@ -136,12 +137,23 @@ void NCursesUI::HandlingKeyboard()
             if(Controller_!=0)
               {
                 unsigned int idx = c-'1';
+
+            cout << "idx manual2                                   :" << idx<< endl;
+              
                 if (Controller_->GetApplyControl(idx))
                       Controller_->SetApplyControl(idx,false);
                 else
                       Controller_->SetApplyControl(idx,true);
                }
          }
+        if (c=='q')
+        {
+          loop=false;
+          end_of_loop_=true;
+          FINITE_STATE = 5;
+        
+         }            
+     
     }
 
 
@@ -226,6 +238,11 @@ bool NCursesUI::DisplayInformation()
 int NCursesUI::get_FINITE_STATE()
 {
     return(FINITE_STATE);
+}
+
+bool NCursesUI::GetEndofLoop()
+{
+    return(end_of_loop_);
 }
 NCursesUI::~NCursesUI()
 {

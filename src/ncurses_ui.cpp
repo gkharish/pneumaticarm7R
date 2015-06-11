@@ -84,7 +84,12 @@ void NCursesUI::HandlingKeyboard()
         { 
            Controller_->ResetControl(true);
         }
-      if (c=='l') 
+     if (c=='i') 
+        { 
+           Controller_->SetControllerType(3);
+           controller_type_flag = 0;
+        } 
+     if (c=='l') 
         { 
            Controller_->SetControllerType(2);
            controller_type_flag = 1;

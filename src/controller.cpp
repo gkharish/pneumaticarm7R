@@ -26,6 +26,7 @@ Controller::Controller()
   controls_.resize(16);
   apply_controls_.resize(16);
   user_controls_.resize(16);
+  initconfig_controls_.resize(16);
   JOINT_NUM_.resize(7);
   mean_pressure_.resize(7);
   delta.resize(7);
@@ -38,7 +39,7 @@ Controller::Controller()
   P_[3] = 0.002;
   D_[3] = 0;
   Pid_factor_[3] = -1;
-  mean_pressure_[3] = 1;
+  //mean_pressure_[3] = 1;
   // mean_pressure_[]
   
   /** \ Refernce generator paramter intialization  */
@@ -105,43 +106,55 @@ void Controller::ApplyControlLaw()
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
 
-      loop++;
+     loop++;
     }
 }
 
 void Controller::ComputeControlLaw()
 {
-  if(CONTROLLER_TYPE_== 1)
-    for(unsigned int i=0;i<16;i++)
+   if (CONTROLLER_TYPE_== 3)
+     {
+       for (unsigned int i=0;i<16;i++)
+         {
+           if (reset_control_ ==false)
+                 controls_[i] = initconfig_controls_[i];
+          else 
+                 controls_[i] = 0.0;
+         }
+     }
+    if(CONTROLLER_TYPE_== 1)
     {
-      if (apply_controls_[i] ==true && reset_control_ ==false)
-        controls_[i] = user_controls_[i];
-      else 
-        controls_[i] = 0.0;
+      for (unsigned int i=0;i<16;i++)
+           {
+              if (apply_controls_[i] ==true && reset_control_ ==false)
+                   controls_[i] = user_controls_[i];
+              else 
+                   controls_[i] = 0.0;//initconfig_controls_[i];
+           }
     }
-  if(CONTROLLER_TYPE_ == 2)
-  {
+  if (CONTROLLER_TYPE_ == 2)
+    {
     //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
    // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
-   for (unsigned int i =0; i<7; i++)
-    {
-      if (JOINT_NUM_[i] == true && reset_control_==false)  
-        {
+     for (unsigned int i =0; i<7; i++)
+       {
+        if (JOINT_NUM_[i] == true && reset_control_==false)  
+          {
           
-            cout << "Inside Joint num:" << i << endl;
-            double error_now = ref_traj_ - positions_[i];
-           double error_derivative = error_now - error_prev_;
-           error_prev_ = error_now;  
-           ODEBUGL("error_now: " << error_now,1);
-           std::cout << "error_prev:" << error_prev_ << endl;
-           PidController(error_now, error_derivative,i);
-        }
+             cout << "Inside Joint num:" << i << endl;
+             double error_now = ref_traj_ - positions_[i];
+             double error_derivative = error_now - error_prev_;
+             error_prev_ = error_now;  
+             ODEBUGL("error_now: " << error_now,1);
+             std::cout << "error_prev:" << error_prev_ << endl;
+             PidController(error_now, error_derivative,i);
+          }
        else
-        {
-           controls_[2*i] =0.0;
-           controls_[2*i+1] = 0.0;
-        }
-     }
+         {
+            controls_[2*i] = initconfig_controls_[2*i];
+            controls_[2*i+1] = initconfig_controls_[2*i+1];
+         }
+      }
   }
 
 
@@ -168,8 +181,11 @@ void Controller::PidController(double error, double error_derivative, int joint_
          delta[joint_num] = delta[joint_num]+update_delta;
      }
 
-    controls_[2*joint_num] = MeanPressure(joint_num) + delta[joint_num];
-    controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
+   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
+   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
+    controls_[2*joint_num] = initconfig_controls_[2*joint_num]+ delta[joint_num];
+    controls_[2*joint_num+1] = initconfig_controls_[2*joint_num+1] - (delta[joint_num]);
+    
     cout << "Update delta:     " <<update_delta << endl;
                   
     ODEBUGL("Pid command : " << delta[joint_num],1);
@@ -178,6 +194,7 @@ void Controller::PidController(double error, double error_derivative, int joint_
 }
 double Controller::MeanPressure(int i)
 {
+    //mean_pressure_[i] = initconfig_controls_[i];
     return(mean_pressure_[i]);
 }
 
@@ -208,6 +225,7 @@ double Controller::GetDesiredPosition()
 void Controller::SetUserControl(unsigned int idx, double control)
 {
   user_controls_[idx] = control;
+  initconfig_controls_[idx] = control;
 }
 
 double Controller::GetUserControl(unsigned int idx)

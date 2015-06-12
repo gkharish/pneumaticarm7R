@@ -83,12 +83,13 @@ void Controller::ApplyControlLaw()
   for(unsigned int i=0; i <7; i++)
     {
         unsigned index1 = 16;
+        ref_init_ = 0;
         positions_[i] = shmaddr_[index1++];
          if(JOINT_NUM_[i] == true)
             ref_init_ = positions_[i];
         ref_final_ = GetDesiredPosition();
     }   
-  
+   int loop_reference_traj_[7] = {0,0,0,0,0,0,0};
   while(1)
     {
       // Waiting the next iteration
@@ -99,9 +100,9 @@ void Controller::ApplyControlLaw()
         positions_[i] = shmaddr_[index++];
       //ODEBUGL("DEbug Before referencegen", 1);
       
-      ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
+     // ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
      // ODEBUGL("After Refgen", 1);
-      ComputeControlLaw();
+      ComputeControlLaw(TASK_PERIOD);
      // ODEBUGL("After Control Law" , 1);
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
@@ -110,9 +111,10 @@ void Controller::ApplyControlLaw()
     }
 }
 
-void Controller::ComputeControlLaw()
+void Controller::ComputeControlLaw(long double timestep)
 {
-   if (CONTROLLER_TYPE_== 3)
+   
+    if (CONTROLLER_TYPE_== 3)
      {
        for (unsigned int i=0;i<16;i++)
          {
@@ -136,18 +138,21 @@ void Controller::ComputeControlLaw()
     {
     //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
    // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
+   
      for (unsigned int i =0; i<7; i++)
        {
         if (JOINT_NUM_[i] == true && reset_control_==false)  
           {
-          
+             ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
              cout << "Inside Joint num:" << i << endl;
              double error_now = ref_traj_ - positions_[i];
              double error_derivative = error_now - error_prev_;
              error_prev_ = error_now;  
-             ODEBUGL("error_now: " << error_now,1);
-             std::cout << "error_prev:" << error_prev_ << endl;
+            // ODEBUGL("error_now: " << error_now,1);
+            // std::cout << "error_prev:" << error_prev_ << endl;
              PidController(error_now, error_derivative,i);
+             loop_reference_traj_[i]++;
+             cout << " loop_traj" << loop_reference_traj_[i] << "\n" << endl;
           }
        else
          {
@@ -214,7 +219,7 @@ else
      else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
    }
-   // ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
+   ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 
 double Controller::GetDesiredPosition()

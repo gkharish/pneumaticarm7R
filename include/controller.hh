@@ -29,7 +29,7 @@ public:
 
   /** \brief Default control law.
       Set constant pressure on each muscle. */
-  virtual void ComputeControlLaw();
+  virtual void ComputeControlLaw(long double timestep);
 
   /** \brief Set the user control law,
       i.e. set the desired pressure */
@@ -92,6 +92,7 @@ protected:
   double ref_traj_;
   double ref_slope_;
   double desired_position_;
+  int loop_reference_traj_[7];
   double error_prev_;
   /** ! Initialize the shared memory. */
   void InitSharedMemory();

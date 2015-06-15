@@ -391,13 +391,18 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   /* variables used in the principal program */
   int FLAG = 1;
+  bool LOGFLAG = 0;
 
   RTIME   now, previous=0,  time_diff, TASK_PERIOD = 2.5e6;//1000000; ..present,
   double t, time_start_loop, present_time;
+  double SubSampling_period = 100e6;
+  double data_array[40][23];
+  int subsampling_itr;
   //ciodac16_ -> client_start();
   //udppacket_control send_packet;
 
   sensorlog_.open("sensorlog.txt");
+  log_pneumaticthread_data_.open("pneumaticthread_data.txt");
   //int i = 0;
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
 
@@ -426,7 +431,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
       // Receiving information from NIC module
       ciodas64_ -> adconv(1);
-      ciodas64_ -> logudpdata();
+      //ciodas64_ -> logudpdata();
       if(ciodas64_->CheckBoundaryLimit() == true)
             ciodac16_->SetBoundaryError(true);
 
@@ -434,17 +439,42 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
       // Sending desired pressure
      // ciodac16_ -> daconv(1, '1');
-
+       
       previous = now;
-      if(t >= timeofsimulation)
-	{
+      if(LOGFLAG == 1)
+      {
 	  FLAG = 0;
-	  ODEBUG("\n END of Loop");
-	}
+	  ///ODEBUG("\n END of Loop");
+          for (unsigned int i=0; i <23; i++)
+          {
+             data_array[subsampling_itr][i] = shmaddr_[i];
+          }
+
+
+          if ( subsampling_itr  >= ( (int) SubSampling_period/TASK_PERIOD) -1)
+          {
+              for (unsigned int j = 0; j <= subsampling_itr; j++)
+              {
+                
+                  for (unsigned int i = 0; i < 16; i++)
+                        log_pneumaticthread_data_ << data_array[j][i] << " ";
+                  
+                  log_pneumaticthread_data_ << "\t";
+                
+                  for (unsigned int i = 16; i <  23; i++)
+                        log_pneumaticthread_data_ << data_array[j][i] << " ";
+                 
+                  log_pneumaticthread_data_ << "\n";
+              }
+              subsampling_itr= 0;
+          }
+          subsampling_itr++;
+      }
       if (FINITE_STATE_ == 5)
             InitIOboards();
     } //while (ok2) finish
   sensorlog_.close();
+  log_pneumaticthread_data_.close();
 
   // terminaison
 

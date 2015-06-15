@@ -33,6 +33,7 @@ Controller::Controller()
   error_now_.resize(7);
   error_derivative_.resize(7);
   error_prev_.resize(7);
+  loop_reference_traj_.resize(7);
 
   reset_control_ = false;
 
@@ -97,7 +98,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 2.50e6;//1000000; ..present,
+  RTIME   TASK_PERIOD = 2.5e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
 
@@ -109,8 +110,9 @@ void Controller::ApplyControlLaw()
       if(JOINT_NUM_[i] == true)
 	ref_init_ = positions_[i];
       ref_final_ = GetDesiredPosition();
-    }   
-  int loop_reference_traj_[7] = {0,0,0,0,0,0,0};
+      loop_reference_traj_[i] = 0;
+    }
+
   while(1)
     {
       // Waiting the next iteration
@@ -165,7 +167,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
 	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
-	      ODEBUG("Inside Joint num:" << i );
+	      //ODEBUG("Inside Joint num:" << i );
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
@@ -173,7 +175,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
 	      PidController(error_now_[i], error_derivative_[i],i);
 	      loop_reference_traj_[i]++;
-	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",3);
+	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
 	    }
 	  else
 	    {
@@ -193,7 +195,7 @@ void Controller::ResetControl(bool idx)
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
   double update_delta;
-  double error_acceptable_ = 1;
+  double error_acceptable_ = 2;
   if (error >= error_acceptable_ || error <= -error_acceptable_)
     {
       update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
@@ -233,9 +235,9 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
-  ODEBUGL("Update delta:     " <<update_delta, 1 );
+  //ODEBUGL("Update delta:     " <<update_delta, 1 );
                   
-  ODEBUGL("Pid command : " << delta[joint_num],1);
+  //ODEBUGL("Pid command : " << delta[joint_num],1);
 
 
 }
@@ -261,7 +263,7 @@ void Controller::ReferenceGenerator(long double timestep)
       else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
     }
-  // ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
+ ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 
 double Controller::GetDesiredPosition()
@@ -358,3 +360,14 @@ double Controller::GetErrorDerivative(unsigned int idx)
 {
   return error_derivative_[idx];
 }
+
+double Controller::GetUpdateDelta(unsigned int idx)
+{
+    return(P_[idx]*error_now_[idx]);
+}
+
+bool Controller::GetJointNum(unsigned int idx)
+{
+    return(JOINT_NUM_[idx]);
+}
+

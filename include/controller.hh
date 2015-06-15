@@ -63,6 +63,9 @@ public:
   double GetDesiredPosition();
   void  ReferenceGenerator(long double timestep);
   
+  double GetUpdateDelta(unsigned int idx);
+  bool GetJointNum(unsigned int idx);
+  
 protected:
   // Pointer to the shared memory
   double * shmaddr_;
@@ -107,7 +110,7 @@ protected:
   double ref_traj_;
   double ref_slope_;
   double desired_position_;
-  int loop_reference_traj_[7];
+  std::vector<int> loop_reference_traj_;
 
   
   std::vector<double> error_prev_;

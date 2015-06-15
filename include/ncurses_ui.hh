@@ -17,7 +17,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <ncurses.h>			/* ncurses.h includes stdio.h */
-
+#include <fstream>
+#include <sstream>
+#include <istream>
 #include <controller.hh>
 
 class NCursesUI
@@ -45,6 +47,7 @@ protected:
   double potentiometer_[7];
   double control_[NB_CONTROLS];
   int FINITE_STATE;
+  ofstream log_data_;
   Controller * Controller_;
 };
 #endif /* _PNEUMATIC_ARM_NCURSES_UI_H_ */

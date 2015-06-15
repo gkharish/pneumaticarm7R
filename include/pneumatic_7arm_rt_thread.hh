@@ -90,7 +90,7 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   VectorXd pressure_command_array_;
   VectorXd sensors_array_;
   ofstream sensorlog_;
-
+  ofstream log_pneumaticthread_data_;
   int num_joints_;
 
   /// \brief Actuators

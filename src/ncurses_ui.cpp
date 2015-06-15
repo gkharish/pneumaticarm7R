@@ -24,7 +24,8 @@ NCursesUI::NCursesUI(Controller *aController):
   Controller_ = aController;
   for(unsigned int i=0;i<NB_CONTROLS;i++)
     control_[i] = 0.0;
-
+ // Openinng file to log the data
+ log_data_.open("logdata.txt");
   /* start the curses mode */
   initscr();				
   /* No waiting for the keyboard. */
@@ -171,12 +172,31 @@ void NCursesUI::CreateSharedMemory()
 void NCursesUI::UpdateSharedMemory()
 {
   unsigned int index =0;
+  unsigned int indx = 0;
   for(unsigned int i=0;i<NB_CONTROLS;i++)
-    control_[i] = shmaddr_[index++];
+  {
+      control_[i] = shmaddr_[index++];
+      log_data_ << control_[i] << " ";
+  }
+  for ( unsigned int i = 0; i >7; i++)
+   {
+     potentiometer_[i] = shmaddr_[i+16];
+     log_data_ << potentiometer_[i] << " ";
+   }
+
 
   for(unsigned int i=0;i<7;i++)
-    potentiometer_[i] = shmaddr_[index++];
-
+  {
+    
+      if (Controller_->GetJointNum(i) == true)
+            indx = i;
+  }
+  log_data_ << "\t\t";
+  log_data_ << Controller_ -> GetErrorNow(indx);
+  log_data_ << "\t\t";
+  log_data_ << Controller_-> GetUpdateDelta(indx);
+  log_data_ << "\t\t";
+   log_data_ << "\n" ;
   shmaddr_[23] = this -> get_FINITE_STATE();
 }
 
@@ -252,5 +272,6 @@ bool NCursesUI::GetEndofLoop()
 }
 NCursesUI::~NCursesUI()
 {
- endwin();
+    log_data_.close();
+    endwin();
 }

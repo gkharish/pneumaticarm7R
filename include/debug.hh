@@ -19,4 +19,7 @@
 #define ODEBUGL(x,y);
 #endif
 
+#define ODEBUGF(x) std::cerr << x << std::endl
+#define ODEBUGFL(x,y) if (y<DEBUG_LEVEL) std::cerr << x << std::endl;
+
 #endif

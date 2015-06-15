@@ -392,7 +392,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   /* variables used in the principal program */
   int FLAG = 1;
 
-  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 1.0e8;//1000000; ..present,
+  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 2.5e6;//1000000; ..present,
   double t, time_start_loop, present_time;
   //ciodac16_ -> client_start();
   //udppacket_control send_packet;
@@ -406,8 +406,9 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   time_start_loop  = round((double)now/1.0e9);
 
   InitializeSensors();
-
-while (1)
+  
+  unsigned long long nb_it;
+  while (1)
     {
       rt_task_wait_period(NULL);
 
@@ -418,7 +419,10 @@ while (1)
       present_time  = round((double)now/1.0e9);
       t = present_time - time_start_loop;
       time_diff = now - previous;
-      ODEBUG("\n time difference :" << (double)time_diff/(double)1.0e6);
+      if (nb_it%50==0)
+	ODEBUGF("\n time difference :" << (double)time_diff/(double)1.0e6);
+
+      nb_it++;
 
       // Receiving information from NIC module
       ciodas64_ -> adconv(1);

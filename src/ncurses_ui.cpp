@@ -111,7 +111,7 @@ void NCursesUI::HandlingKeyboard()
 	    {
 	     // unsigned int idx =2* c-1;
               unsigned int idx1 = c-'1';
-              cout << "idx1                                    :" << idx1<< endl;
+
               unsigned int idx = 2*idx1+1;
               Controller_->SetApplyControl(idx,true);
 	      Controller_->SetApplyControl(idx-1,true);
@@ -128,8 +128,6 @@ void NCursesUI::HandlingKeyboard()
              {
                 unsigned int idx = 9+c-'a';
 
-              cout << "idx manual                                   :" << idx<< endl;
-              
                 if (Controller_->GetApplyControl(idx))
                       Controller_->SetApplyControl(idx,false);
                 else
@@ -143,8 +141,6 @@ void NCursesUI::HandlingKeyboard()
               {
                 unsigned int idx = c-'1';
 
-            cout << "idx manual2                                   :" << idx<< endl;
-              
                 if (Controller_->GetApplyControl(idx))
                       Controller_->SetApplyControl(idx,false);
                 else
@@ -233,6 +229,11 @@ bool NCursesUI::DisplayInformation()
         oss << control_[i+7];
         std::string as = oss.str();
         mvwprintw(main_win_,3+i,col/2+10,"%f",control_[i+7]);
+      }
+
+      {
+        mvwprintw(main_win_,3+i,col/2+20,"%f",Controller_->GetErrorNow(i));
+        mvwprintw(main_win_,3+i,col/2+30,"%f",Controller_->GetErrorDerivative(i));
       }
 
     }

@@ -42,6 +42,12 @@ public:
   /** \brief Set if a given muscle may or not be activated. */
   void SetApplyControl(unsigned int idx, bool apply_control);
 
+  /** \brief Getting error */
+  double GetErrorNow(unsigned int idx);
+  
+  /** \brief Getting derivative */
+  double GetErrorDerivative(unsigned int idx);
+  
   /** \brief Get if a given muscle may is activated. */
   bool GetApplyControl(unsigned int idx);
  /** \ Reset flag to set the control value to zero */
@@ -56,6 +62,7 @@ public:
  /** \ Reference generator function   */
   double GetDesiredPosition();
   void  ReferenceGenerator(long double timestep);
+  
 protected:
   // Pointer to the shared memory
   double * shmaddr_;
@@ -81,10 +88,18 @@ protected:
   // User Specified Mean Pressure
   std::vector<double>mean_pressure_;
   //Pid Controller parameter
-  std::vector<double>Pid_factor_;
-  std::vector<double>P_;
-  std::vector<double>D_;
-  std::vector<double>delta;
+  std::vector<double> Pid_factor_;
+  std::vector<double> P_;
+  std::vector<double> D_;
+  std::vector<double> delta;
+
+  /*! @{ Errors computation */
+  /* \brief Current error */
+  std::vector<double> error_now_;
+  /* \brief Error derivative */
+  std::vector<double> error_derivative_;
+  /*! @} */
+
   bool reset_control_;
   //ReferenceGenerator parameter
   double ref_init_;
@@ -93,7 +108,9 @@ protected:
   double ref_slope_;
   double desired_position_;
   int loop_reference_traj_[7];
-  double error_prev_;
+
+  
+  std::vector<double> error_prev_;
   /** ! Initialize the shared memory. */
   void InitSharedMemory();
 

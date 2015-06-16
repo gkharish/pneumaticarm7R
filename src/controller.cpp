@@ -44,7 +44,7 @@ Controller::Controller()
 
   //Here parameters are inititalized to test jont num 4 the elbow joint 
   // Elbow
-  P_[3] = 0.002;
+  P_[3] = 0.001;
   D_[3] = 0;
   Pid_factor_[3] = -1;
 // Elbow
@@ -65,7 +65,7 @@ Controller::Controller()
   // mean_pressure_[]
   
   /** \ Refernce generator paramter intialization  */
-  desired_position_ = -30;   // Value is in degree
+  desired_position_ = -90;   // Value is in degree
   ref_slope_ = 1;
   ref_traj_ = 0;
   /** \ Mean Pressure */
@@ -98,7 +98,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 2.5e6;//1000000; ..present,
+  RTIME   TASK_PERIOD = 10e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
 
@@ -168,6 +168,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	    {
 	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
 	      //ODEBUG("Inside Joint num:" << i );
+              ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
@@ -195,8 +196,9 @@ void Controller::ResetControl(bool idx)
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
   double update_delta;
-  double error_acceptable_ = 2;
-  if (error >= error_acceptable_ || error <= -error_acceptable_)
+  double error_acceptable_ = 1;
+ // if (error >= error_acceptable_ || error <= -error_acceptable_)
+ if(true)
     {
       update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
    

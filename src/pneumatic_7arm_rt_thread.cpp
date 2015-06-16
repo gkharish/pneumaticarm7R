@@ -393,7 +393,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   int FLAG = 1;
   bool LOGFLAG = 0;
 
-  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 2.5e6;//1000000; ..present,
+  RTIME   now, previous=0,  time_diff, TASK_PERIOD = 10e6;//1000000; ..present,
   double t, time_start_loop, present_time;
   double SubSampling_period = 100e6;
   double data_array[40][23];

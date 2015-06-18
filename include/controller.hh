@@ -12,6 +12,7 @@
 #include <vector>
 #include <native/task.h>
 #include <cmath>
+#define PI 3.14159265
 using namespace std;
 
 class Controller 
@@ -61,8 +62,8 @@ public:
   double  MeanPressure(int);
  /** \ Reference generator function   */
   double GetDesiredPosition();
-  void  ReferenceGenerator(long double timestep);
-  
+  void  ReferenceGenerator(long double timestep, unsigned int type);
+  void SetStepResponse();
   double GetUpdateDelta(unsigned int idx);
   bool GetJointNum(unsigned int idx);
   
@@ -109,7 +110,9 @@ protected:
   double ref_final_;
   double ref_traj_;
   double ref_slope_;
+  //double ref_step_;
   double desired_position_;
+  unsigned int ref_type_;
   std::vector<int> loop_reference_traj_;
 
   

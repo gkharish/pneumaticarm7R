@@ -68,6 +68,7 @@ Controller::Controller()
   desired_position_ = -45;   // Value is in degree
   ref_slope_ = 1;
   ref_traj_ = 0;
+  ref_type_ = 2;
   /** \ Mean Pressure */
 
   for(unsigned int i=0;i<16;i++)
@@ -166,9 +167,9 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
+	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9, ref_type_);
 	      //ODEBUG("Inside Joint num:" << i );
-             ref_traj_ = ref_final_;
+             //ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
@@ -249,9 +250,13 @@ double Controller::MeanPressure(int i)
   return(mean_pressure_[i]);
 }
 
-void Controller::ReferenceGenerator(long double timestep)
+void Controller::ReferenceGenerator(long double timestep, unsigned int type)
 {
-  if(ref_init_ <= ref_final_)
+  if (type == 0)
+  {
+
+      
+    if(ref_init_ <= ref_final_)
     {
       if(ref_traj_ >= ref_final_)
 	ref_traj_ = ref_final_;
@@ -265,6 +270,20 @@ void Controller::ReferenceGenerator(long double timestep)
       else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
     }
+  }
+  
+  if (type == 1)
+  {
+      //SetStepResponse();
+      ref_traj_ = desired_position_;
+  }
+
+  if (type == 2)
+  {
+      ref_traj_ = -1*( 30 + 30*sin( timestep*PI/10 ));
+  }
+
+
  ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 

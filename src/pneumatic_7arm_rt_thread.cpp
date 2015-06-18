@@ -267,7 +267,7 @@ void Pneumatic7ArmRtThread::InitIOboards()
     }
 
 
-  ciodas64_ -> adconv(1);
+ ciodas64_ -> adconv(1);
   if(ciodas64_->CheckBoundaryLimit() == false)
          ciodac16_ -> daconv(1, '1');
   else
@@ -336,7 +336,7 @@ void Pneumatic7ArmRtThread::Initializing()
     }
 
   // Initialize actuators
-  InitActuators();
+InitActuators();
   ODEBUGL("After Actuator initialization",4);
 
   // Init IO boards.
@@ -430,7 +430,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
       nb_it++;
 
       // Receiving information from NIC module
-      ciodas64_ -> adconv(1);
+     ciodas64_ -> adconv(1);
       //ciodas64_ -> logudpdata();
       if(ciodas64_->CheckBoundaryLimit() == true)
             ciodac16_->SetBoundaryError(true);
@@ -603,7 +603,7 @@ void Pneumatic7ArmRtThread::ApplyPressure()
 void Pneumatic7ArmRtThread::ReadStatus()
 {
   // Read position
-  ciodas64_ -> adconv(1);
+  //ciodas64_ -> adconv(1);
   ciodas64_ -> logudpdata();
 
  for(unsigned int i=16;i<23;i++)

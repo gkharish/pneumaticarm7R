@@ -65,7 +65,7 @@ Controller::Controller()
   // mean_pressure_[]
   
   /** \ Refernce generator paramter intialization  */
-  desired_position_ = -90;   // Value is in degree
+  desired_position_ = -45;   // Value is in degree
   ref_slope_ = 1;
   ref_traj_ = 0;
   /** \ Mean Pressure */
@@ -168,7 +168,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	    {
 	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
 	      //ODEBUG("Inside Joint num:" << i );
-             // ref_traj_ = ref_final_;
+             ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  

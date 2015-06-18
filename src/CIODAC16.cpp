@@ -81,16 +81,6 @@ void CIODAC16::daconv(int  , char header)
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3
       ODEBUGL("\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control,2);
-
-
-      for(unsigned int lp =0; lp < sizeof(send_packet_init); lp++  )
-	{
-	  unsigned char auc=buffer_send[lp];
-	  printf("0x%02x ",auc);
-	  if (lp%4==3)
-	    printf("\t");
-	}
-      printf("\n");
 #endif
 #endif
 

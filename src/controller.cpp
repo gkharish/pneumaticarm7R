@@ -168,7 +168,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	    {
 	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
 	      //ODEBUG("Inside Joint num:" << i );
-              ref_traj_ = ref_final_;
+             // ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  

@@ -90,13 +90,6 @@ void CIODAS64::adconv(int )
 	     (*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6]);
 #endif
 #endif
-      //cout << (*recv_packet_DAQ).data[0];
-      //struct udppacket_DAQ daq = recv_packet_DAQ;
-      //std::cout << "\n  CIODAC16 message send is unsigned int control: " << *daq << std::endl;
-      /*recv_data(0) = (*recv_packet_DAQ).data[0];
-	recv_data(1) = (*recv_packet_DAQ).data[1];
-    	val1 = (*recv_packet_DAQ).data[0];
-    	val = (unsigned int ) val1;*/
     }
 
 

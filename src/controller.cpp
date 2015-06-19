@@ -296,10 +296,10 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-          ref_traj_[joint_num] = -30 + 30*(sin( timestep*PI/30 ));
+          ref_traj_[joint_num] = -30 + 30*(sin(timestep*2*PI/10 ));
       }
       else 
-          ref_traj_[joint_num] = 25* sin(timestep*PI/30);
+          ref_traj_[joint_num] = 25* sin(timestep*2*PI/10);
   }
 
 

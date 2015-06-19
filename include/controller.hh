@@ -61,8 +61,8 @@ public:
   //void SetPidParameter();
   double  MeanPressure(int);
  /** \ Reference generator function   */
-  double GetDesiredPosition();
-  void  ReferenceGenerator(long double timestep, unsigned int type);
+  double GetDesiredPosition(unsigned int idx);
+  void  ReferenceGenerator(long double timestep, unsigned int joint_num, unsigned int type);
   void SetStepResponse();
   double GetUpdateDelta(unsigned int idx);
   bool GetJointNum(unsigned int idx);
@@ -106,13 +106,13 @@ protected:
 
   bool reset_control_;
   //ReferenceGenerator parameter
-  double ref_init_;
-  double ref_final_;
-  double ref_traj_;
-  double ref_slope_;
+  std::vector<double>ref_init_;
+  std::vector<double>ref_final_;
+  std::vector<double>ref_traj_;
+  std::vector<double>ref_slope_;
   //double ref_step_;
-  double desired_position_;
-  unsigned int ref_type_;
+  std::vector<double>desired_position_;
+  std::vector<unsigned int>ref_type_;
   std::vector<int> loop_reference_traj_;
 
   

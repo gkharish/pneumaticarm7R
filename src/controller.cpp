@@ -34,7 +34,12 @@ Controller::Controller()
   error_derivative_.resize(7);
   error_prev_.resize(7);
   loop_reference_traj_.resize(7);
-
+  ref_init_.resize(7);
+  ref_final_.resize(7);
+  ref_traj_.resize(7);
+  ref_slope_.resize(7);
+  ref_type_.resize(7);
+  desired_position_.resize(7);
   reset_control_ = false;
 
   /** \ Pid controller parameter intialization  */
@@ -44,32 +49,39 @@ Controller::Controller()
 
   //Here parameters are inititalized to test jont num 4 the elbow joint 
   // Elbow
-  P_[3] = 0.001;
+  P_[3] = 0.0005;
   D_[3] = 0;
   Pid_factor_[3] = -1;
-// Elbow
-  P_[2] = 0.0002;
+  ref_init_[3] = 0;
+  desired_position_[3] = -30;
+  ref_slope_[3] = 1;
+  ref_type_[3] = 2;
+// Arm rotation
+  P_[2] = 0.0005;
   D_[2] = 0;
   Pid_factor_[2] = 1;
-
-  // Elbow
-  P_[4] = 0.0002;
+  ref_init_[2] = 0;
+  desired_position_[2] = 30;
+  ref_slope_[2] = 1;
+  ref_type_[2] = 2;
+  // Elbow rotation
+  P_[4] = 0.001;
   D_[4] = 0;
-  Pid_factor_[4] = -1;
+  Pid_factor_[4] = 1;
+  ref_init_[4] = 0;
+  desired_position_[4] = 30;
+  ref_slope_[4] = 1;
+  ref_type_[4] = 2;
 
   // Wrist 
-  P_[5] = 0.0002;
+  P_[5] = 0.0005;
   D_[5] = 0;
-  Pid_factor_[5] = -1;
-  //mean_pressure_[3] = 1;
-  // mean_pressure_[]
-  
-  /** \ Refernce generator paramter intialization  */
-  desired_position_ = -45;   // Value is in degree
-  ref_slope_ = 1;
-  ref_traj_ = 0;
-  ref_type_ = 2;
-  /** \ Mean Pressure */
+  Pid_factor_[5] = 1;
+
+  ref_init_[5] = 0;
+  desired_position_[5] = 30;
+  ref_slope_[5] = 1;
+  ref_type_[5] = 2;
 
   for(unsigned int i=0;i<16;i++)
     {
@@ -106,11 +118,9 @@ void Controller::ApplyControlLaw()
   for(unsigned int i=0; i <7; i++)
     {
       unsigned index1 = 16;
-      ref_init_ = 0;
       positions_[i] = shmaddr_[index1++];
-      if(JOINT_NUM_[i] == true)
-	ref_init_ = positions_[i];
-      ref_final_ = GetDesiredPosition();
+      ref_init_[i] = 0;   //positions_[i];
+      //ref_final_ = GetDesiredPosition();
       loop_reference_traj_[i] = 0;
     }
 
@@ -121,10 +131,13 @@ void Controller::ApplyControlLaw()
 
       unsigned int index =16;
       for(unsigned int i=0;i<7;i++)
+      {
         positions_[i] = shmaddr_[index++];
+        ref_final_[i] = GetDesiredPosition(i);
+      }
       //ODEBUGL("DEbug Before referencegen", 1);
       
-      // ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
+      //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
       // ODEBUGL("After Control Law" , 1);
@@ -167,10 +180,10 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9, ref_type_);
+	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9, i,  ref_type_[i]);
 	      //ODEBUG("Inside Joint num:" << i );
              //ref_traj_ = ref_final_;
-	      error_now_[i] = ref_traj_ - positions_[i];
+	      error_now_[i] = ref_traj_[i] - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
 	      ODEBUGL("error_now: " << error_now_[i],3);
@@ -250,46 +263,51 @@ double Controller::MeanPressure(int i)
   return(mean_pressure_[i]);
 }
 
-void Controller::ReferenceGenerator(long double timestep, unsigned int type)
+void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num, unsigned int type)
 {
   if (type == 0)
   {
 
       
-    if(ref_init_ <= ref_final_)
+    if(ref_init_[joint_num] <= ref_final_[joint_num])
     {
-      if(ref_traj_ >= ref_final_)
-	ref_traj_ = ref_final_;
+      if(ref_traj_[joint_num] >= ref_final_[joint_num])
+	ref_traj_[joint_num] = ref_final_[joint_num];
       else
-        ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
+        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*timestep;
     }
-  if(ref_init_ >  ref_final_)
+  if(ref_init_[joint_num] >  ref_final_[joint_num])
     {
-      if(ref_traj_ <= ref_final_)
-	ref_traj_ = ref_final_;
+      if(ref_traj_[joint_num] <= ref_final_[joint_num])
+	ref_traj_[joint_num] = ref_final_[joint_num];
       else
-        ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
+        ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*timestep;
     }
   }
   
   if (type == 1)
   {
       //SetStepResponse();
-      ref_traj_ = desired_position_;
+      ref_traj_[joint_num] = desired_position_[joint_num];
   }
 
   if (type == 2)
   {
-      ref_traj_ = -1*( 30 + 30*sin( timestep*PI/10 ));
+      if (joint_num == 3)
+      {
+          ref_traj_[joint_num] = - 30* abs (sin( timestep*PI/10 ));
+      }
+      else 
+          ref_traj_[joint_num] = 30* sin(timestep*PI/10);
   }
 
 
- ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
+ ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1); 
 }
 
-double Controller::GetDesiredPosition()
+double Controller::GetDesiredPosition(unsigned int idx)
 {
-  return(desired_position_);
+  return(desired_position_[idx]);
 }
 
 void Controller::SetUserControl(unsigned int idx, double control)

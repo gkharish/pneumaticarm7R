@@ -53,7 +53,7 @@ Controller::Controller()
   D_[3] = 0;
   Pid_factor_[3] = -1;
   ref_init_[3] = 0;
-  desired_position_[3] = -30;
+  desired_position_[3] = -45;
   ref_slope_[3] = 1;
   ref_type_[3] = 2;
   ref_traj_[3] = 0;
@@ -63,7 +63,7 @@ Controller::Controller()
   Pid_factor_[2] = 1;
   ref_init_[2] = 0;
   desired_position_[2] = 30;
-  ref_slope_[2] = 1;
+  ref_slope_[2] = 4;
   ref_type_[2] = 2;
   // Elbow rotation
   P_[4] = 0.001;
@@ -112,7 +112,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 10e6;//1000000; ..present,
+  RTIME   TASK_PERIOD = 5e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
 

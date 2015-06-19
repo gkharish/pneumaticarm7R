@@ -56,6 +56,7 @@ Controller::Controller()
   desired_position_[3] = -30;
   ref_slope_[3] = 1;
   ref_type_[3] = 2;
+  ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
   D_[2] = 0;
@@ -295,10 +296,10 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-          ref_traj_[joint_num] = - 30* abs (sin( timestep*PI/10 ));
+          ref_traj_[joint_num] = -30 + 30*(sin( timestep*PI/30 ));
       }
       else 
-          ref_traj_[joint_num] = 30* sin(timestep*PI/10);
+          ref_traj_[joint_num] = 25* sin(timestep*PI/30);
   }
 
 

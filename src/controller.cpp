@@ -130,20 +130,25 @@ void Controller::ApplyControlLaw()
       // Waiting the next iteration
       rt_task_wait_period(NULL);      
 
+      shm_sem_.Acquire();
       unsigned int index =16;
       for(unsigned int i=0;i<7;i++)
       {
         positions_[i] = shmaddr_[index++];
         ref_final_[i] = GetDesiredPosition(i);
       }
+      shm_sem_.Release();
       //ODEBUGL("DEbug Before referencegen", 1);
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
+
       // ODEBUGL("After Control Law" , 1);
+      shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
+      shm_sem_.Release();
 
       loop++;
     }
@@ -211,17 +216,11 @@ void Controller::ResetControl(bool idx)
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
   double update_delta;
-  double error_acceptable_ = 1;
+  //  double error_acceptable_ = 1;
  // if (error >= error_acceptable_ || error <= -error_acceptable_)
  if(true)
     {
       update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
-   
-      /* if (delta[joint_num] >=2)
-	 delta[joint_num] = 2;
-	 else if (delta[joint_num] <= -2)
-	 delta[joint_num] = -2;
-	 else*/
       delta[joint_num] = delta[joint_num]+update_delta;
     }
    
@@ -252,12 +251,10 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
-  //ODEBUGL("Update delta:     " <<update_delta, 1 );
-                  
-  //ODEBUGL("Pid command : " << delta[joint_num],1);
-
-
+  ODEBUGL("Update delta:     " <<update_delta, 4);
+  ODEBUGL("Pid command : " << delta[joint_num],4);
 }
+
 double Controller::MeanPressure(int i)
 {
   //mean_pressure_[i] = initconfig_controls_[i];
@@ -275,14 +272,14 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
       if(ref_traj_[joint_num] >= ref_final_[joint_num])
 	ref_traj_[joint_num] = ref_final_[joint_num];
       else
-        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*timestep;
+        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
     }
   if(ref_init_[joint_num] >  ref_final_[joint_num])
     {
       if(ref_traj_[joint_num] <= ref_final_[joint_num])
 	ref_traj_[joint_num] = ref_final_[joint_num];
       else
-        ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*timestep;
+        ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*(double)timestep;
     }
   }
   
@@ -296,10 +293,10 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-          ref_traj_[joint_num] = -30 + 30*(sin(timestep*2*PI/10 ));
+        ref_traj_[joint_num] = -30 + 30*(sin((double)timestep*2*PI/10 ));
       }
       else 
-          ref_traj_[joint_num] = 25* sin(timestep*2*PI/10);
+        ref_traj_[joint_num] = 25* sin((double)timestep*2*PI/10);
   }
 
 

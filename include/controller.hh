@@ -15,6 +15,8 @@
 #define PI 3.14159265
 using namespace std;
 
+#include "shared_memory.hh"
+
 class Controller 
 {
 public:
@@ -71,6 +73,9 @@ protected:
   // Pointer to the shared memory
   double * shmaddr_;
   
+  // Semaphore to protect the shared memory.
+  Semaphore shm_sem_;
+
   // Pointer of the graph entity 
   RT_TASK principal_task_;
 

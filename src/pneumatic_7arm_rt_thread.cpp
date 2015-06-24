@@ -176,6 +176,7 @@
 #include <pneumatic_7arm_rt_thread.hh>
 
 #define LOG_FILENAME "/var/log/pneumatic_arm.shm"
+#define SEM_FILENAME "/var/log/pneumatic_arm.sem"
 
 using namespace std;
 using namespace Eigen;
@@ -574,15 +575,18 @@ void Pneumatic7ArmRtThread::CreateSharedMemory()
     
   aof << current_time.tv_sec << "." << current_time.tv_usec << std::endl;
   aof.close();
-  
+
   // Attached the shared memory to a memory segment.
   shmaddr_ = CreateSharedMemoryForPneumaticArm(true);
+
 }
 
 void Pneumatic7ArmRtThread::UpdateSharedMemory()
 {
+  shm_sem_.Acquire();
   ApplyPressure();
   ReadStatus();
+  shm_sem_.Release();
 }
 
 void Pneumatic7ArmRtThread::ApplyPressure()
@@ -590,6 +594,7 @@ void Pneumatic7ArmRtThread::ApplyPressure()
   // Write desired pressure
   for(unsigned int muscle_j=0;muscle_j<14;muscle_j++)
     {
+      
       double pressure =  shmaddr_[muscle_j];
 
       ciodac16_->send_command_array(muscle_j, pressure);

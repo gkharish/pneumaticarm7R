@@ -52,6 +52,7 @@
 #include "clientudp3.hh"
 #include "test_config.hh"
 #include <Eigen/Eigen>
+#include "shared_memory.hh"
 using namespace Eigen;
 class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
 {
@@ -130,6 +131,8 @@ class Pneumatic7ArmRtThread : public ClientUDP, public ioboards
   int shmid_;
   /// \brief Address to the shared memory */
   double * shmaddr_;
+  /// \brief Semaphore object */
+  Semaphore shm_sem_;
   
 
   /** \brief Miscelleanous */

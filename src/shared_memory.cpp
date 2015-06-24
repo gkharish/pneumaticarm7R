@@ -1,3 +1,4 @@
+#include <iostream>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <semaphore.h>
@@ -52,8 +53,12 @@ void Semaphore::InitSemaphore(std::string & filename)
   sem_filename_ = filename;
   semid_=NULL;
   semid_=sem_open(sem_filename_.c_str(), O_CREAT, S_IRUSR | S_IWUSR, 1);
-  if (semid_<0)
-    perror("Error while creating the semaphore for the shared memory\n");
+  if (semid_==SEM_FAILED)
+    { 
+      std::cerr << "File " << sem_filename_ << " for shared memory semaphore." <<std::endl;
+      perror("Error while creating the semaphore for the shared memory\n");
+    }
+      
 }
 
 
@@ -66,7 +71,7 @@ Semaphore::~Semaphore()
 void Semaphore::Acquire()
 {
   int r=0;
-  if (r=sem_trywait(semid_)<0)
+  if ((r=sem_trywait(semid_))<0)
     {
       //std::cerr << "Unble to acquire the semaphore."<<std::endl;
     }

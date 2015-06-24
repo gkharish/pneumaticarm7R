@@ -2,7 +2,7 @@
 #define _PNEUMATIC_ARM_7R_SHARED_MEMORY_HH_
 
 #define SHM_LOG_FILENAME "/var/log/pneumatic_arm.shm"
-#define SEM_FILENAME "/var/log/pneumatic_arm.sem"
+#define SEM_FILENAME "/pneumaticarmsem"
 
 #include <string>
 #include <stdio.h>

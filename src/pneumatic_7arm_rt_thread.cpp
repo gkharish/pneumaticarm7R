@@ -176,7 +176,6 @@
 #include <pneumatic_7arm_rt_thread.hh>
 
 #define LOG_FILENAME "/var/log/pneumatic_arm.shm"
-#define SEM_FILENAME "/var/log/pneumatic_arm.sem"
 
 using namespace std;
 using namespace Eigen;

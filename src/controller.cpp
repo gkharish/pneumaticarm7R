@@ -51,9 +51,9 @@ Controller::Controller()
   // Elbow
   P_[3] = 0.0005;
   D_[3] = 0;
-  Pid_factor_[3] = -1;
+  Pid_factor_[3] = 1;
   ref_init_[3] = 0;
-  desired_position_[3] = -45;
+  desired_position_[3] = 45;
   ref_slope_[3] = 1;
   ref_type_[3] = 2;
   ref_traj_[3] = 0;
@@ -293,7 +293,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-        ref_traj_[joint_num] = -30 + 30*(sin((double)timestep*2*PI/10 ));
+        ref_traj_[joint_num] = 30 + 30*(sin((double)timestep*2*PI/10 ));
       }
       else 
         ref_traj_[joint_num] = 25* sin((double)timestep*2*PI/10);

@@ -133,6 +133,9 @@ double CIODAS64::read_sensors(int axis_num)
   //cout << "\n cioads64:read_sensors()1 " << index;
   //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
   val1 = (*recv_packet_DAQ).data[6- index];
+  if (index ==3 || index ==1 || index ==6)
+      val1 = -val1;
+
   ODEBUGL(axis_num << " - cioads64:read_sensors() " << (double)val1 << " ",3);
 
   //float val2 = rand() % 10;

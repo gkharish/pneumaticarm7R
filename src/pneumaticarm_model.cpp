@@ -19,8 +19,16 @@
 
 #include "pneumaticarm_model.hh"
 
+
+PneumaticarmModel::PneumaticarmModel()
+{
+    //state_vector_.resize(2);
+    //state_derivative_.resize(2);
+    //control_vector_.resize(2);
+}
+
 /* Setting Number of Joints or degree of freedom*/
-void PnematicarmModel::setProblemDimension (int n)
+void PneumaticarmModel::setProblemDimension (int n)
 {
     nDOF_ = n;
 }
@@ -44,11 +52,10 @@ void PneumaticarmModel::setParameters (void)
         
  /*PAM system dynamics and Compute state derivatives*/
         
-VectorXd PnuematicarmModel::computeStateDerivative(double time, VectorXd statevector, VectorXd control)
+void PneumaticarmModel::computeStateDerivative(double time)
 {
-    double c1,c2,c3,c4;
-    VectorXd state_derivative(statevector.size());
-    double Tmax, fv, a, b;        
+    //VectorXd state_derivative(statevector.size());
+    double Tmax, fv, a, b, K1, K2;        
     double lo = 0.185;
     double alphao = 23.0;
     double epsilono = 0.15;
@@ -65,43 +72,78 @@ VectorXd PnuematicarmModel::computeStateDerivative(double time, VectorXd stateve
     K2 = (PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
     fv = 0.1*Tmax;
-    state_derivative(0) = statevector(1);
+    state_derivative_[0] = state_vector_[1];
             
-    state_derivative(1) = (K1/I)*(control(0) - control(1)) - (K2/I)*(control(0) + control(1))
-                                                -(m*GRAVITY*link_l/I)*sin(statevector(0)) 
-                                                -(fv/I)*statevector(1);
+    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) - (K2/I)*(control_vector_[0] + control_vector_[1])
+                                                -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
+                                                -(fv/I)*state_vector_[1];
             
-    return (state_derivative);
-}
+    }
  
         
 /* Numerical Integrator Rungee Kutta */
-VectorXd PneumatiarmModel::integrateRK4 (double t, VectorXd state, VectorXd u, double h)
+void PneumaticarmModel::integrateRK4 (double t, double h)
 {
-    VectorXd st1 = computeStateDerivative (t, state, u);
-            
-    VectorXd st2 = computeStateDerivative (t + (0.5 * h), state + (0.5 * h * st1), u);
-            
-    VectorXd st3 = computeStateDerivative (t + (0.5 * h), state + (0.5 * h * st2),  u);
-            
-    VectorXd st4 = computeStateDerivative (t + h, state + (h * st3), u);
+    vector<double> st1, st2, st3, st4;
+   
+    computeStateDerivative (t);
+    for (unsigned int i =0; i <2; i++)
+    {
+        st1[i] = state_derivative_[i];
+        state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
+    }
 
-    VectorXd stNew = state + ( (1/6.0) * h * (st1 + 2.0*st2 + 2.0*st3 + st4) );
 
-    
-    return (stNew);
+    computeStateDerivative (t + (0.5 * h));
+    for (unsigned int i =0; i <2; i++)
+    {
+        st2[i] = state_derivative_[i];
+        state_vector_[i] = state_vector_[i] + 0.5*h*st2[i];
+    }
+        
+   computeStateDerivative (t + (0.5 * h));
+   for (unsigned int i =0; i <2; i++)
+   {
+        st3[i] = state_derivative_[i];
+        state_vector_[i] = state_vector_[i] + h*st3[i];
+   }
+   
+   computeStateDerivative (t + h);
+   for (unsigned int i =0; i <2; i++)
+        st4[i] = state_derivative_[i];
+  
+  
+   for (unsigned int i =0; i <2; i++)
+       state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
 }
         
         
 /* Numerical Integrator Euler */
-VectorXd PneumaticarmModel::integrateEuler (double t, VectorXd state, VectorXd u, double h)
+/*VectorXd PneumaticarmModel::integrateEuler (double t, VectorXd state, VectorXd u, double h)
 {
     VectorXd st = computeStateDerivative (t, state, u);
             
     VectorXd stNew = state + h*st;
     return (stNew);
-}
+}*/
         
 
+void PneumaticarmModel::Set_ControlVector (double value, unsigned int idx)
 
+{
+    control_vector_[idx] = value;
+}
 
+double PneumaticarmModel::Get_ControlVector(unsigned int idx)
+{
+    return(control_vector_[idx]);
+}
+
+double PneumaticarmModel::Get_StateVector(unsigned int idx)
+{
+    return(state_vector_[idx]);
+}
+
+PneumaticarmModel::~PneumaticarmModel()
+{
+}

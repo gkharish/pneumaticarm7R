@@ -47,13 +47,13 @@ protected:
   /*! Boolean for the end. */
   bool end_;  // fin
   /*Muscle modelling parameters*/
-  std::vector<double> po_;
-  std::vector<double> alphao_;
-  std::vector<double> epsilono_;
-  std::vector<double> k_;
-  std::vector<double> ro_;
-  std::vector<double> R_;
-  std::vector<double> fv_;
+  /*vector<double> po_;
+  vector<double> alphao_;
+  vector<double> epsilono_;
+  vector<double> k_;
+  vector<double> ro_;
+  vector<double> R_;
+  vector<double> fv_;*/
 public:
   void init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 

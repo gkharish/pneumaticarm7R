@@ -12,8 +12,10 @@
 #include <debug.hh>
 #include <controller.hh>
 #include <shared_memory.hh>
-#include "pneumaticarm_model.hh"
-using namespace Eigen;
+#include <pneumaticarm_model.hh>
+//using namespace Eigen;
+
+//PneumaticarmModel model;
 void principale_controller_function(void *arg)
 {
   Controller * aController = static_cast<Controller *> (arg);
@@ -21,7 +23,7 @@ void principale_controller_function(void *arg)
     aController->ApplyControlLaw();
 }
 
-Controller::Controller()
+Controller::Controller(PneumaticarmModel amodelp)
 {
   positions_.resize(7);
   controls_.resize(16);
@@ -42,6 +44,8 @@ Controller::Controller()
   ref_type_.resize(7);
   desired_position_.resize(7);
   reset_control_ = false;
+
+  modelp = amodelp;
 
   /** \ Pid controller parameter intialization  */
   Pid_factor_.resize(7);
@@ -117,21 +121,26 @@ void Controller::ApplyControlLaw()
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
   /*Plant Model object created*/
-  PneumaticarmModel *model = new PneumaticarmModel();
-  model -> setProblemDimension(1);
+  //PneumaticarmModel *model = new PneumaticarmModel();
+  modelp.setProblemDimension(1);
   //model -> server_start();
   double integrator_timestep = 0.001;
-  VectorXd previous_state, u;
-  VectorXd newstate;
-            
+  vector<double> previous_state, newstate,  u;
+             
         
   int control_len = 0, control_size, state_len = 0, states_size;
-  control_size= u.size();
-  states_size = previous_state.size();
+  u.resize(2);
+  previous_state.resize(2);
+  newstate.resize(2);
+  //states_size = previous_state.size();
+ /* Variables used in Timer*/
+  double t, present_time, previous_time ;
+  time_t now , previous;
+  struct timespec spec;
   clock_gettime(CLOCK_REALTIME, &spec);
-  double now  = spec.tv_sec;
-  double present_time = round(spec.tv_nsec / 1.0e9);
-  double previous_time = present_time;
+  now  = spec.tv_sec;
+  present_time = (spec.tv_nsec / 1.0e9);
+  previous_time = present_time;
     
   for(unsigned int i=0; i <7; i++)
     {
@@ -139,11 +148,11 @@ void Controller::ApplyControlLaw()
       positions_[i] = shmaddr_[index1++];
       ref_init_[i] = 0;   //positions_[i];
       //ref_final_ = GetDesiredPosition();
-      previous_state(i) = positions_[i];
+      previous_state[i] = positions_[i];
       loop_reference_traj_[i] = 0;
     }
-    u(0) = shmaddr_[6];
-    u(1) = shmaddr_[7];
+    u[0] = shmaddr_[6];
+    u[1] = shmaddr_[7];
   while(1)
     {
       // Waiting the next iteration
@@ -163,21 +172,25 @@ void Controller::ApplyControlLaw()
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
 
-      u(0) = controls_[6];
-      u(1) = controls_[7];
+      u[0] = controls_[6];
+      u[1] = controls_[7];
+      for (unsigned int i =0; i<2; i++)
+          modelp.Set_ControlVector(u[i], i);
+      
       clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
-      present_time = round(spec.tv_nsec / 1.0e9);            
+      present_time = (spec.tv_nsec / 1.0e9);            
       t = present_time - previous_time;
-      newstate = model -> integrateRK4(t, previous_state, u, integrator_timestep);
-      previous_state = newstate;
+      modelp.integrateRK4(t, integrator_timestep);
+      for (unsigned int i=0; i<2; i++)
+          previous_state[i] = newstate[i];
 
       // ODEBUGL("After Control Law" , 1);
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
       shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = newstate(3)*180/3.14;
+      shmaddr_[23] = newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }

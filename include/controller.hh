@@ -12,15 +12,17 @@
 #include <vector>
 #include <native/task.h>
 #include <cmath>
+#include <time.h>
+#include <math.h>
 #define PI 3.14159265
 #include "shared_memory.hh"
 #include "pneumaticarm_model.hh"
 using namespace std;
-using namespace Eigen;
+//using namespace Eigen;
 class Controller 
 {
 public:
-  Controller();
+  Controller(PneumaticarmModel amodelp);
   virtual ~Controller();
 
   /** !\brief Start the control real time thread */
@@ -33,6 +35,7 @@ public:
   /** \brief Default control law.
       Set constant pressure on each muscle. */
   virtual void ComputeControlLaw(long double timestep);
+ // PneumaticarmModel *model;
 
   /** \brief Set the user control law,
       i.e. set the desired pressure */
@@ -75,7 +78,7 @@ protected:
   
   // Semaphore to protect the shared memory.
   Semaphore shm_sem_;
-
+  PneumaticarmModel modelp;
   // Pointer of the graph entity 
   RT_TASK principal_task_;
 

@@ -71,7 +71,7 @@ VectorXd PnuematicarmModel::computeStateDerivative(double time, VectorXd stateve
                                                 -(m*GRAVITY*link_l/I)*sin(statevector(0)) 
                                                 -(fv/I)*statevector(1);
             
-    return state_derivative;
+    return (state_derivative);
 }
  
         

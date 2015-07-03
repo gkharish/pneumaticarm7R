@@ -7,9 +7,7 @@
 #ifndef PNEUMATICARMMODEL_HH
 #define PNEUMATICARMMODEL_HH
 
-#include <system_dynamics.hh>
-#include <integrate_dynamics.hh>
-
+#include <Eigen/Dense>
 #include <Eigen/Core>
 #include <math.h>
 
@@ -19,7 +17,7 @@
 using namespace std;
 using namespace Eigen;
 
-class PneumaticarmModel::public SystemDynamics, public IntegrateDynamics
+class PneumaticarmModel
 {
  protected:
             double length_;
@@ -31,7 +29,7 @@ class PneumaticarmModel::public SystemDynamics, public IntegrateDynamics
             
         public:
                 /// Constructor
-                PneumaticarmModel () : SystemDynamics(), IntegrateDynamics()
+                PneumaticarmModel ()
                 {
                     
                 }

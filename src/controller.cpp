@@ -119,7 +119,7 @@ void Controller::ApplyControlLaw()
   /*Plant Model object created*/
   PneumaticarmModel *model = new PneumaticarmModel();
   model -> setProblemDimension(1);
-  model -> server_start();
+  //model -> server_start();
   double integrator_timestep = 0.001;
   VectorXd previous_state, u;
   VectorXd newstate;
@@ -129,9 +129,9 @@ void Controller::ApplyControlLaw()
   control_size= u.size();
   states_size = previous_state.size();
   clock_gettime(CLOCK_REALTIME, &spec);
-  now  = spec.tv_sec;
-  present_time = round(spec.tv_nsec / 1.0e9);
-  previous_time = present_time;
+  double now  = spec.tv_sec;
+  double present_time = round(spec.tv_nsec / 1.0e9);
+  double previous_time = present_time;
     
   for(unsigned int i=0; i <7; i++)
     {

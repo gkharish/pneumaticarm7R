@@ -52,6 +52,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   muscle.cpp
   shared_memory.cpp
   pneumatic_7arm_rt_thread.cpp
+  pneumaticarm_model.cpp
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )
 

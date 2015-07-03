@@ -56,11 +56,11 @@ double * CreateSharedMemoryForPneumaticArm(bool create)
   gid_t gid = 1001;
   mode_t mode = 0664;
 
-  if ((shmid = shmget(key_to_shm, 16*sizeof(double)+7*sizeof(double)+sizeof(int), 
+  if ((shmid = shmget(key_to_shm, 16*sizeof(double)+7*sizeof(double)+sizeof(int)+sizeof(double), 
                        shmflg)) < 0)
     {
       shmflg = SHM_R | SHM_W;
-      if ((shmid = shmget(key_to_shm, 16*sizeof(double)+7*sizeof(double)+sizeof(int), 
+      if ((shmid = shmget(key_to_shm, 16*sizeof(double)+7*sizeof(double)+sizeof(int)+sizeof(double), 
 			  shmflg)) < 0)
 	{
 	  perror("Pb with the shared memory.");

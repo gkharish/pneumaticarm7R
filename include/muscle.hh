@@ -46,11 +46,20 @@ class Muscle
 protected:
   /*! Boolean for the end. */
   bool end_;  // fin
+  /*Muscle modelling parameters*/
+  std::vector<double> po_;
+  std::vector<double> alphao_;
+  std::vector<double> epsilono_;
+  std::vector<double> k_;
+  std::vector<double> ro_;
+  std::vector<double> R_;
+  std::vector<double> fv_;
 public:
   void init_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
 
   void reset_muscle_i(controller_axis *controleur_i, double *vitesse);
 
   void trait_muscle_i (controller_axis *controleur_i, double * delta, double * vitesse);
+  double muscle_force_i (controller_axis *controleur_i);
 };
 #endif /* MUSCLE_HH */

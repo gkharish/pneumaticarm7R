@@ -62,3 +62,10 @@ trait_muscle_i (controller_axis *controleur_i,
       controleur_i -> degonfle(*vitesse);
     }
 }
+double Muscle::muscle_force_i (controller_axis *controleur_i)
+{
+    double force;
+    force = 1;
+
+    return(force);
+}

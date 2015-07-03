@@ -12,8 +12,7 @@
 #include <debug.hh>
 #include <controller.hh>
 #include <shared_memory.hh>
-#include "pneumaticarm_model.hh"
-using namespace Eigen;
+
 void principale_controller_function(void *arg)
 {
   Controller * aController = static_cast<Controller *> (arg);
@@ -35,12 +34,7 @@ Controller::Controller()
   error_derivative_.resize(7);
   error_prev_.resize(7);
   loop_reference_traj_.resize(7);
-  ref_init_.resize(7);
-  ref_final_.resize(7);
-  ref_traj_.resize(7);
-  ref_slope_.resize(7);
-  ref_type_.resize(7);
-  desired_position_.resize(7);
+
   reset_control_ = false;
 
   /** \ Pid controller parameter intialization  */
@@ -50,40 +44,31 @@ Controller::Controller()
 
   //Here parameters are inititalized to test jont num 4 the elbow joint 
   // Elbow
-  P_[3] = 0.0005;
+  P_[3] = 0.001;
   D_[3] = 0;
-  Pid_factor_[3] = 1;
-  ref_init_[3] = 0;
-  desired_position_[3] = 45;
-  ref_slope_[3] = 1;
-  ref_type_[3] = 2;
-  ref_traj_[3] = 0;
-// Arm rotation
-  P_[2] = 0.0005;
+  Pid_factor_[3] = -1;
+// Elbow
+  P_[2] = 0.0002;
   D_[2] = 0;
   Pid_factor_[2] = 1;
-  ref_init_[2] = 0;
-  desired_position_[2] = 30;
-  ref_slope_[2] = 4;
-  ref_type_[2] = 2;
-  // Elbow rotation
-  P_[4] = 0.001;
+
+  // Elbow
+  P_[4] = 0.0002;
   D_[4] = 0;
-  Pid_factor_[4] = 1;
-  ref_init_[4] = 0;
-  desired_position_[4] = 30;
-  ref_slope_[4] = 1;
-  ref_type_[4] = 2;
+  Pid_factor_[4] = -1;
 
   // Wrist 
-  P_[5] = 0.0005;
+  P_[5] = 0.0002;
   D_[5] = 0;
-  Pid_factor_[5] = 1;
-
-  ref_init_[5] = 0;
-  desired_position_[5] = 30;
-  ref_slope_[5] = 1;
-  ref_type_[5] = 2;
+  Pid_factor_[5] = -1;
+  //mean_pressure_[3] = 1;
+  // mean_pressure_[]
+  
+  /** \ Refernce generator paramter intialization  */
+  desired_position_ = -90;   // Value is in degree
+  ref_slope_ = 1;
+  ref_traj_ = 0;
+  /** \ Mean Pressure */
 
   for(unsigned int i=0;i<16;i++)
     {
@@ -113,72 +98,38 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 5e6;//1000000; ..present,
+  RTIME   TASK_PERIOD = 10e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
-  /*Plant Model object created*/
-  PneumaticarmModel *model = new PneumaticarmModel();
-  model -> setProblemDimension(1);
-  model -> server_start();
-  double integrator_timestep = 0.001;
-  VectorXd previous_state, u;
-  VectorXd newstate;
-            
-        
-  int control_len = 0, control_size, state_len = 0, states_size;
-  control_size= u.size();
-  states_size = previous_state.size();
-  clock_gettime(CLOCK_REALTIME, &spec);
-  now  = spec.tv_sec;
-  present_time = round(spec.tv_nsec / 1.0e9);
-  previous_time = present_time;
-    
+
   for(unsigned int i=0; i <7; i++)
     {
       unsigned index1 = 16;
+      ref_init_ = 0;
       positions_[i] = shmaddr_[index1++];
-      ref_init_[i] = 0;   //positions_[i];
-      //ref_final_ = GetDesiredPosition();
-      previous_state(i) = positions_[i];
+      if(JOINT_NUM_[i] == true)
+	ref_init_ = positions_[i];
+      ref_final_ = GetDesiredPosition();
       loop_reference_traj_[i] = 0;
     }
-    u(0) = shmaddr_[6];
-    u(1) = shmaddr_[7];
+
   while(1)
     {
       // Waiting the next iteration
       rt_task_wait_period(NULL);      
 
-      shm_sem_.Acquire();
       unsigned int index =16;
       for(unsigned int i=0;i<7;i++)
-      {
         positions_[i] = shmaddr_[index++];
-        ref_final_[i] = GetDesiredPosition(i);
-      }
-      shm_sem_.Release();
       //ODEBUGL("DEbug Before referencegen", 1);
       
-      //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
+      // ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
-
-      u(0) = controls_[6];
-      u(1) = controls_[7];
-      clock_gettime(CLOCK_REALTIME, &spec);
-      now  = spec.tv_sec;
-      present_time = round(spec.tv_nsec / 1.0e9);            
-      t = present_time - previous_time;
-      newstate = model -> integrateRK4(t, previous_state, u, integrator_timestep);
-      previous_state = newstate;
-
       // ODEBUGL("After Control Law" , 1);
-      shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = newstate(3)*180/3.14;
-      shm_sem_.Release();
+
       loop++;
     }
 }
@@ -215,10 +166,10 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9, i,  ref_type_[i]);
+	      ReferenceGenerator(loop_reference_traj_[i]*timestep/1.0e9);
 	      //ODEBUG("Inside Joint num:" << i );
-             //ref_traj_ = ref_final_;
-	      error_now_[i] = ref_traj_[i] - positions_[i];
+             // ref_traj_ = ref_final_;
+	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
 	      ODEBUGL("error_now: " << error_now_[i],3);
@@ -245,11 +196,17 @@ void Controller::ResetControl(bool idx)
 void Controller::PidController(double error, double error_derivative, int joint_num)
 {
   double update_delta;
-  //  double error_acceptable_ = 1;
+  double error_acceptable_ = 1;
  // if (error >= error_acceptable_ || error <= -error_acceptable_)
  if(true)
     {
       update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+   
+      /* if (delta[joint_num] >=2)
+	 delta[joint_num] = 2;
+	 else if (delta[joint_num] <= -2)
+	 delta[joint_num] = -2;
+	 else*/
       delta[joint_num] = delta[joint_num]+update_delta;
     }
    
@@ -280,61 +237,40 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
-  ODEBUGL("Update delta:     " <<update_delta, 4);
-  ODEBUGL("Pid command : " << delta[joint_num],4);
-}
+  //ODEBUGL("Update delta:     " <<update_delta, 1 );
+                  
+  //ODEBUGL("Pid command : " << delta[joint_num],1);
 
+
+}
 double Controller::MeanPressure(int i)
 {
   //mean_pressure_[i] = initconfig_controls_[i];
   return(mean_pressure_[i]);
 }
 
-void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num, unsigned int type)
+void Controller::ReferenceGenerator(long double timestep)
 {
-  if (type == 0)
-  {
-
-      
-    if(ref_init_[joint_num] <= ref_final_[joint_num])
+  if(ref_init_ <= ref_final_)
     {
-      if(ref_traj_[joint_num] >= ref_final_[joint_num])
-	ref_traj_[joint_num] = ref_final_[joint_num];
+      if(ref_traj_ >= ref_final_)
+	ref_traj_ = ref_final_;
       else
-        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
+        ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
     }
-  if(ref_init_[joint_num] >  ref_final_[joint_num])
+  if(ref_init_ >  ref_final_)
     {
-      if(ref_traj_[joint_num] <= ref_final_[joint_num])
-	ref_traj_[joint_num] = ref_final_[joint_num];
+      if(ref_traj_ <= ref_final_)
+	ref_traj_ = ref_final_;
       else
-        ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*(double)timestep;
+        ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
     }
-  }
-  
-  if (type == 1)
-  {
-      //SetStepResponse();
-      ref_traj_[joint_num] = desired_position_[joint_num];
-  }
-
-  if (type == 2)
-  {
-      if (joint_num == 3)
-      {
-        ref_traj_[joint_num] = 30 + 30*(sin((double)timestep*2*PI/10 ));
-      }
-      else 
-        ref_traj_[joint_num] = 25* sin((double)timestep*2*PI/10);
-  }
-
-
- ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1); 
+ ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 
-double Controller::GetDesiredPosition(unsigned int idx)
+double Controller::GetDesiredPosition()
 {
-  return(desired_position_[idx]);
+  return(desired_position_);
 }
 
 void Controller::SetUserControl(unsigned int idx, double control)

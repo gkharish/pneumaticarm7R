@@ -6,17 +6,17 @@
  * O. Stasse                            *
  ****************************************/
 
-#ifndef _PNEUMATIC_ARM_7R_CONTROLLER_HH_
-#define _PNEUMATIC_ARM_7R_CONTROLLER_HH_
+#ifndef CONTROLLER_HH_
+#define CONTROLLER_HH_
 
 #include <vector>
 #include <native/task.h>
 #include <cmath>
 #define PI 3.14159265
-using namespace std;
-
 #include "shared_memory.hh"
-
+#include "pneumaticarm_model.hh"
+using namespace std;
+using namespace Eigen;
 class Controller 
 {
 public:

@@ -45,6 +45,9 @@ SET(${PROJECT_NAME}_HEADERS
 	include/joystick.h
 	include/modele.h
 	include/port.hh
+        include/system_dynamics.hh
+        include/integrate_dynamics.hh
+        include/pneumaticarm_model.hh
 	include/main_controleur.hh
   include/test_config.hh
 

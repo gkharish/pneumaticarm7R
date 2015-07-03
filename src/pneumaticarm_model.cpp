@@ -22,9 +22,9 @@
 
 PneumaticarmModel::PneumaticarmModel()
 {
-    //state_vector_.resize(2);
-    //state_derivative_.resize(2);
-    //control_vector_.resize(2);
+    state_vector_.resize(2);
+    state_derivative_.resize(2);
+    control_vector_.resize(2);
 }
 
 /* Setting Number of Joints or degree of freedom*/

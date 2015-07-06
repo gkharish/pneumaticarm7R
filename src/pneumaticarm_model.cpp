@@ -9,7 +9,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/mman.h>
-
+#include <iostream>
 //#include <native/task.h>
 //#include <native/timer.h>
 #include <time.h>
@@ -74,10 +74,12 @@ void PneumaticarmModel::computeStateDerivative(double time)
     fv = 0.1*Tmax;
     state_derivative_[0] = state_vector_[1];
             
-    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) - (K2/I)*(control_vector_[0] + control_vector_[1])
+    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) - (K2/I)*(control_vector_[0] 
+                                                + control_vector_[1])
                                                 -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
                                                 -(fv/I)*state_vector_[1];
-            
+   
+    ODEBUGL("State derivative: "<< state_derivative_[0],0);
     }
  
         
@@ -85,14 +87,17 @@ void PneumaticarmModel::computeStateDerivative(double time)
 void PneumaticarmModel::integrateRK4 (double t, double h)
 {
     vector<double> st1, st2, st3, st4;
-   
+    st1.resize(2);
+    st2.resize(2);
+    st3.resize(2);
+    st4.resize(2);
     computeStateDerivative (t);
     for (unsigned int i =0; i <2; i++)
     {
         st1[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
     }
-
+    ODEBUGL("After St1 inside integrtorrk4" << state_vector_[0], 0);
 
     computeStateDerivative (t + (0.5 * h));
     for (unsigned int i =0; i <2; i++)
@@ -115,6 +120,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
   
    for (unsigned int i =0; i <2; i++)
        state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
+   ODEBUGL("State vector: " << state_vector_[0],0);
 }
         
         
@@ -132,6 +138,7 @@ void PneumaticarmModel::Set_ControlVector (double value, unsigned int idx)
 
 {
     control_vector_[idx] = value;
+    ODEBUGL("Control vector is set",0);
 }
 
 double PneumaticarmModel::Get_ControlVector(unsigned int idx)
@@ -142,6 +149,11 @@ double PneumaticarmModel::Get_ControlVector(unsigned int idx)
 double PneumaticarmModel::Get_StateVector(unsigned int idx)
 {
     return(state_vector_[idx]);
+}
+
+void PneumaticarmModel::Set_StateVector(double value, unsigned int idx)
+{
+    state_vector_[idx] = value;
 }
 
 PneumaticarmModel::~PneumaticarmModel()

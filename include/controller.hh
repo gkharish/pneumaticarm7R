@@ -22,7 +22,7 @@ using namespace std;
 class Controller 
 {
 public:
-  Controller(PneumaticarmModel amodelp);
+  Controller();
   virtual ~Controller();
 
   /** !\brief Start the control real time thread */
@@ -35,7 +35,7 @@ public:
   /** \brief Default control law.
       Set constant pressure on each muscle. */
   virtual void ComputeControlLaw(long double timestep);
- // PneumaticarmModel *model;
+  //PneumaticarmModel *modelp;
 
   /** \brief Set the user control law,
       i.e. set the desired pressure */
@@ -78,7 +78,10 @@ protected:
   
   // Semaphore to protect the shared memory.
   Semaphore shm_sem_;
-  PneumaticarmModel modelp;
+ 
+  //Model object for elbow joint
+  //PneumaticarmModel *modelp;
+ 
   // Pointer of the graph entity 
   RT_TASK principal_task_;
 

@@ -40,6 +40,7 @@ class PneumaticarmModel
                 void integrateRK4 (double time, double timeStep);
                 // vector<double> integrateEuler (double time, double timeStep);
                 void Set_ControlVector(double value, unsigned int idx);
+                void Set_StateVector(double value, unsigned int idx);
                 double Get_StateVector(unsigned idx);
                 double Get_ControlVector(unsigned int idx);
                 

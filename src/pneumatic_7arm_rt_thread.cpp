@@ -615,8 +615,9 @@ void Pneumatic7ArmRtThread::ReadStatus()
       shmaddr_[i] = sensors_[i-16].read_sensors_array();
       ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
     }
-  FINITE_STATE_= (int) shmaddr_[23];
- // ODEBUGL("FINITE_STATE_" << FINITE_STATE_, 0);
+  FINITE_STATE_= 6;
+  double jointposition5 =  shmaddr_[24];
+ ODEBUGL("JointPosition : " << jointposition5, 0);
 }
 void Pneumatic7ArmRtThread::CloseSharedMemory()
 {

@@ -20,10 +20,13 @@ void principale_controller_function(void *arg)
 {
   Controller * aController = static_cast<Controller *> (arg);
   if (aController!=0)
+  {
+    cout << " Controller object is created" << endl;
     aController->ApplyControlLaw();
+  }
 }
 
-Controller::Controller(PneumaticarmModel amodelp)
+Controller::Controller()
 {
   positions_.resize(7);
   controls_.resize(16);
@@ -45,7 +48,7 @@ Controller::Controller(PneumaticarmModel amodelp)
   desired_position_.resize(7);
   reset_control_ = false;
 
-  modelp = amodelp;
+
 
   /** \ Pid controller parameter intialization  */
   Pid_factor_.resize(7);
@@ -60,7 +63,7 @@ Controller::Controller(PneumaticarmModel amodelp)
   ref_init_[3] = 0;
   desired_position_[3] = 45;
   ref_slope_[3] = 1;
-  ref_type_[3] = 2;
+  ref_type_[3] = 1;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -77,7 +80,7 @@ Controller::Controller(PneumaticarmModel amodelp)
   ref_init_[4] = 0;
   desired_position_[4] = 30;
   ref_slope_[4] = 1;
-  ref_type_[4] = 2;
+  ref_type_[4] = 1;
 
   // Wrist 
   P_[5] = 0.0005;
@@ -121,14 +124,16 @@ void Controller::ApplyControlLaw()
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
   /*Plant Model object created*/
-  //PneumaticarmModel *model = new PneumaticarmModel();
-  modelp.setProblemDimension(1);
+  PneumaticarmModel *modelp = new PneumaticarmModel();
+  if(modelp!=0)
+      ODEBUGL("Pneumatic model object is created",4);
+  modelp -> setProblemDimension(1);
   //model -> server_start();
   double integrator_timestep = 0.001;
   vector<double> previous_state, newstate,  u;
              
         
-  int control_len = 0, control_size, state_len = 0, states_size;
+  //int control_len = 0, control_size, state_len = 0, states_size;
   u.resize(2);
   previous_state.resize(2);
   newstate.resize(2);
@@ -150,9 +155,14 @@ void Controller::ApplyControlLaw()
       positions_[i] = shmaddr_[index1++];
       ref_init_[i] = 0;   //positions_[i];
       //ref_final_ = GetDesiredPosition();
-      previous_state[i] = positions_[i];
+     // previous_state[i] = positions_[i];
+     // newstate[i] = positions_[i];
       loop_reference_traj_[i] = 0;
     }
+    previous_state[0] = positions_[3];
+    previous_state[1] = 0;
+    newstate[0] = previous_state[0];
+    newstate[1] = 0;
     u[0] = shmaddr_[6];
     u[1] = shmaddr_[7];
   while(1)
@@ -168,7 +178,9 @@ void Controller::ApplyControlLaw()
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
-      //ODEBUGL("DEbug Before referencegen", 1);
+      ODEBUGL("DEbug Before referencegen", 4);
+      modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
+
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
@@ -177,15 +189,18 @@ void Controller::ApplyControlLaw()
       u[0] = controls_[6];
       u[1] = controls_[7];
       for (unsigned int i =0; i<2; i++)
-          modelp.Set_ControlVector(u[i], i);
-      
+          modelp -> Set_ControlVector(u[i], i);
+       ODEBUGL("DEbug after set_Controlvector", 4);
+
      /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
       present_time = (spec.tv_nsec / 1.0e9); */
       now = rt_timer_read();
       present_time = now/1.0e9;
       t = present_time - previous_time;
-      modelp.integrateRK4(t, integrator_timestep);
+      modelp -> integrateRK4(t, integrator_timestep);
+      ODEBUGL("DEbug after integrator", 1);
+
       for (unsigned int i=0; i<2; i++)
           previous_state[i] = newstate[i];
 
@@ -193,8 +208,8 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] = ref_traj_[3];
-     // shmaddr_[23] = newstate[0]*180/3.14;
+      shmaddr_[23] = (int)ref_traj_[3];
+      shmaddr_[24] = ( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }

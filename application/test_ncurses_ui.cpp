@@ -4,8 +4,7 @@
 
 int main(void)
 {
-  PneumaticarmModel amodel;
-  Controller aController(amodel);
+  Controller aController;
   NCursesUI ancursesui(&aController);
     
   ancursesui.Init();

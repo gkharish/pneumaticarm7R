@@ -38,10 +38,10 @@ NCursesUI::NCursesUI(Controller *aController):
       printf("Your terminal does not support color\n");
       exit(1);
     }
-  start_color();
+  //start_color();
 
   // Create a pair of color
-  init_pair(1, COLOR_RED, COLOR_BLACK);
+  //init_pair(1, COLOR_RED, COLOR_BLACK);
 
   int row,col;				/* to store the number of rows and *
 					 * the number of colums of the screen */
@@ -197,7 +197,7 @@ void NCursesUI::UpdateSharedMemory()
   log_data_ << Controller_-> GetUpdateDelta(indx);
   log_data_ << "\t\t";
    log_data_ << "\n" ;
-  shmaddr_[23] = this -> get_FINITE_STATE();
+  //shmaddr_[23] = this -> get_FINITE_STATE();
 }
 
 void NCursesUI::Init()

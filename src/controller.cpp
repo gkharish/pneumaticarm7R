@@ -117,7 +117,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   TASK_PERIOD = 5e6;//1000000; ..present,
+  RTIME   now, TASK_PERIOD = 5e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
   /*Plant Model object created*/
@@ -135,11 +135,13 @@ void Controller::ApplyControlLaw()
   //states_size = previous_state.size();
  /* Variables used in Timer*/
   double t, present_time, previous_time ;
-  time_t now , previous;
+ /* time_t now , previous;
   struct timespec spec;
   clock_gettime(CLOCK_REALTIME, &spec);
   now  = spec.tv_sec;
-  present_time = (spec.tv_nsec / 1.0e9);
+  present_time = (spec.tv_nsec / 1.0e9);*/
+  now = rt_timer_read();
+  present_time = now/1.0e9;
   previous_time = present_time;
     
   for(unsigned int i=0; i <7; i++)
@@ -177,9 +179,11 @@ void Controller::ApplyControlLaw()
       for (unsigned int i =0; i<2; i++)
           modelp.Set_ControlVector(u[i], i);
       
-      clock_gettime(CLOCK_REALTIME, &spec);
+     /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
-      present_time = (spec.tv_nsec / 1.0e9);            
+      present_time = (spec.tv_nsec / 1.0e9); */
+      now = rt_timer_read();
+      present_time = now/1.0e9;
       t = present_time - previous_time;
       modelp.integrateRK4(t, integrator_timestep);
       for (unsigned int i=0; i<2; i++)
@@ -190,7 +194,7 @@ void Controller::ApplyControlLaw()
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
       shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = newstate[0]*180/3.14;
+     // shmaddr_[23] = newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }

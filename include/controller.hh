@@ -62,6 +62,7 @@ public:
   void SetControllerType(int idx);
   /** \ PID controller design  */
   void  PidController(double error, double error_derivative , int joint_num);
+  void  SimulatedPidController(double error, double error_derivative , int joint_num);
   //double GetPidParameter();
   //void SetPidParameter();
   double  MeanPressure(int);
@@ -87,9 +88,11 @@ protected:
 
   // Positions values 
   std::vector<double> positions_;
+  std::vector<double> simulated_positions_;
 
   // Control values
   std::vector<double> controls_;
+  std::vector<double> simulated_controls_; 
 
   // Binary vector to apply controls.
   std::vector<bool> apply_controls_;
@@ -107,12 +110,15 @@ protected:
   std::vector<double> P_;
   std::vector<double> D_;
   std::vector<double> delta;
+  std::vector<double> simulated_delta_;
 
   /*! @{ Errors computation */
   /* \brief Current error */
   std::vector<double> error_now_;
+  std::vector<double> simulated_error_now_;
   /* \brief Error derivative */
   std::vector<double> error_derivative_;
+  std::vector<double> simulated_error_derivative_;
   /*! @} */
 
   bool reset_control_;
@@ -128,6 +134,7 @@ protected:
 
   
   std::vector<double> error_prev_;
+  std::vector<double> simulated_error_prev_;
   /** ! Initialize the shared memory. */
   void InitSharedMemory();
 

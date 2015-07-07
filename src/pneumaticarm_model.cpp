@@ -57,27 +57,27 @@ void PneumaticarmModel::computeStateDerivative(double time)
     //VectorXd state_derivative(statevector.size());
     double Tmax, fv, a, b, K1, K2;        
     double lo = 0.185;
-    double alphao = 23.0;
+    double alphao = 23.0*PI/180;
     double epsilono = 0.15;
     double k = 1.25;
     double ro = 0.009;
     double R = 0.015;
     double m = 5;
-    double I = 1;
-    double link_l = 0.18;
+    double I = 0.07;
+    double link_l = 0.12;
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
                
-    K1 = (PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
-    K2 = (PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
+    K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
+    K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
     fv = 0.1*Tmax;
     state_derivative_[0] = state_vector_[1];
             
-    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) - (K2/I)*(control_vector_[0] 
-                                                + control_vector_[1])
-                                                -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
-                                                -(fv/I)*state_vector_[1];
+    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) 
+                            - (K2/I)*(control_vector_[0] + control_vector_[1])*state_vector_[0]
+                            -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
+                            -(fv/I)*state_vector_[1];
    
     ODEBUGL("State derivative: "<< state_derivative_[0],0);
     }
@@ -97,7 +97,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
         st1[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
     }
-    ODEBUGL("After St1 inside integrtorrk4" << state_vector_[0], 0);
+    ODEBUGL("After St1 inside integrtorrk4" << state_vector_[0], 4);
 
     computeStateDerivative (t + (0.5 * h));
     for (unsigned int i =0; i <2; i++)
@@ -138,7 +138,7 @@ void PneumaticarmModel::Set_ControlVector (double value, unsigned int idx)
 
 {
     control_vector_[idx] = value;
-    ODEBUGL("Control vector is set",0);
+    ODEBUGL("Control vector is set" << control_vector_[idx],0);
 }
 
 double PneumaticarmModel::Get_ControlVector(unsigned int idx)

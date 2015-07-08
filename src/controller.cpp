@@ -35,6 +35,7 @@ Controller::Controller()
   apply_controls_.resize(16);
   user_controls_.resize(16);
   initconfig_controls_.resize(16);
+  simulated_initconfig_controls_.resize(16);
   JOINT_NUM_.resize(7);
   mean_pressure_.resize(7);
   delta.resize(7);
@@ -173,10 +174,14 @@ void Controller::ApplyControlLaw()
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
-    u[0] = 0.2;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
-    u[1] = 4.0;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
+    u[0] = 2.5;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
+    u[1] = 2.5;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
+    simulated_initconfig_controls_[6] = 2.5; 
+    simulated_initconfig_controls_[7] = 2.5; 
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
+    for (unsigned int i =0; i<2; i++)
+          modelp -> Set_StateVector(0, i);
   while(1)
     {
       // Waiting the next iteration
@@ -238,7 +243,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	  if (reset_control_ ==false)
           {
               controls_[i] = initconfig_controls_[i];
-              simulated_controls_[i] = initconfig_controls_[i];
+              simulated_controls_[i] = simulated_initconfig_controls_[i];
           }
           else 
           {
@@ -292,8 +297,8 @@ void Controller::ComputeControlLaw(long double timestep)
 	    {
 	      controls_[2*i] = initconfig_controls_[2*i];
 	      controls_[2*i+1] = initconfig_controls_[2*i+1];
-              simulated_controls_[2*i] = initconfig_controls_[2*i];
-	      simulated_controls_[2*i+1] = initconfig_controls_[2*i+1];
+              simulated_controls_[2*i] = simulated_initconfig_controls_[2*i];
+	      simulated_controls_[2*i+1] = simulated_initconfig_controls_[2*i+1];
 
 	    }
 	}
@@ -350,17 +355,17 @@ void Controller::PidController(double error, double error_derivative, int joint_
 
 void Controller::SimulatedPidController(double error, double error_derivative, int joint_num)
 {
-  double update_delta;
+  double simulated_update_delta;
   //  double error_acceptable_ = 1;
  // if (error >= error_acceptable_ || error <= -error_acceptable_)
  if(true)
     {
-      update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
-      simulated_delta_[joint_num] = simulated_delta_[joint_num]+update_delta;
+      simulated_update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
+      simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
    
-  double control_limit_agonistic =  0.2 + simulated_delta_[joint_num];
-  double control_limit_antagonistic = 4.0 - simulated_delta_[joint_num];
+  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + simulated_delta_[joint_num];
+  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - simulated_delta_[joint_num];
 
 
   /*if (control_limit_agonistic  <=4.5 && control_limit_agonistic >=0)
@@ -383,10 +388,10 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
     }*/
      
 
-  simulated_controls_[2*joint_num] = control_limit_agonistic;
-  simulated_controls_[2*joint_num+1] = control_limit_antagonistic;
+  simulated_controls_[2*joint_num] = simulated_control_limit_agonistic;
+  simulated_controls_[2*joint_num+1] = simulated_control_limit_antagonistic;
    
-  ODEBUGL("Simulated Update delta:     " <<update_delta, 4);
+  ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
   ODEBUGL("Simulated Pid command : " << delta[joint_num],4);
 }
 

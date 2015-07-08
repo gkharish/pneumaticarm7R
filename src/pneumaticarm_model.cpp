@@ -57,10 +57,10 @@ void PneumaticarmModel::computeStateDerivative(double time)
     //VectorXd state_derivative(statevector.size());
     double Tmax, fv, a, b, K1, K2;        
     double lo = 0.185;
-    double alphao = 23.0*PI/180;
+    double alphao = 20.0*PI/180;
     double epsilono = 0.15;
     double k = 1.25;
-    double ro = 0.009;
+    double ro = 0.0085;
     double R = 0.015;
     double m = 5;
     double I = 0.07;
@@ -71,7 +71,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
     K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
     K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
-    fv = 0.1*Tmax;
+    fv = 0.1*Tmax/3;
     state_derivative_[0] = state_vector_[1];
             
     state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) 

@@ -101,6 +101,7 @@ protected:
   std::vector<bool> user_controls_;
  // Initial configuration or zero configuration control
   std::vector<double> initconfig_controls_;
+  std::vector<double> simulated_initconfig_controls_;
   // Joint Number 
   std::vector<bool>JOINT_NUM_;
   // User Specified Mean Pressure

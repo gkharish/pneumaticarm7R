@@ -182,6 +182,8 @@ void Controller::ApplyControlLaw()
           modelp -> Set_ControlVector(u[i], i);
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_StateVector(0, i);
+    for (unsigned int i =2; i<4; i++)
+          modelp -> Set_StateVector(2.5, i);
   while(1)
     {
       // Waiting the next iteration

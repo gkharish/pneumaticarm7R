@@ -22,8 +22,8 @@
 
 PneumaticarmModel::PneumaticarmModel()
 {
-    state_vector_.resize(2);
-    state_derivative_.resize(2);
+    state_vector_.resize(4);
+    state_derivative_.resize(4);
     control_vector_.resize(2);
 }
 
@@ -62,23 +62,27 @@ void PneumaticarmModel::computeStateDerivative(double time)
     double k = 1.25;
     double ro = 0.0085;
     double R = 0.015;
-    double m = 5;
+    double m = 4;
     double I = 0.07;
     double link_l = 0.12;
+    double time_constant = 0.2;
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
                
     K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
     K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
-    fv = 0.1*Tmax/3;
+    fv = 0.1*Tmax/5;
     state_derivative_[0] = state_vector_[1];
             
-    state_derivative_[1] = (K1/I)*(control_vector_[0] - control_vector_[1]) 
-                            - (K2/I)*(control_vector_[0] + control_vector_[1])*state_vector_[0]
+    state_derivative_[1] = (K1/I)*(state_vector_[2] - state_vector_[3]) 
+                            - (K2/I)*(state_vector_[2] + state_vector_[3])*state_vector_[0]
                             -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
                             -(fv/I)*state_vector_[1];
-   
+    state_derivative_[2] = (1/time_constant)*(-state_vector_[2] + control_vector_[0]);
+
+    state_derivative_[3] = (1/time_constant)*(-state_vector_[3] + control_vector_[1]);
+
     ODEBUGL("State derivative: "<< state_derivative_[0],0);
     }
  
@@ -87,38 +91,38 @@ void PneumaticarmModel::computeStateDerivative(double time)
 void PneumaticarmModel::integrateRK4 (double t, double h)
 {
     vector<double> st1, st2, st3, st4;
-    st1.resize(2);
-    st2.resize(2);
-    st3.resize(2);
-    st4.resize(2);
+    st1.resize(4);
+    st2.resize(4);
+    st3.resize(4);
+    st4.resize(4);
     computeStateDerivative (t);
-    for (unsigned int i =0; i <2; i++)
+    for (unsigned int i =0; i <4; i++)
     {
         st1[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
     }
-    ODEBUGL("After St1 inside integrtorrk4" << state_vector_[0], 4);
+    ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
 
     computeStateDerivative (t + (0.5 * h));
-    for (unsigned int i =0; i <2; i++)
+    for (unsigned int i =0; i <4; i++)
     {
         st2[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + 0.5*h*st2[i];
     }
         
    computeStateDerivative (t + (0.5 * h));
-   for (unsigned int i =0; i <2; i++)
+   for (unsigned int i =0; i <4; i++)
    {
         st3[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + h*st3[i];
    }
    
    computeStateDerivative (t + h);
-   for (unsigned int i =0; i <2; i++)
+   for (unsigned int i =0; i <4; i++)
         st4[i] = state_derivative_[i];
   
   
-   for (unsigned int i =0; i <2; i++)
+   for (unsigned int i =0; i <4; i++)
        state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
    ODEBUGL("State vector: " << state_vector_[0],0);
 }

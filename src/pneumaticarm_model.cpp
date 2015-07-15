@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <iostream>
+#include <cmath>
 //#include <native/task.h>
 //#include <native/timer.h>
 #include <time.h>
@@ -55,7 +56,7 @@ void PneumaticarmModel::setParameters (void)
 void PneumaticarmModel::computeStateDerivative(double time)
 {
     //VectorXd state_derivative(statevector.size());
-    double Tmax, fv, a, b, K1, K2;        
+    double Tmax, fk,fs, a, b, K1, K2;        
     double lo = 0.185;
     double alphao = 20.0*PI/180;
     double epsilono = 0.15;
@@ -63,22 +64,32 @@ void PneumaticarmModel::computeStateDerivative(double time)
     double ro = 0.0085;
     double R = 0.015;
     double m = 4;
-    double I = 0.07;
+    double I = 0.05;
     double link_l = 0.12;
     double time_constant = 0.2;
+    double velocity_constant = 0.15;
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
                
     K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
     K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
-    fv = 0.1*Tmax/5;
+    fk = 0.01*Tmax;
+    fs = fk/10;
+    double fadd;// (fs -fk)*( state_vector_[2]*exp(-R*state_vector_[1]/velocity_constant) + state_vector_[3]*exp(-R*state_vector_[1]/velocity_constant) )*state_vector_[1];
+    if(state_vector_[1] >= 0)
+        fadd = (fs-fk)*exp(-R*abs(state_vector_[1])/velocity_constant);
+    else
+        fadd = -1*(fs-fk)*exp(-R*abs(state_vector_[1])/velocity_constant);
+
     state_derivative_[0] = state_vector_[1];
-            
+    
+
     state_derivative_[1] = (K1/I)*(state_vector_[2] - state_vector_[3]) 
                             - (K2/I)*(state_vector_[2] + state_vector_[3])*state_vector_[0]
                             -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
-                            -(fv/I)*state_vector_[1];
+                            -(fk/I)*state_vector_[1] - (fadd/I)*state_vector_[1];
+
     state_derivative_[2] = (1/time_constant)*(-state_vector_[2] + control_vector_[0]);
 
     state_derivative_[3] = (1/time_constant)*(-state_vector_[3] + control_vector_[1]);

@@ -269,6 +269,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_controls_[i] = 0.0;
           }
 	}
+        controls_[6] = initconfig_controls_[6]+1;   // Step input open loop
+        controls_[7] = initconfig_controls_[7]-1;
     }
   if (CONTROLLER_TYPE_ == 2)
     {

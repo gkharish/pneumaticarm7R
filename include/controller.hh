@@ -14,6 +14,7 @@
 #include <cmath>
 #include <time.h>
 #include <math.h>
+#include <random>
 #define PI 3.14159265
 #include "shared_memory.hh"
 #include "pneumaticarm_model.hh"
@@ -72,7 +73,9 @@ public:
   void SetStepResponse();
   double GetUpdateDelta(unsigned int idx);
   bool GetJointNum(unsigned int idx);
-  
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::normal_distribution <> d(0,2);
 protected:
   // Pointer to the shared memory
   double * shmaddr_;

@@ -4,6 +4,7 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <random>
 
 #include <tgmath.h>
 #include <native/task.h>
@@ -13,7 +14,8 @@
 #include <controller.hh>
 #include <shared_memory.hh>
 #include <pneumaticarm_model.hh>
-//using namespace Eigen;
+using namespace std;
+
 
 //PneumaticarmModel model;
 void principale_controller_function(void *arg)
@@ -307,12 +309,25 @@ void Controller::ComputeControlLaw(long double timestep)
 	    }
 	}
       double wn = 6;
-      double delc = 0.2*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9)))+ (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 0.2*(sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
-                                (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+ (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );
-      double delc1 = 
+      double delc = 0.2*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9)))+ 
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );
+      double tim = loop_reference_traj_[3]*timestep/1.0e9;
+      double delc1;
+      double step_time = 1.5;
+      double step_amp = 0.1;
+      bool exit = false;
+      int lp  = (int)(tim/step_time);
+      //delc1 = step_amp*lp;
 
-    controls_[6] = 0.2 + 2 + delc;
-    controls_[7] = 4.0 - 2 - delc;
+      delc1 = d(gen);
+     if(delc1 > 2)
+              delc1 = 2;
+     
+    controls_[6] = 0.2 + 2 + delc1;
+    controls_[7] = 4.0 - 2 - delc1;
     }
 
 

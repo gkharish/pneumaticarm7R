@@ -269,8 +269,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_controls_[i] = 0.0;
           }
 	}
-        controls_[6] = initconfig_controls_[6]+1;   // Step input open loop
-        controls_[7] = initconfig_controls_[7]-1;
+        controls_[6] = initconfig_controls_[6]+2;   // Step input open loop
+        controls_[7] = initconfig_controls_[7]-2;
     }
   if (CONTROLLER_TYPE_ == 2)
     {
@@ -294,7 +294,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
 	      PidController(error_now_[i], error_derivative_[i],i);
               SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
-	      loop_reference_traj_[i]++;
+              loop_reference_traj_[i]++;
 	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
 	    }
 	  else
@@ -306,6 +306,13 @@ void Controller::ComputeControlLaw(long double timestep)
 
 	    }
 	}
+      double wn = 6;
+      double delc = 0.2*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9)))+ (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 0.2*(sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
+                                (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+ (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );
+      double delc1 = 
+
+    controls_[6] = 0.2 + 2 + delc;
+    controls_[7] = 4.0 - 2 - delc;
     }
 
 

@@ -52,10 +52,10 @@ NCursesUI::NCursesUI(Controller *aController):
 
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
-    0.0, 0.0, 0.0, 0.0, 2.0,
-    2.0, 0.2, 4.0, 1.1, 1.1,
-    1.0, 1.0, 0.0, 0.0, 
-    1.0, 1.0};
+    0.0, 0.0, 0.0, 0.0, 1.0,
+    1.0, 0.2, 4.0, 0.1, 0.1,
+    0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0};
   
   ODEBUGL(" Controler:" << Controller_,3);
   if (Controller_!=0)
@@ -94,6 +94,11 @@ void NCursesUI::HandlingKeyboard()
         { 
            Controller_->SetControllerType(2);
            controller_type_flag = 1;
+        }
+     if (c=='o') 
+        { 
+           Controller_->SetControllerType(1);
+           //controller_type_flag = 1;
         }
        if (c=='m')
          {

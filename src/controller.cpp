@@ -4,7 +4,7 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#include <random>
+// #include <random>
 
 #include <tgmath.h>
 #include <native/task.h>
@@ -131,7 +131,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   now, TASK_PERIOD = 5e6;//1000000; ..present,
+  RTIME   now, TASK_PERIOD = 10e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   int loop = 0;
   /*Plant Model object created*/
@@ -320,14 +320,15 @@ void Controller::ComputeControlLaw(long double timestep)
       double step_amp = 0.1;
       bool exit = false;
       int lp  = (int)(tim/step_time);
-      //delc1 = step_amp*lp;
-
-      delc1 = d(gen);
+      delc1 = step_amp*lp;
+     // delc1 = 0.02*(rand()%100); 
+      //delc1 = d(gen);
      if(delc1 > 2)
               delc1 = 2;
-     
-    controls_[6] = 0.2 + 2 + delc1;
-    controls_[7] = 4.0 - 2 - delc1;
+    double init_pres1 = initconfig_controls_[6];
+    double init_pres2 = initconfig_controls_[7];
+    controls_[6] = init_pres1 + 1.5 ;
+    controls_[7] = init_pres2 + 1.5 ;
     }
 
 

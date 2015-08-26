@@ -26,6 +26,7 @@ class PneumaticarmModel
             float pressure_muscle1_, pressure_muscle2_, pressure_musclebase_;
             
             int nDOF_;
+           unsigned int n_;
             std::vector<double> state_vector_;
             std::vector<double> state_derivative_;
             std::vector<double> control_vector_;

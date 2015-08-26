@@ -178,14 +178,15 @@ void Controller::ApplyControlLaw()
     newstate[1] = 0;
     u[0] = 2.5;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
     u[1] = 2.5;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
-    simulated_initconfig_controls_[6] = 2.5; 
-    simulated_initconfig_controls_[7] = 2.5; 
+    simulated_initconfig_controls_[6] = 0; 
+    simulated_initconfig_controls_[7] = 0; 
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_StateVector(0, i);
-    for (unsigned int i =2; i<4; i++)
-          modelp -> Set_StateVector(2.5, i);
+  
+    //for (unsigned int i =2; i<4; i++)
+    //      modelp -> Set_StateVector(2.5, i);
   while(1)
     {
       // Waiting the next iteration
@@ -221,7 +222,7 @@ void Controller::ApplyControlLaw()
       t = present_time - previous_time;
       modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
-      ODEBUGL("DEbug after integrator", 1);
+      ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
 
       for (unsigned int i=0; i<2; i++)
           previous_state[i] = newstate[i];
@@ -391,8 +392,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
    
-  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 1.8; //simulated_delta_[joint_num];
-  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 1.8;//simulated_delta_[joint_num];
+  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 2.0; //simulated_delta_[joint_num];
+  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 2.0;//simulated_delta_[joint_num];
 
 
   /*if (control_limit_agonistic  <=4.5 && control_limit_agonistic >=0)

@@ -391,8 +391,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
    
-  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + simulated_delta_[joint_num];
-  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - simulated_delta_[joint_num];
+  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 1.8; //simulated_delta_[joint_num];
+  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 1.8;//simulated_delta_[joint_num];
 
 
   /*if (control_limit_agonistic  <=4.5 && control_limit_agonistic >=0)

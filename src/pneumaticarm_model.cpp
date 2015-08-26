@@ -88,7 +88,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
     state_derivative_[1] = (K1/I)*(state_vector_[2] - state_vector_[3]) 
                             - (K2/I)*(state_vector_[2] + state_vector_[3])*state_vector_[0]
                             -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
-                            -(fk/I)*state_vector_[1];// - (fadd/I)*state_vector_[1];
+                            -(fk/I)*state_vector_[1]- (fadd/I)*state_vector_[1];
 
     state_derivative_[2] = (1/time_constant)*(-state_vector_[2] + control_vector_[0]);
 

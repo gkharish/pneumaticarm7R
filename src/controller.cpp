@@ -139,6 +139,7 @@ void Controller::ApplyControlLaw()
   if(modelp!=0)
       ODEBUGL("Pneumatic model object is created",4);
   modelp -> setProblemDimension(1);
+  modelp -> setParameters();
   //model -> server_start();
   double integrator_timestep = 0.001;
   vector<double> previous_state, newstate,  u;

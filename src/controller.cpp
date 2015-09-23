@@ -177,10 +177,10 @@ void Controller::ApplyControlLaw()
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
-    u[0] = 2.5;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
-    u[1] = 2.5;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
-    simulated_initconfig_controls_[6] = 0; 
-    simulated_initconfig_controls_[7] = 0; 
+    u[0] = 0;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
+    u[1] = 0;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
+    simulated_initconfig_controls_[6] = 0.0; 
+    simulated_initconfig_controls_[7] = 0.0; 
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
     for (unsigned int i =0; i<2; i++)
@@ -393,7 +393,7 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
    
-  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 2.0; //simulated_delta_[joint_num];
+  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 2.5; //simulated_delta_[joint_num];
   double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 2.0;//simulated_delta_[joint_num];
 
 

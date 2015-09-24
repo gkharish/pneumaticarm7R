@@ -76,9 +76,9 @@ void PneumaticarmModel::computeStateDerivative(double time)
     K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
     K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
     Tmax = 5*K1;
-    fk = 0.02*Tmax;
+    fk = 0.03*Tmax;
     fs = fk/10;
-    P_m = 2.5;
+    P_m = 2.1;
     double fadd;// (fs -fk)*( state_vector_[2]*exp(-R*state_vector_[1]/velocity_constant) + state_vector_[3]*exp(-R*state_vector_[1]/velocity_constant) )*state_vector_[1];
     if(state_vector_[1] >= 0)
         fadd = (fs-fk)*exp(-R*abs(state_vector_[1])/velocity_constant);
@@ -90,7 +90,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
 
     state_derivative_[1] = (K1/I)*(2*control_vector_[0]) 
                             - (K2/I)*(2*P_m)*state_vector_[0]
-                            -(m*GRAVITY*link_l/I)*sin(state_vector_[0]) 
+                            -(m*GRAVITY*link_l/(2*I))*sin(state_vector_[0]) 
                             -(fk/I)*state_vector_[1];//- (fadd/I)*state_vector_[1];
 
     //state_derivative_[2] = (1/time_constant)*(-state_vector_[2] + control_vector_[0]);

@@ -330,7 +330,7 @@ void Controller::ComputeControlLaw(long double timestep)
     double init_pres1 = initconfig_controls_[6];
     double init_pres2 = initconfig_controls_[7];
     controls_[6] = init_pres1 + 1.5 ;
-    controls_[7] = init_pres2 + 1.5 ;
+    controls_[7] = init_pres2 - 1.5 ;
     }
 
 
@@ -393,8 +393,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
    
-  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 2.5; //simulated_delta_[joint_num];
-  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 2.0;//simulated_delta_[joint_num];
+  double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 1.5; //simulated_delta_[joint_num];
+  double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 1.5;//simulated_delta_[joint_num];
 
 
   /*if (control_limit_agonistic  <=4.5 && control_limit_agonistic >=0)
@@ -417,8 +417,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
     }*/
      
 
-  simulated_controls_[2*joint_num] = simulated_control_limit_agonistic;
-  simulated_controls_[2*joint_num+1] = simulated_control_limit_antagonistic;
+  simulated_controls_[2*joint_num] = 1.5; //simulated_control_limit_agonistic;
+  simulated_controls_[2*joint_num+1] = 1.5; //simulated_control_limit_antagonistic;
    
   ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
   ODEBUGL("Simulated Pid command : " << delta[joint_num],4);

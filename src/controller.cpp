@@ -221,6 +221,8 @@ void Controller::ApplyControlLaw()
       now = rt_timer_read();
       present_time = now/1.0e9;
       t = present_time - previous_time;
+      /* Ste*/
+
       modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
@@ -310,27 +312,27 @@ void Controller::ComputeControlLaw(long double timestep)
 
 	    }
 	}
-      double wn = 6;
-      double delc = 0.2*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9)))+ 
+      double wn = 0.2;
+      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9))) );/*+ 
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );*/
       double tim = loop_reference_traj_[3]*timestep/1.0e9;
       double delc1;
       double step_time = 1.5;
       double step_amp = 0.1;
       bool exit = false;
       int lp  = (int)(tim/step_time);
-      delc1 = step_amp*lp;
-     // delc1 = 0.02*(rand()%100); 
+      delc1 = tim/2;//step_amp*lp;
+      //delc1 = 0.02*(rand()%100); 
       //delc1 = d(gen);
-     if(delc1 > 2)
-              delc1 = 2;
-    double init_pres1 = initconfig_controls_[6];
-    double init_pres2 = initconfig_controls_[7];
-    controls_[6] = init_pres1 + 1.5 ;
-    controls_[7] = init_pres2 - 1.5 ;
+     if(delc1 > 3)
+              delc1 = 3;
+    double init_pres1 = initconfig_controls_[6] ;
+    double init_pres2 = initconfig_controls_[7] ;
+    controls_[6] = init_pres1 + delc1 ;
+    controls_[7] = init_pres2 - delc1 ;
     }
 
 
@@ -417,8 +419,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
     }*/
      
 
-  simulated_controls_[2*joint_num] = 1.5; //simulated_control_limit_agonistic;
-  simulated_controls_[2*joint_num+1] = 1.5; //simulated_control_limit_antagonistic;
+  simulated_controls_[2*joint_num] = 3.5 ;//controls_[6] - initconfig_controls_[6]; //simulated_control_limit_agonistic;
+  simulated_controls_[2*joint_num+1] = 3.5 ;//controls_[7] -initconfig_controls_[7]; //simulated_control_limit_antagonistic;
    
   ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
   ODEBUGL("Simulated Pid command : " << delta[joint_num],4);

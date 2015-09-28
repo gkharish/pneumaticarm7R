@@ -57,7 +57,7 @@ void PneumaticarmModel::setParameters (void)
 void PneumaticarmModel::computeStateDerivative(double time)
 {
     //VectorXd state_derivative(statevector.size());
-    double Tmax, fk,fs, a, b, K1, K2, P_m;        
+    double Tmax, fk,fs, a, b, K1, K2, P_m1, P_m2;        
     double lo = 0.185;
     double alphao = 20.0*PI/180;
     double epsilono = 0.15;
@@ -78,7 +78,8 @@ void PneumaticarmModel::computeStateDerivative(double time)
     Tmax = 5*K1;
     fk = 0.03*Tmax;
     fs = fk/10;
-    P_m = 2.1;
+    P_m1 = 0.675;
+    P_m2 = 4.0;
     double fadd;// (fs -fk)*( state_vector_[2]*exp(-R*state_vector_[1]/velocity_constant) + state_vector_[3]*exp(-R*state_vector_[1]/velocity_constant) )*state_vector_[1];
     if(state_vector_[1] >= 0)
         fadd = (fs-fk)*exp(-R*abs(state_vector_[1])/velocity_constant);
@@ -88,8 +89,8 @@ void PneumaticarmModel::computeStateDerivative(double time)
     state_derivative_[0] = state_vector_[1];
     
 
-    state_derivative_[1] = (K1/I)*(2*control_vector_[0]) 
-                            - (K2/I)*(2*P_m)*state_vector_[0]
+    state_derivative_[1] = (K1/I)*(2*control_vector_[0] ) 
+                            - (K2/I)*(P_m1 + P_m2)*state_vector_[0]
                             -(m*GRAVITY*link_l/(2*I))*sin(state_vector_[0]) 
                             -(fk/I)*state_vector_[1];//- (fadd/I)*state_vector_[1];
 

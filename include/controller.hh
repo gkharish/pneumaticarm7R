@@ -18,6 +18,7 @@
 #define PI 3.14159265
 #include "shared_memory.hh"
 #include "pneumaticarm_model.hh"
+#include "MPCcontroller.hh"
 using namespace std;
 //using namespace Eigen;
 class Controller 
@@ -66,6 +67,9 @@ public:
   void  SimulatedPidController(double error, double error_derivative , int joint_num);
   //double GetPidParameter();
   //void SetPidParameter();
+  /* MPC controller */
+  MPCcontroller mpc_controller;
+  double mpc_u;
   double  MeanPressure(int);
  /** \ Reference generator function   */
   double GetDesiredPosition(unsigned int idx);

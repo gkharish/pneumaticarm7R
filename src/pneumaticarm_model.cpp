@@ -57,29 +57,40 @@ void PneumaticarmModel::setParameters (void)
 void PneumaticarmModel::computeStateDerivative(double time)
 {
     //VectorXd state_derivative(statevector.size());
-    double Tmax, fk,fs, a, b, K1, K2, P_m1, P_m2;        
+    double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
     double lo = 0.185;
     double alphao = 20.0*PI/180;
     double epsilono = 0.15;
     double k = 1.25;
     double ro = 0.0085;
     double R = 0.015;
-    double m = 2.75;
+    double m = 2.5;
     double link_l = 0.32;
     double time_constant = 0.1;
     double velocity_constant = 0.15;
-    double I = 0.25*m*link_l*link_l/3; //0.0036;
+    double I = m*link_l*link_l/3; //0.0036;
+    double term1, term2, term3, Po_1, Po_2, epsilono1, epsilono2;
 
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
                
-    K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
-    K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;
+    /*K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
+    K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;*/
+    Po_1 = 0.67*1e5;
+    Po_2 = 4.0*1e5;
+    epsilono1 = 0.05;
+    epsilono2 = 0.25;
+    term1 = Po_1*(1 - (2*k*epsilono1));
+    term2 = Po_2*(1 - (2*k*epsilono2));
+    K0 = a*(term1 - term2) - b*(Po_1 - Po_2);
+    term3 = 1 - k*(epsilono1 + epsilono2);
+    K1 = 2* (a*term3 - b)*1e5;
+    K2 = 2*a*k*R*(Po_1 + Po_2)/lo;
     Tmax = 5*K1;
-    fk = 0.03*Tmax;
+    fk = 0.1*Tmax*1e-6;
     fs = fk/10;
-    P_m1 = 0.675;
-    P_m2 = 4.0;
+    //P_m1 = 0.675;
+    //P_m2 = 4.0;
     double fadd;// (fs -fk)*( state_vector_[2]*exp(-R*state_vector_[1]/velocity_constant) + state_vector_[3]*exp(-R*state_vector_[1]/velocity_constant) )*state_vector_[1];
     if(state_vector_[1] >= 0)
         fadd = (fs-fk)*exp(-R*abs(state_vector_[1])/velocity_constant);
@@ -89,11 +100,14 @@ void PneumaticarmModel::computeStateDerivative(double time)
     state_derivative_[0] = state_vector_[1];
     
 
-    state_derivative_[1] = (K1/I)*(2*control_vector_[0] ) 
+   /* state_derivative_[1] = (K1/I)*(2*control_vector_[0] ) 
                             - (K2/I)*(P_m1 + P_m2)*state_vector_[0]
                             -(m*GRAVITY*link_l/(2*I))*sin(state_vector_[0]) 
-                            -(fk/I)*state_vector_[1];//- (fadd/I)*state_vector_[1];
-
+                            -(fk/I)*state_vector_[1];//- (fadd/I)*state_vector_[1];*/
+    
+    state_derivative_[1] = (PI*pow(ro,2))*(R/I)*(K0 + K1*control_vector_[0] - K2*state_vector_[0]) 
+                                        - (m*GRAVITY*link_l*0.5/I)*sin(state_vector_[0])
+                                        - (fk/I)*state_vector_[1];
     //state_derivative_[2] = (1/time_constant)*(-state_vector_[2] + control_vector_[0]);
 
     //state_derivative_[3] = (1/time_constant)*(-state_vector_[3] + control_vector_[1]);

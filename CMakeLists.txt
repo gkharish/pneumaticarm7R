@@ -47,16 +47,14 @@ SET(${PROJECT_NAME}_HEADERS
 	include/port.hh
         include/pneumaticarm_model.hh
 	include/main_controleur.hh
-  include/test_config.hh
-
-)
-SET(CXX_DISABLE_WERROR TRUE)
-
-ADD_REQUIRED_DEPENDENCY ("libxenomai_native")
-ADD_REQUIRED_DEPENDENCY ("libxenomai_rtdm")
-ADD_REQUIRED_DEPENDENCY ("libxenomai_vxworks")
-ADD_REQUIRED_DEPENDENCY ("ncurses")
-
+        include/dynamicmodel.h
+        include/config.h
+        include/costfunction.h
+        include/costfunctionpneumaticarmelbow.h
+        include/ilqrsolver.h
+        include/MPCcontroller.hh
+        include/pneumaticarmelbowlinear.
+    )
 SETUP_PROJECT()
 
 SEARCH_FOR_BOOST()

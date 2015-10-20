@@ -282,7 +282,27 @@ void Controller::ComputeControlLaw(long double timestep)
     {
       //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
       // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
-   
+   double wn = 0.2;
+      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9))) );/*+ 
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );*/
+      double tim = loop_reference_traj_[3]*timestep/1.0e9;
+      double delc1;
+      double step_time = 1.5;
+      double step_amp = 0.1;
+      bool exit = false;
+      int lp  = (int)(tim/step_time);
+      delc1 = tim/2;//step_amp*lp;
+      //delc1 = 0.02*(rand()%100); 
+      //delc1 = d(gen);
+     if(delc1 > 3)
+              delc1 = 3;
+    double init_pres1 = initconfig_controls_[2] ;
+    double init_pres2 = initconfig_controls_[3] ;
+    
+
       for (unsigned int i =0; i<7; i++)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
@@ -301,7 +321,12 @@ void Controller::ComputeControlLaw(long double timestep)
 	      PidController(error_now_[i], error_derivative_[i],i);
               SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
-	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
+              mpc_u = mpc_controller.GetControl(positions_[i], ref_traj_[i]);
+              controls_[2*i] =  initconfig_controls_[2*i]+ mpc_u;
+              controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
+              simulated_controls_[2*i] = 0.5;
+              simulated_controls_[2*i +1] = 0.5;
+	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
 	    }
 	  else
 	    {
@@ -312,27 +337,7 @@ void Controller::ComputeControlLaw(long double timestep)
 
 	    }
 	}
-      double wn = 0.2;
-      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9))) );/*+ 
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );*/
-      double tim = loop_reference_traj_[3]*timestep/1.0e9;
-      double delc1;
-      double step_time = 1.5;
-      double step_amp = 0.1;
-      bool exit = false;
-      int lp  = (int)(tim/step_time);
-      delc1 = tim/2;//step_amp*lp;
-      //delc1 = 0.02*(rand()%100); 
-      //delc1 = d(gen);
-     if(delc1 > 3)
-              delc1 = 3;
-    double init_pres1 = initconfig_controls_[6] ;
-    double init_pres2 = initconfig_controls_[7] ;
-    controls_[6] = init_pres1 + delc1 ;
-    controls_[7] = init_pres2 - delc1 ;
+         
     }
 
 

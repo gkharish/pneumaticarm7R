@@ -92,6 +92,8 @@ public:
 
   // Positions values 
   std::vector<double> positions_;
+  std::vector<double> position_store_;
+  std::vector<double> xstate_;
   std::vector<double> simulated_positions_;
 
   // Control values

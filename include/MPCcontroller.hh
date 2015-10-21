@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <vector>
 #include "config.h"
 
 #include "ilqrsolver.h"
@@ -11,9 +11,9 @@
 /*#include "romeosimpleactuator.h"
 #include "romeolinearactuator.h"
 #include "costfunctionromeoactuator.h"*/
-#include "pneumaticarm2ordermodel.h"
+//#include "pneumaticarm2ordermodel.h"
 #include "pneumaticarmelbowlinear.h"
-#include "pneumaticarmelbowpiecelinear.h"
+// #include "pneumaticarmelbowpiecelinear.h"
 #include "costfunctionpneumaticarmelbow.h"
 
 #include <time.h>
@@ -38,7 +38,7 @@ private:
     double stopCrit ;
     stateVec_t* xList;
     commandVec_t* uList;
-    ILQRSolver::traj lastTraj;
+    ILQRSolver::traj lastTraj;  // ofstream fichier("resultsMPC.csv",ios::out | ios::trunc);
 
     /* --- test on romeo actuator --- */
     /*RomeoSimpleActuator romeoActuatorModel(dt);
@@ -47,14 +47,14 @@ private:
     ILQRSolver testSolverRomeoActuator(romeoActuatorModel,costRomeoActuator);*/
 
     /* --- test on pneumatic actuator --- */
-    PneumaticarmElbowLinear pneumaticarmElbowLinearModel(dt);
+   /* PneumaticarmElbowLinear pneumaticarmElbowLinearModel(double dt);
     CostFunctionPneumaticarmElbow costPneumaticArmElbow;
-    ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarmElbowLinearModel,costPneumaticArmElbow);
+    ILQRSolver iLQRsolverpneumaticarmElbowLinear(PneumaticarmElbowLinear pneumaticarmElbowLinearModel, CostFunctionPneumaticarmElbow costPneumaticArmElbow);*/
 
 public:
     MPCcontroller();
     virtual ~MPCcontroller();
-    double GetControl(double xfeedback, double reference);
+    double GetControl(vector<double>& xstate, double reference);
     double GetState();
 };
 

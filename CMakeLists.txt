@@ -53,8 +53,15 @@ SET(${PROJECT_NAME}_HEADERS
         include/costfunctionpneumaticarmelbow.h
         include/ilqrsolver.h
         include/MPCcontroller.hh
-        include/pneumaticarmelbowlinear.
-    )
+        include/pneumaticarmelbowlinear.h
+ )
+SET(CXX_DISABLE_WERROR TRUE)
+
+ADD_REQUIRED_DEPENDENCY ("libxenomai_native")
+ADD_REQUIRED_DEPENDENCY ("libxenomai_rtdm")
+ADD_REQUIRED_DEPENDENCY ("libxenomai_vxworks")
+ADD_REQUIRED_DEPENDENCY ("ncurses")
+
 SETUP_PROJECT()
 
 SEARCH_FOR_BOOST()
@@ -63,3 +70,4 @@ SEARCH_FOR_EIGEN()
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(application)
 SETUP_PROJECT_FINALIZE()
+

@@ -6,7 +6,7 @@
 #include <sys/time.h>
 // #include <random>
 
-#include <tgmath.h>
+//#include <tgmath.h>
 #include <native/task.h>
 #include <native/timer.h>
 
@@ -31,6 +31,8 @@ void principale_controller_function(void *arg)
 Controller::Controller()
 {
   positions_.resize(7);
+  position_store_.resize(4);
+  xstate_.resize(3);
   simulated_positions_.resize(7);
   controls_.resize(16);
   simulated_controls_.resize(16);
@@ -131,9 +133,11 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   now, TASK_PERIOD = 10e6;//1000000; ..present,
+  RTIME   now, TASK_PERIOD = 5e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
-  int loop = 0;
+  unsigned int loop = 0;
+  unsigned int filter_loop =0;
+  double velocity1 = 0, velocity2 = 0, acceleration = 0;
   /*Plant Model object created*/
   PneumaticarmModel *modelp = new PneumaticarmModel();
   if(modelp!=0)
@@ -142,6 +146,7 @@ void Controller::ApplyControlLaw()
   modelp -> setParameters();
   //model -> server_start();
   double integrator_timestep = 0.001;
+  double time_step = TASK_PERIOD/1e-9;
   vector<double> previous_state, newstate,  u;
              
         
@@ -201,9 +206,28 @@ void Controller::ApplyControlLaw()
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
-      ODEBUGL("DEbug Before referencegen", 4);
+      ODEBUGL("DEbug Before referencegen" << positions_store_[0], 0);
       //modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
+      //cout << "POSITION[3] = " << positions_[3] << endl;
+      
+      if(filter_loop <=2)
+      {
+          position_store_[2] = position_store_[1];
+          position_store_[1] = position_store_[0];
 
+          filter_loop++;
+      }
+      if(filter_loop ==3)
+          filter_loop = 0;
+      position_store_[0] = positions_[3]*3.14/180;
+
+      velocity1 = (position_store_[1] - position_store_[2])/time_step;
+      velocity2 = (position_store_[0] - position_store_[1])/time_step;
+
+      acceleration = (velocity2 - velocity1)/time_step;
+      xstate_[0] = position_store_[0];
+      xstate_[1] = velocity2;
+      xstate_[2] = acceleration;
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
@@ -321,9 +345,21 @@ void Controller::ComputeControlLaw(long double timestep)
 	      PidController(error_now_[i], error_derivative_[i],i);
               SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
-              mpc_u = mpc_controller.GetControl(positions_[i], ref_traj_[i]);
+              mpc_u = mpc_controller.GetControl(xstate_, ref_traj_[i]);
+                         
               controls_[2*i] =  initconfig_controls_[2*i]+ mpc_u;
               controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
+              
+              if(controls_[2*i +1] >=4.0)
+                  controls_[2*i +1] = 3.0;
+              else if (controls_[2*i+1] <= 0.0)
+                  controls_[2*i+1] = 0.0;
+              
+              if(controls_[2*i] >=4.0)
+                  controls_[2*i] = 3.0;
+              else if (controls_[2*i] <= 0.0)
+                  controls_[2*i] = 0.0;
+             
               simulated_controls_[2*i] = 0.5;
               simulated_controls_[2*i +1] = 0.5;
 	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);

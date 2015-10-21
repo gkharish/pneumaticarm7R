@@ -53,6 +53,15 @@ ADD_LIBRARY(${LIBRARY_NAME}
   shared_memory.cpp
   pneumatic_7arm_rt_thread.cpp
   pneumaticarm_model.cpp
+  
+  dynamicmodel.cpp
+  costfunction.cpp
+  costfunctionpneumaticarmelbow.cpp
+  ilqrsolver.cpp
+  MPCcontroller.cpp
+  pneumaticarmelbowlinear.cpp
+
+
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
   )
 

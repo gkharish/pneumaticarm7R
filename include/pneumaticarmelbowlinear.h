@@ -21,13 +21,13 @@ private:
     double dt;
     static const unsigned int stateNb=3;
     static const unsigned int commandNb=1;
-    static const double k=1000.0;
-    static const double R=200.0;
-    static const double Jm=138*1e-7;
-    static const double Jl=0.1;
+    //static const double k=1000.0;
+    //static const double R=200.0;
+    //static const double Jm=138*1e-7;
+    //static const double Jl=0.1;
     double fvm;
-    static const double Cf0=0.1;
-    static const double a=10.0;
+    //static const double Cf0=0.1;
+    //static const double a=10.0;
 
     stateMat_t Id;
     stateMat_t A;

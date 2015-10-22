@@ -53,7 +53,8 @@ SET(${PROJECT_NAME}_HEADERS
         include/costfunctionpneumaticarmelbow.h
         include/ilqrsolver.h
         include/MPCcontroller.hh
-        include/pneumaticarmelbowlinear.h
+        #include/pneumaticarmelbowlinear.h
+        include/pneumaticarm2ordermodel.h
  )
 SET(CXX_DISABLE_WERROR TRUE)
 

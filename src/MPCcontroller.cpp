@@ -1,9 +1,9 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-PneumaticarmElbowLinear pneumaticarmElbowLinearModel(dt);
+Pneumaticarm2orderModel pneumaticarm2orderModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
-ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarmElbowLinearModel, costPneumaticArmElbow);
+ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarm2orderModel, costPneumaticArmElbow);
 
 
 MPCcontroller::MPCcontroller()
@@ -47,7 +47,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, double reference)
     xinit(1) = xstate[1];
     xinit(2) = xstate[2];
 
-    xDes(0) = reference*3.14/180;
+    xDes(0) = 45*3.14/180;
     iLQRsolverpneumaticarmElbowLinear.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
     gettimeofday(&tbegin,NULL);

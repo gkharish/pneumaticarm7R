@@ -74,8 +74,8 @@ Controller::Controller()
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
   desired_position_[3] = 45;
-  ref_slope_[3] = 1;
-  ref_type_[3] = 1;
+  ref_slope_[3] = 2;
+  ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -258,8 +258,8 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[23] = (int)ref_traj_[3];
-      shmaddr_[24] = ( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      shmaddr_[24] = ref_traj_[3];
+      shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }

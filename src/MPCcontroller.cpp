@@ -12,9 +12,9 @@ MPCcontroller::MPCcontroller()
     xinit << 0.0,0.0,0.0;
     xDes << 0.0,0.0,0.0;
 
-    T = 40;
-    M = 400;
-    dt=10e-3;
+    T = 30;
+    //M = 400;
+    dt=5e-3;
     iterMax = 20;
     stopCrit = 1e-3;
   
@@ -77,7 +77,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, double reference)
 
 //    fichier.close();
 
-    return(uList[0](0,0));
+    return(uList[1](0,0));
 
 }
 

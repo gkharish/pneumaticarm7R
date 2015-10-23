@@ -59,8 +59,8 @@ ADD_LIBRARY(${LIBRARY_NAME}
   costfunctionpneumaticarmelbow.cpp
   ilqrsolver.cpp
   MPCcontroller.cpp
-  #pneumaticarmelbowlinear.cpp
-  pneumaticarmelbow2ndordermodel.cpp
+  pneumaticarmelbowlinear.cpp
+  # pneumaticarmelbow2ndordermodel.cpp
 
 
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}

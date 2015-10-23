@@ -32,7 +32,7 @@ Controller::Controller()
 {
   positions_.resize(7);
   position_store_.resize(4);
-  xstate_.resize(2);
+  xstate_.resize(3);
   simulated_positions_.resize(7);
   controls_.resize(16);
   simulated_controls_.resize(16);
@@ -77,7 +77,7 @@ Controller::Controller()
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
   desired_position_[3] = 45;
-  ref_slope_[3] = 10;
+  ref_slope_[3] = 5.0;
   ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
@@ -230,7 +230,7 @@ void Controller::ApplyControlLaw()
       acceleration = (velocity2 - velocity1)/time_step;
       xstate_[0] = position_store_[0];
       xstate_[1] = velocity2;
-      //xstate_[2] = acceleration;
+      xstate_[2] = acceleration;
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);

@@ -1,9 +1,9 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-Pneumaticarm2orderModel pneumaticarm2orderModel(dt);
+PneumaticarmElbowLinear pneumaticarmElbowModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
-ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarm2orderModel, costPneumaticArmElbow);
+ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarmElbowModel, costPneumaticArmElbow);
 
 
 MPCcontroller::MPCcontroller()

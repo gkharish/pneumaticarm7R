@@ -32,7 +32,7 @@ Controller::Controller()
 {
   positions_.resize(7);
   position_store_.resize(4);
-  xstate_.resize(3);
+  xstate_.resize(2);
   simulated_positions_.resize(7);
   controls_.resize(16);
   simulated_controls_.resize(16);
@@ -55,6 +55,9 @@ Controller::Controller()
   ref_init_.resize(7);
   ref_final_.resize(7);
   ref_traj_.resize(7);
+  ref_vel_.resize(7);
+  ref_acl_.resize(7);
+  reference_.resize(3);
   ref_slope_.resize(7);
   ref_type_.resize(7);
   desired_position_.resize(7);
@@ -74,7 +77,7 @@ Controller::Controller()
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
   desired_position_[3] = 45;
-  ref_slope_[3] = 2;
+  ref_slope_[3] = 10;
   ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
@@ -227,7 +230,7 @@ void Controller::ApplyControlLaw()
       acceleration = (velocity2 - velocity1)/time_step;
       xstate_[0] = position_store_[0];
       xstate_[1] = velocity2;
-      xstate_[2] = acceleration;
+      //xstate_[2] = acceleration;
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
@@ -345,7 +348,10 @@ void Controller::ComputeControlLaw(long double timestep)
 	      PidController(error_now_[i], error_derivative_[i],i);
               SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
-              mpc_u = mpc_controller.GetControl(xstate_, ref_traj_[i]);
+              reference_[0] = ref_traj_[i];
+              reference_[1] = ref_vel_[i];
+              reference_[2] = ref_acl_[i];
+              mpc_u = mpc_controller.GetControl(xstate_, reference_);
                          
               controls_[2*i] =  initconfig_controls_[2*i]+ mpc_u;
               controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
@@ -484,16 +490,31 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
     if(ref_init_[joint_num] <= ref_final_[joint_num])
     {
       if(ref_traj_[joint_num] >= ref_final_[joint_num])
+      {
 	ref_traj_[joint_num] = ref_final_[joint_num];
+        ref_vel_[joint_num] = 0;
+        ref_acl_[joint_num] = 0;
+      }
       else
-        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
+      { ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
+        ref_vel_[joint_num] = ref_slope_[joint_num];
+        ref_acl_[joint_num] = 0;
+      }
     }
   if(ref_init_[joint_num] >  ref_final_[joint_num])
     {
       if(ref_traj_[joint_num] <= ref_final_[joint_num])
+      {
 	ref_traj_[joint_num] = ref_final_[joint_num];
+        ref_vel_[joint_num] = 0;
+        ref_acl_[joint_num] = 0;
+      }
       else
+      {
         ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*(double)timestep;
+        ref_vel_[joint_num] = -ref_slope_[joint_num]; 
+        ref_acl_[joint_num] = 0;
+      }
     }
   }
   

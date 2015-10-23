@@ -133,7 +133,11 @@ public:
   std::vector<double>ref_init_;
   std::vector<double>ref_final_;
   std::vector<double>ref_traj_;
+  std::vector<double>ref_vel_;
+  std::vector<double>ref_acl_;
+  std::vector<double>reference_;
   std::vector<double>ref_slope_;
+  
   //double ref_step_;
   std::vector<double>desired_position_;
   std::vector<unsigned int>ref_type_;

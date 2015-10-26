@@ -60,7 +60,8 @@ ADD_LIBRARY(${LIBRARY_NAME}
   ilqrsolver.cpp
   MPCcontroller.cpp
   #pneumaticarmelbowlinear.cpp
-  pneumaticarmelbow2ndordermodel.cpp
+  # pneumaticarmelbow2ndordermodel.cpp
+  pneumaticarm3ordermodel.cpp
 
 
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}

@@ -252,6 +252,7 @@ void Controller::ApplyControlLaw()
 
       modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
+      simulated_positions_[2] = mpc_controller.GetState();
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
 
       for (unsigned int i=0; i<2; i++)
@@ -262,7 +263,8 @@ void Controller::ApplyControlLaw()
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
       shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      shmaddr_[18] = simulated_positions_[2];
+      shmaddr_[23] = 0;//(int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }

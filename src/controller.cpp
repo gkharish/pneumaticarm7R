@@ -261,8 +261,8 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      shmaddr_[24] = mpc_controller.GetState();//ref_traj_[3];
+      //shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }
@@ -345,8 +345,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_prev_[i]  = simulated_error_now_[i];
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
-	      PidController(error_now_[i], error_derivative_[i],i);
-              SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
+	      //PidController(error_now_[i], error_derivative_[i],i);
+              //SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
               reference_[0] = ref_traj_[i];
               reference_[1] = ref_vel_[i];

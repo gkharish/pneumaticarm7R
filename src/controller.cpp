@@ -28,9 +28,12 @@ void principale_controller_function(void *arg)
   }
 }
 
+
 Controller::Controller()
 {
   positions_.resize(7);
+  velocity_.resize(7);
+  acceleration_.resize(7);
   position_store_.resize(4);
   xstate_.resize(2);
   simulated_positions_.resize(7);
@@ -73,11 +76,11 @@ Controller::Controller()
   //Here parameters are inititalized to test jont num 4 the elbow joint 
   // Elbow
   P_[3] = 0.0005;
-  D_[3] = 0;
+  D_[3] = 0.000;
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
   desired_position_[3] = 45;
-  ref_slope_[3] = 10;
+  ref_slope_[3] = 5;
   ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
@@ -206,6 +209,7 @@ void Controller::ApplyControlLaw()
       for(unsigned int i=0;i<7;i++)
       {
         positions_[i] = shmaddr_[index++];
+        
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
@@ -223,6 +227,7 @@ void Controller::ApplyControlLaw()
       if(filter_loop ==3)
           filter_loop = 0;
       position_store_[0] = positions_[3]*3.14/180;
+      
 
       velocity1 = (position_store_[1] - position_store_[2])/time_step;
       velocity2 = (position_store_[0] - position_store_[1])/time_step;
@@ -230,6 +235,8 @@ void Controller::ApplyControlLaw()
       acceleration = (velocity2 - velocity1)/time_step;
       xstate_[0] = position_store_[0];
       xstate_[1] = velocity2;
+      velocity_[3] = velocity2;
+      acceleration_[3] = acceleration;
       //xstate_[2] = acceleration;
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
@@ -261,8 +268,11 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] = ref_traj_[3];
-      shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+     // shmaddr_[24] = ref_traj_[3];
+      //shmaddr_[20] = velocity_[3];
+      //shmaddr_[21] = acceleration_[3];
+      //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
+      //shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }
@@ -321,7 +331,7 @@ void Controller::ComputeControlLaw(long double timestep)
       double step_amp = 0.1;
       bool exit = false;
       int lp  = (int)(tim/step_time);
-      delc1 = tim/2;//step_amp*lp;
+      delc1 = 3*tim;//step_amp*lp;
       //delc1 = 0.02*(rand()%100); 
       //delc1 = d(gen);
      if(delc1 > 3)
@@ -345,8 +355,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_prev_[i]  = simulated_error_now_[i];
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
-	      PidController(error_now_[i], error_derivative_[i],i);
-              SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
+	      // mpc_u = PidController(error_now_[i], error_derivative_[i],i);
+              //SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
               reference_[0] = ref_traj_[i];
               reference_[1] = ref_vel_[i];
@@ -357,12 +367,12 @@ void Controller::ComputeControlLaw(long double timestep)
               controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
               
               if(controls_[2*i +1] >=4.0)
-                  controls_[2*i +1] = 3.0;
+                  controls_[2*i +1] = 4.0;
               else if (controls_[2*i+1] <= 0.0)
                   controls_[2*i+1] = 0.0;
               
-              if(controls_[2*i] >=4.0)
-                  controls_[2*i] = 3.0;
+              if(controls_[2*i] >=3.75)
+                  controls_[2*i] = 3.75;
               else if (controls_[2*i] <= 0.0)
                   controls_[2*i] = 0.0;
              
@@ -389,7 +399,8 @@ void Controller::ResetControl(bool idx)
 {
   reset_control_ = idx;
 }
-void Controller::PidController(double error, double error_derivative, int joint_num)
+
+double Controller::PidController(double error, double error_derivative, int joint_num)
 {
   double update_delta;
   //  double error_acceptable_ = 1;
@@ -400,7 +411,7 @@ void Controller::PidController(double error, double error_derivative, int joint_
       delta[joint_num] = delta[joint_num]+update_delta;
     }
    
-  double control_limit_agonistic =  initconfig_controls_[2*joint_num]+ delta[joint_num];
+  /*double control_limit_agonistic =  initconfig_controls_[2*joint_num]+ delta[joint_num];
   double control_limit_antagonistic = initconfig_controls_[2*joint_num+1] - delta[joint_num];
 
 
@@ -428,7 +439,9 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
   ODEBUGL("Update delta:     " <<update_delta, 4);
-  ODEBUGL("Pid command : " << delta[joint_num],4);
+  ODEBUGL("Pid command : " << delta[joint_num],4);*/
+  return(delta[joint_num]);
+
 }
 
 void Controller::SimulatedPidController(double error, double error_derivative, int joint_num)

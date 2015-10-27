@@ -4,12 +4,12 @@ CostFunctionPneumaticarmElbow::CostFunctionPneumaticarmElbow()
 
 {
     Q <<1e-3*1.0, 0.0, 0.0,
-        0.0,0.0,0.0,
+        0.0,1e-3*1.0,0.0,
         0.0,0.0,0.0;
     Qf <<  1e-3*1.0,    0.0,    0.0,
-        0.0,    0.0 ,   0.0,
+        0.0,   1e-3*1.0 ,   0.0,
         0.0,    0.0,   0.0;
-    R << 0.000015;
+    R << 0.000020;
 
     lxx = Q;
     luu = R;

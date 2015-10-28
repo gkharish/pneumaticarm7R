@@ -43,13 +43,14 @@ MPCcontroller::MPCcontroller()
 
 double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& reference)
 {
-    /*xinit(0) = xstate[0];
+    xinit(0) = xstate[0];
     xinit(1) = xstate[1];
-    //xinit(2) = xstate[2];*/
+    xinit(2) = xstate[2];
 
+    //xDes(0) = 45*3.14/180;
     xDes(0) = reference[0]*3.14/180;
     xDes(1) = reference[1]*3.14/180;
-    //xDes(2) = reference[2]*3.14/180;
+    xDes(2) = reference[2]*3.14/180;
     //cout << "Reference position" << xDes(1) << endl;
 
     iLQRsolverpneumaticarmElbowLinear.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
@@ -62,7 +63,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
         lastTraj = iLQRsolverpneumaticarmElbowLinear.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        xinit = xList[1];
+        //xinit = xList[1];
         
         //cout << "mpc position: " << xList[1](0,0);
        // cout << "mpc control: " << uList[0](0,0);

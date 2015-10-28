@@ -146,6 +146,7 @@ public:
   
   std::vector<double> error_prev_;
   std::vector<double> simulated_error_prev_;
+  bool refflag_;
   /** ! Initialize the shared memory. */
   void InitSharedMemory();
 

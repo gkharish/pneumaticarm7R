@@ -271,7 +271,7 @@ void Controller::ApplyControlLaw()
      // shmaddr_[24] = ref_traj_[3];
       //shmaddr_[20] = velocity_[3];
       //shmaddr_[21] = acceleration_[3];
-      //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
+      shmaddr_[24] = mpc_controller.GetState()*180/3.14;
       //shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;

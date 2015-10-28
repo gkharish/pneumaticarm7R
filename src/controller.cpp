@@ -251,8 +251,8 @@ void Controller::ApplyControlLaw()
       /* Ste*/
 
       modelp -> integrateRK4(t, integrator_timestep);
-      simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
-      simulated_positions_[2] = mpc_controller.GetState();
+     // simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
+      simulated_positions_[2] = mpc_controller.GetState()*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
 
       for (unsigned int i=0; i<2; i++)
@@ -262,9 +262,9 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] = ref_traj_[3];
-      shmaddr_[18] = simulated_positions_[2];
-      shmaddr_[23] = 0;//(int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      shmaddr_[24] = ref_traj_[3]; //simulated_positions_[2]; 
+      //shmaddr_[18] = simulated_positions_[2];
+      //shmaddr_[23] = 0;//(int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }
@@ -347,8 +347,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_prev_[i]  = simulated_error_now_[i];
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
-	      PidController(error_now_[i], error_derivative_[i],i);
-              SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
+	      //PidController(error_now_[i], error_derivative_[i],i);
+             // SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
               reference_[0] = ref_traj_[i];
               reference_[1] = ref_vel_[i];
@@ -358,7 +358,7 @@ void Controller::ComputeControlLaw(long double timestep)
               controls_[2*i] =  initconfig_controls_[2*i]+ mpc_u;
               controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
               
-              if(controls_[2*i +1] >=4.0)
+             /* if(controls_[2*i +1] >=4.0)
                   controls_[2*i +1] = 3.0;
               else if (controls_[2*i+1] <= 0.0)
                   controls_[2*i+1] = 0.0;
@@ -366,7 +366,7 @@ void Controller::ComputeControlLaw(long double timestep)
               if(controls_[2*i] >=4.0)
                   controls_[2*i] = 3.0;
               else if (controls_[2*i] <= 0.0)
-                  controls_[2*i] = 0.0;
+                  controls_[2*i] = 0.0;*/
              
               simulated_controls_[2*i] = 0.5;
               simulated_controls_[2*i +1] = 0.5;

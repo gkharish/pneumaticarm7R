@@ -81,7 +81,7 @@ Controller::Controller()
   ref_init_[3] = 0;
   desired_position_[3] = 45;
   ref_slope_[3] = 5;
-  ref_type_[3] = 0;
+  ref_type_[3] = 2;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -268,10 +268,10 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-     // shmaddr_[24] = ref_traj_[3];
+        shmaddr_[24] = ref_traj_[3];
       //shmaddr_[20] = velocity_[3];
       //shmaddr_[21] = acceleration_[3];
-      shmaddr_[24] = mpc_controller.GetState()*180/3.14;
+      //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
       //shmaddr_[23] = (int)( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
@@ -541,7 +541,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-        ref_traj_[joint_num] = 30 + 30*(sin((double)timestep*2*PI/10 ));
+        ref_traj_[joint_num] = 20+25*(sin((double)timestep*2*PI/10 ));
       }
       else 
         ref_traj_[joint_num] = 25* sin((double)timestep*2*PI/10);

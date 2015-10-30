@@ -9,10 +9,10 @@ ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarmModel, costPneumaticArm
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit << 0.0,0.0,2.5;
+    xinit << 0.0,0.0,0.0;
     xDes << 0.0,0.0,0.0;
 
-    T = 80;
+    T =80;
     //M = 400;
     dt=5e-3;
     iterMax = 20;

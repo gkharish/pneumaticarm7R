@@ -3,13 +3,13 @@
 CostFunctionPneumaticarmElbow::CostFunctionPneumaticarmElbow()
 
 {
-    Q <<1e-3*1.0, 0.0, 0.0,
+    Q <<1*1.0, 0.0, 0.0,
         0.0,0.0,0.0,
         0.0,0.0,0.0;
-    Qf <<  1e-3*1.0,    0.0,    0.0,
+    Qf <<  1*1.0,    0.0,    0.0,
         0.0,    0.0 ,   0.0,
         0.0,    0.0,   0.0;
-    R << 0.00005;
+    R << 0.000001;
 
     lxx = Q;
     luu = R;

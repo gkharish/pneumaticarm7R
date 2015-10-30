@@ -35,7 +35,7 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
     A10 = dt*(m*g*0.5*link_l/I);
     A(1,1) = (-fv/I);
     A(1,2) = 2*K1/I;
-    A(2,2) = -1/time_constant;
+    A(2,2) = 0; //-1/time_constant;
     /*A(0,1) = 1.0;
     A(2,3) = 1.0;
     A(1,0) = -((k/Jl)+(k/(Jm*R*R)));
@@ -56,7 +56,7 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
 
     fxBase <<  1,                       dt,         0,
                dt*(-2*K2*Pm/I),     1 -(fv/I)*dt,   dt*2*K1/I,
-               0,                       0,           -1/time_constant;
+               0,                       0,           1;
     fxx[0].setZero();
     fxx[1].setZero();
     //fxx[2].setZero();
@@ -65,7 +65,7 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
     fxu[0].setZero();
     fxu[0].setZero();
     fuBase << 0.0,
-              2*K1/I;
+              0.0,
               1/time_constant;
     fu = dt* fuBase;
     fuu[0].setZero();

@@ -49,6 +49,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 
     xDes(0) = reference[0]*3.14/180;
     xDes(1) = reference[1]*3.14/180;
+    xDes << 1.0, 0.0, 0.0;
     //xDes(2) = reference[2]*3.14/180;
     //cout << "Reference position" << xDes(1) << endl;
 
@@ -87,7 +88,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 
 double MPCcontroller::GetState()
 {
-    return(xList[1](0,0));
+    return(xList[1](2,0));
 }
 
 MPCcontroller::~MPCcontroller()

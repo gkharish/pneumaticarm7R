@@ -45,7 +45,7 @@ private:
     stateMat_t Ad;
     stateR_commandC_t B;
     stateR_commandC_t Bd;
-    double A13atan,A10;
+    double A13atan,A10, A21;
     double A33atan;
     stateMat_t fx,fxBase;
     stateTens_t fxx;

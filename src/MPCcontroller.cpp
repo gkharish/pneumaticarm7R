@@ -88,7 +88,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 
 double MPCcontroller::GetState()
 {
-    return(xList[1](2,0));
+    return(xList[1](0,0));
 }
 
 MPCcontroller::~MPCcontroller()

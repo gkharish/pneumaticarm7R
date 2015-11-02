@@ -30,12 +30,13 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
     I = m*link_l*link_l/3;
     A.setZero();
     A(0,1) = 1.0;
-    A(1,0) = -2*K2*Pm/I;
+    A(1,2) = 1.0;
+    A(2,1) = -2*K2*Pm/I;
     
-    A10 = dt*(m*g*0.5*link_l/I);
-    A(1,1) = (-fv/I);
-    A(1,2) = 2*K1/I;
-    A(2,2) = -1/time_constant;
+    A21 = dt*(m*g*0.5*link_l/I);
+    A(2,2) = (-fv/I);
+    //A(1,2) = 2*K1/I;
+    //A(2,2) = -1/time_constant;
     /*A(0,1) = 1.0;
     A(2,3) = 1.0;
     A(1,0) = -((k/Jl)+(k/(Jm*R*R)));
@@ -49,14 +50,14 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
 */
     B <<  0.0,
           0.0,
-          1/time_constant;
+          (2*K1/I)/time_constant;
 
     Ad = (A*dt + Id);
     Bd = dt*B;
 
-    fxBase <<  1,                       dt,         0,
-               dt*(-2*K2*Pm/I),     1 -(fv/I)*dt,   dt*2*K1/I,
-               0,                       0,           1 - (dt/time_constant);
+    fxBase <<  1,                       dt,                          0.0,
+               0.0,                     1,                          dt,
+               0,                       dt*(-2*K2*Pm/I),           1 - (fv*dt/I);
     fxx[0].setZero();
     fxx[1].setZero();
     //fxx[2].setZero();
@@ -66,7 +67,7 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
     fxu[0].setZero();
     fuBase << 0.0,
               0.0,
-              1e5/time_constant;
+              (2*K1/I)/time_constant;
     fu = dt* fuBase;
     fuu[0].setZero();
     fux[0].setZero();
@@ -81,7 +82,7 @@ Pneumaticarm3orderModel::Pneumaticarm3orderModel(double& mydt)
 stateVec_t Pneumaticarm3orderModel::computeNextState(double& dt, const stateVec_t& X,const commandVec_t& U)
 {
     stateVec_t result = Ad*X + Bd*U;
-    result(1,0)-=A10*sin(X(0));
+    result(2,1)-=A21*cos(X(0))*X(1);
     //result(3,0)+=A33atan*atan(a*X(3,0));
 
     return result;
@@ -90,8 +91,11 @@ stateVec_t Pneumaticarm3orderModel::computeNextState(double& dt, const stateVec_
 void Pneumaticarm3orderModel::computeAllModelDeriv(double& dt, const stateVec_t& X,const commandVec_t& U)
 {
     fx = fxBase;
-    fx(1,0) -= A10*cos(X(0));
-    fxx[0](1,0)+= A10*sin(X(0));
+    fx(2,1) -= A21*cos(X(0));
+    fx(2,0) += A21*sin(X(0))*X(1);
+    fxx[0](2,1)+= A21*sin(X(0));
+    fxx[0](2,0)+= A21*cos(X(0))*X(1);
+
     //fxx[3](1,3) = -((2*dt*Jm*R)/(pi*Jl))*Cf0*((2*a*a*a*X(3,0))/((1+(a*a*X(3,0)*X(3,0)))*(1+(a*a*X(3,0)*X(3,0)))));
     //fxx[3](3,3) = +((2*dt*Cf0)/(pi*Jl))*((2*a*a*a*X(3,0))/((1+(a*a*X(3,0)*X(3,0)))*(1+(a*a*X(3,0)*X(3,0)))));
 }

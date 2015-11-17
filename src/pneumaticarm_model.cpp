@@ -183,7 +183,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
     VectorXd stNew = state + h*st;
     return (stNew);
 }*/
-double  PneumaticarmModel::InverseModel (double reference)
+double  PneumaticarmModel::InverseModel (vector<double>& reference)
 {
     //Parameters Muscles
     //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
@@ -204,9 +204,9 @@ double  PneumaticarmModel::InverseModel (double reference)
     
     double theta, theta_dot, theta_dot2;
     double a, b, t1, t2, Pmax, tor1, tor2, P_meanDes, Fmax, emax;
-    theta = reference;//%(t-1)*5*pi/180;         %ref_traj(1);
-    theta_dot = 0;//reference[1];//%5*pi/180;     %ref_traj(2);
-    theta_dot2 = 0;//reference[2];
+    theta = reference[0];//%(t-1)*5*pi/180;         %ref_traj(1);
+    theta_dot = reference[1];//%5*pi/180;     %ref_traj(2);
+    theta_dot2 = reference[2];
     //theta_dot3 = reference[3];
     //theta_dot4 = reference[4];
     Pmax = 4.0*1e5;

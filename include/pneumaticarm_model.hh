@@ -40,7 +40,7 @@ class PneumaticarmModel
                 //void setpidcoeff(int p, int i, int d);
                 void computeStateDerivative (double time);
                 void integrateRK4 (double time, double timeStep);
-                double InverseModel(double reference);
+                double InverseModel(vector<double>& reference);
                 // vector<double> integrateEuler (double time, double timeStep);
                 void Set_ControlVector(double value, unsigned int idx);
                 void Set_StateVector(double value, unsigned int idx);

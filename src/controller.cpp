@@ -224,9 +224,11 @@ void Controller::ApplyControlLaw()
       }
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
-      //modelp -> Set_StateVector(position_store_[3]*3.14/180, 0);
+      //modelp -> Get_StateVector(0);
       //cout << "POSITION[3] = " << positions_[3] << endl;
-      pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
+      //pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
+      pmodel -> Set_PositionFeedback(modelp -> Get_StateVector(0));
+
       if(filter_loop <=2)
       {
           position_store_[2] = position_store_[1];
@@ -389,7 +391,7 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[0] = ref_traj_[i];
               reference_[1] = ref_vel_[i];
               reference_[2] = ref_acl_[i];
-              Pdes_feedforward = modelp ->  InverseModel(reference_[0]);
+              Pdes_feedforward = modelp ->  InverseModel(reference_);
               //mpc_u = mpc_controller.GetControl(xstate_, reference_);
               u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;
               u_pres[1] = initconfig_controls_[7] - Pdes_feedforward;

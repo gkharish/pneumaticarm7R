@@ -158,7 +158,7 @@ void Controller::ApplyControlLaw()
   pmodel -> setParameters();
   //model -> server_start();
   double integrator_timestep = 0.005;
-  double time_step = TASK_PERIOD/1e-9;
+  double time_step = TASK_PERIOD/1e9;
   vector<double> previous_state, newstate,  u;
              
         
@@ -174,9 +174,9 @@ void Controller::ApplyControlLaw()
   clock_gettime(CLOCK_REALTIME, &spec);
   now  = spec.tv_sec;
   present_time = (spec.tv_nsec / 1.0e9);*/
-  //now = rt_timer_read();
-  //present_time = (double)now/1.0e9;
-  //previous_time = present_time;
+  now = rt_timer_read();
+  present_time = (double)now/1.0e9;
+  previous_time = present_time;
     
   for(unsigned int i=0; i <7; i++)
     {
@@ -224,7 +224,7 @@ void Controller::ApplyControlLaw()
       }
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
-      modelp -> Set_StateVector(position_store_[3]*3.14/180, 0);
+      //modelp -> Set_StateVector(position_store_[3]*3.14/180, 0);
       //cout << "POSITION[3] = " << positions_[3] << endl;
       pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
       if(filter_loop <=2)
@@ -266,12 +266,12 @@ void Controller::ApplyControlLaw()
      /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
       present_time = (spec.tv_nsec / 1.0e9); */
-      //now = rt_timer_read();
-      //present_time = (double)now/1.0e9;
-      //t = present_time - previous_time;
+      now = rt_timer_read();
+      present_time = (double)now/1.0e9;
+      t = present_time - previous_time;
       /* Ste*/
 
-      //modelp -> integrateRK4(t, integrator_timestep);
+      modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
       previous_time = present_time;
@@ -398,6 +398,7 @@ void Controller::ComputeControlLaw(long double timestep)
               pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
               controls_[2*i] = pmodel -> Get_StateVector(0);
               controls_[2*i+1] = pmodel -> Get_StateVector(2);
+
  
               
               if(controls_[2*i +1] >=4.0)

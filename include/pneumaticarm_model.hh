@@ -23,6 +23,7 @@ class PneumaticarmModel
             double length_;
             double mass_;
             double friction_;
+            double Torque_, TorqueDes_;
             float pressure_muscle1_, pressure_muscle2_, pressure_musclebase_;
             
             int nDOF_;
@@ -39,12 +40,14 @@ class PneumaticarmModel
                 //void setpidcoeff(int p, int i, int d);
                 void computeStateDerivative (double time);
                 void integrateRK4 (double time, double timeStep);
+                double InverseModel(double reference);
                 // vector<double> integrateEuler (double time, double timeStep);
                 void Set_ControlVector(double value, unsigned int idx);
                 void Set_StateVector(double value, unsigned int idx);
                 double Get_StateVector(unsigned idx);
                 double Get_ControlVector(unsigned int idx);
-                
+                double Get_Torque();
+                double Get_TorqueDes();
                 //VectorXd getControl (VectorXd statevector, double reference_position, double position);
    };
 

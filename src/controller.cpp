@@ -15,8 +15,8 @@
 #include <shared_memory.hh>
 #include <pneumaticarm_model.hh>
 using namespace std;
-
- PressureModel *pmodel = new PressureModel();
+PneumaticarmModel *modelp = new PneumaticarmModel();
+PressureModel *pmodel = new PressureModel();
 //PneumaticarmModel model;
 void principale_controller_function(void *arg)
 {
@@ -146,10 +146,10 @@ void Controller::ApplyControlLaw()
   double velocity1 = 0, velocity2 = 0, acceleration = 0;
   double u_pres[2] = {0, 0};
   /*Plant Model object created*/
-  PneumaticarmModel *modelp = new PneumaticarmModel();
+ 
   if(modelp!=0)
       ODEBUGL("Pneumatic model object is created",4);
-  modelp -> setProblemDimension(1);
+  modelp -> setProblemDimension(2);
   modelp -> setParameters();
  //PressureModel *pmodel = new PressureModel();
   if(pmodel!=0)
@@ -157,7 +157,7 @@ void Controller::ApplyControlLaw()
   //pmodel -> setProblemDimension(2);
   pmodel -> setParameters();
   //model -> server_start();
-  double integrator_timestep = 0.001;
+  double integrator_timestep = 0.005;
   double time_step = TASK_PERIOD/1e-9;
   vector<double> previous_state, newstate,  u;
              
@@ -174,9 +174,9 @@ void Controller::ApplyControlLaw()
   clock_gettime(CLOCK_REALTIME, &spec);
   now  = spec.tv_sec;
   present_time = (spec.tv_nsec / 1.0e9);*/
-  now = rt_timer_read();
-  present_time = now/1.0e9;
-  previous_time = present_time;
+  //now = rt_timer_read();
+  //present_time = (double)now/1.0e9;
+  //previous_time = present_time;
     
   for(unsigned int i=0; i <7; i++)
     {
@@ -199,7 +199,7 @@ void Controller::ApplyControlLaw()
     newstate[0] = previous_state[0];
     newstate[1] = 0;
     u[0] = 0;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
-    u[1] = 0;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
+    u[1] = 4;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
     simulated_initconfig_controls_[6] = 0.0; 
     simulated_initconfig_controls_[7] = 0.0; 
     for (unsigned int i =0; i<2; i++)
@@ -223,8 +223,8 @@ void Controller::ApplyControlLaw()
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
-      ODEBUGL("DEbug Before referencegen" << positions_store_[0], 0);
-      //modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
+      ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
+      modelp -> Set_StateVector(position_store_[3]*3.14/180, 0);
       //cout << "POSITION[3] = " << positions_[3] << endl;
       pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
       if(filter_loop <=2)
@@ -253,8 +253,8 @@ void Controller::ApplyControlLaw()
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
 
-      u[0] = simulated_controls_[6];
-      u[1] = simulated_controls_[7];
+      u[0] = controls_[6];
+      u[1] = controls_[7];
       for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
       ODEBUGL("DEbug after set_Controlvector", 4);
@@ -266,14 +266,15 @@ void Controller::ApplyControlLaw()
      /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
       present_time = (spec.tv_nsec / 1.0e9); */
-      now = rt_timer_read();
-      present_time = now/1.0e9;
-      t = present_time - previous_time;
+      //now = rt_timer_read();
+      //present_time = (double)now/1.0e9;
+      //t = present_time - previous_time;
       /* Ste*/
 
-      modelp -> integrateRK4(t, integrator_timestep);
+      //modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
+      previous_time = present_time;
      /* pmodel -> integrateRK4(t, integrator_timestep);
       controls_[6] = pmodel -> Get_StateVector(0);
       controls_[7] = pmodel -> Get_StateVector(2);
@@ -295,7 +296,7 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-        shmaddr_[24] = ref_traj_[3];
+        shmaddr_[24] = simulated_positions_[3];// ref_traj_[3];
       //shmaddr_[20] = velocity_[3];
       //shmaddr_[21] = acceleration_[3];
       //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
@@ -365,7 +366,7 @@ void Controller::ComputeControlLaw(long double timestep)
               delc1 = 3;
     double init_pres1 = initconfig_controls_[2] ;
     double init_pres2 = initconfig_controls_[3] ;
-    
+    double Pdes_feedforward;
 
       for (unsigned int i =0; i<7; i++)
 	{
@@ -388,9 +389,10 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[0] = ref_traj_[i];
               reference_[1] = ref_vel_[i];
               reference_[2] = ref_acl_[i];
-              mpc_u = mpc_controller.GetControl(xstate_, reference_);
-              u_pres[0] = initconfig_controls_[6] + mpc_u;
-              u_pres[1] = initconfig_controls_[7] - mpc_u;
+              Pdes_feedforward = modelp ->  InverseModel(reference_[0]);
+              //mpc_u = mpc_controller.GetControl(xstate_, reference_);
+              u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;
+              u_pres[1] = initconfig_controls_[7] - Pdes_feedforward;
               for (unsigned int i =0; i<2; i++)
                   pmodel -> Set_ControlVector(u_pres[i], i);
               pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);

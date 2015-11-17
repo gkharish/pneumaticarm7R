@@ -16,7 +16,7 @@
 #include <pneumaticarm_model.hh>
 using namespace std;
 
-
+ PressureModel *pmodel = new PressureModel();
 //PneumaticarmModel model;
 void principale_controller_function(void *arg)
 {
@@ -80,8 +80,8 @@ Controller::Controller()
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
   desired_position_[3] = 45;
-  ref_slope_[3] = 5;
-  ref_type_[3] = 2;
+  ref_slope_[3] = 15;
+  ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -144,12 +144,18 @@ void Controller::ApplyControlLaw()
   unsigned int loop = 0;
   unsigned int filter_loop =0;
   double velocity1 = 0, velocity2 = 0, acceleration = 0;
+  double u_pres[2] = {0, 0};
   /*Plant Model object created*/
   PneumaticarmModel *modelp = new PneumaticarmModel();
   if(modelp!=0)
       ODEBUGL("Pneumatic model object is created",4);
   modelp -> setProblemDimension(1);
   modelp -> setParameters();
+ //PressureModel *pmodel = new PressureModel();
+  if(pmodel!=0)
+      ODEBUGL("Pressure model object is created",4);
+  //pmodel -> setProblemDimension(2);
+  pmodel -> setParameters();
   //model -> server_start();
   double integrator_timestep = 0.001;
   double time_step = TASK_PERIOD/1e-9;
@@ -182,6 +188,10 @@ void Controller::ApplyControlLaw()
      loop_reference_traj_[i] = 0;
     }
     modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
+    pmodel -> Set_StateVector(0.75,0); 
+    pmodel -> Set_StateVector(0,1); 
+    pmodel -> Set_StateVector(4.0,2); 
+    pmodel -> Set_StateVector(0,3);
 
     simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
     previous_state[0] = simulated_positions_[3];
@@ -198,7 +208,7 @@ void Controller::ApplyControlLaw()
           modelp -> Set_StateVector(0, i);
   
     //for (unsigned int i =2; i<4; i++)
-    //      modelp -> Set_StateVector(2.5, i);
+    //      modelp -> Set_StateVector(2.5, i);;
   while(1)
     {
       // Waiting the next iteration
@@ -216,7 +226,7 @@ void Controller::ApplyControlLaw()
       ODEBUGL("DEbug Before referencegen" << positions_store_[0], 0);
       //modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
       //cout << "POSITION[3] = " << positions_[3] << endl;
-      
+      pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
       if(filter_loop <=2)
       {
           position_store_[2] = position_store_[1];
@@ -247,8 +257,12 @@ void Controller::ApplyControlLaw()
       u[1] = simulated_controls_[7];
       for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
-       ODEBUGL("DEbug after set_Controlvector", 4);
-
+      ODEBUGL("DEbug after set_Controlvector", 4);
+      /*u_pres[0] = initconfig_controls_[6] + mpc_u;
+      u_pres[1] = initconfig_controls_[7] - mpc_u;
+      for (unsigned int i =0; i<2; i++)
+          pmodel -> Set_ControlVector(u_pres[i], i);*/
+       
      /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
       present_time = (spec.tv_nsec / 1.0e9); */
@@ -260,7 +274,20 @@ void Controller::ApplyControlLaw()
       modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
+     /* pmodel -> integrateRK4(t, integrator_timestep);
+      controls_[6] = pmodel -> Get_StateVector(0);
+      controls_[7] = pmodel -> Get_StateVector(2);
+      if(controls_[7] >=4.0)
+          controls_[7] = 4.0;
+      else if (controls_[7] <= 0.0)
+          controls_[7] = 0.0;
+      if(controls_[6] >=3.75)
+          controls_[6] = 3.75;
+      else if (controls_[6] <= 0.0)
+          controls_[6] = 0.0;a*/
 
+      
+      
       for (unsigned int i=0; i<2; i++)
           previous_state[i] = newstate[i];
 
@@ -280,8 +307,8 @@ void Controller::ApplyControlLaw()
 
 void Controller::ComputeControlLaw(long double timestep)
 {
-   
-  if (CONTROLLER_TYPE_== 3)
+   double u_pres[2] = {0,0};  
+    if (CONTROLLER_TYPE_== 3)
     {
       for (unsigned int i=0;i<16;i++)
 	{
@@ -362,9 +389,14 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[1] = ref_vel_[i];
               reference_[2] = ref_acl_[i];
               mpc_u = mpc_controller.GetControl(xstate_, reference_);
-                         
-              controls_[2*i] =  initconfig_controls_[2*i]+ mpc_u;
-              controls_[2*i+1] = initconfig_controls_[2*i+1] - mpc_u;
+              u_pres[0] = initconfig_controls_[6] + mpc_u;
+              u_pres[1] = initconfig_controls_[7] - mpc_u;
+              for (unsigned int i =0; i<2; i++)
+                  pmodel -> Set_ControlVector(u_pres[i], i);
+              pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
+              controls_[2*i] = pmodel -> Get_StateVector(0);
+              controls_[2*i+1] = pmodel -> Get_StateVector(2);
+ 
               
               if(controls_[2*i +1] >=4.0)
                   controls_[2*i +1] = 4.0;

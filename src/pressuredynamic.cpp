@@ -21,7 +21,7 @@
 #include "pressuredynamic.hh"
 
 
-PressureModel::PresureModel()
+PressureModel::PressureModel()
 {
     state_vector_.resize(2);
     state_derivative_.resize(2);
@@ -47,7 +47,7 @@ void PressureModel::setParameters (void)
     mass_ = 1.0;   // kg
     friction_ = 0.1; // kg/s
     pressure_musclebase_ = 2.5; //bar
-    n_ = 2; // Number of states in the state space model
+    n_ = 4; // Number of states in the state space model
     /* M=1; //Mass (kg)
     K = 30000; //stiffness 
     L = 1; //Length of the rod
@@ -69,6 +69,7 @@ void PressureModel::computeStateDerivative(double time)
     double ro = 0.0085;
     double R = 0.015;
     double m = 2.5;
+    double pi = 3.14;
     double link_l = 0.32;
     double time_constant = 0.1;
     double velocity_constant = 0.15;
@@ -95,27 +96,27 @@ void PressureModel::computeStateDerivative(double time)
     double epsb2 = pow((1-(lb/lo)),2);
     double termb1 = (1 - cs2*epsb2);
 
-    Vb = 1e6*(pi*lb*pow(ro,2)/(pow((sin(alphao)),2)))*termb1
+    Vb = 1e6*(pi*lb*pow(ro,2)/(pow((sin(alphao)),2)))*termb1;
     //Vb = 230;
-    wnb = 2*pi*380*(1/Vb)
+    wnb = 2*pi*380*(1/Vb);
 
     //% triceps antagonistic muscle 
     double lt = lo*(1-emax) + R*theta; 
-    double cs2 = pow(cos(alphao),2);
+    //double cs2 = pow(cos(alphao),2);
     double epst2 = pow((1-(lt/lo)),2);
     double termt1 = (1 - cs2*epst2);
 
-    Vt = 1e6*(pi*lt*pow(ro,2)/(pow((sin(alphao)),2)))*termt1
+    Vt = 1e6*(pi*lt*pow(ro,2)/(pow((sin(alphao)),2)))*termt1;
     //Vt = 1e6*(pi*lt*ro^2/((sin(alphao))^2))*termt1
     //Vt = 230;
-    wnt = 2*pi*380*(1/Vt)
+    wnt = 2*pi*380*(1/Vt);
 
 
 
-    state_derivative_[0] = state_vector_(1);
-    state_derivative_[1] = -pow(wnb,2)*state_vector_(0) - 2*wnb*1*state_vector_(1) + pow(wnb,2)*control_vector_[0];
-    state_derivative_[2] = state_vector_(3);
-    state_derivative_[3] = -pow(wnt,2)*state_vector_(2) - 2*wnt*1*state_vector_(3) + pow(wnt,2)*control_vector_[1];
+    state_derivative_[0] = state_vector_[1];
+    state_derivative_[1] = -pow(wnb,2)*state_vector_[0] - 2*wnb*1*state_vector_[1] + pow(wnb,2)*control_vector_[0];
+    state_derivative_[2] = state_vector_[3];
+    state_derivative_[3] = -pow(wnt,2)*state_vector_[2] - 2*wnt*1*state_vector_[3] + pow(wnt,2)*control_vector_[1];
    // pres_deriv(3) = pt_state(2);
    // pres_deriv(4) = -wnt^2*pt_state(1) - 2*wnt*1*pt_state(2) + (wnt^2)*Pdes(2);
     ODEBUGL("State derivative: "<< state_derivative_[0],0);

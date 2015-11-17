@@ -55,6 +55,8 @@ SET(${PROJECT_NAME}_HEADERS
         include/MPCcontroller.hh
         #include/pneumaticarmelbowlinear.h
         include/pneumaticarm2ordermodel.h
+        include/pressuredynamic.hh
+
  )
 SET(CXX_DISABLE_WERROR TRUE)
 

@@ -61,6 +61,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   MPCcontroller.cpp
   #pneumaticarmelbowlinear.cpp
   pneumaticarmelbow2ndordermodel.cpp
+  pressuredynamic.cpp
 
 
 ${${PROJECT_NAME}_ABSOLUTE_HEADERS}

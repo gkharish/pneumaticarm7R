@@ -198,14 +198,14 @@ void Controller::ApplyControlLaw()
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
-    u[0] = 0;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
+    u[0] = 0.75;///;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
     u[1] = 4;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
     simulated_initconfig_controls_[6] = 0.0; 
     simulated_initconfig_controls_[7] = 0.0; 
     for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
-    for (unsigned int i =0; i<2; i++)
-          modelp -> Set_StateVector(0, i);
+    /*for (unsigned int i =0; i<2; i++)
+          modelp -> Set_StateVector(0, i);*/
   
     //for (unsigned int i =2; i<4; i++)
     //      modelp -> Set_StateVector(2.5, i);;
@@ -257,6 +257,7 @@ void Controller::ApplyControlLaw()
 
       u[0] = controls_[6];
       u[1] = controls_[7];
+      cout << "Pmodel output:" <<u[0];
       for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
       ODEBUGL("DEbug after set_Controlvector", 4);
@@ -388,9 +389,9 @@ void Controller::ComputeControlLaw(long double timestep)
 	      // mpc_u = PidController(error_now_[i], error_derivative_[i],i);
               //SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
-              reference_[0] = ref_traj_[i];
-              reference_[1] = ref_vel_[i];
-              reference_[2] = ref_acl_[i];
+              reference_[0] = ref_traj_[i]*3.14/180;
+              reference_[1] = ref_vel_[i]*3.14/180;
+              reference_[2] = ref_acl_[i]*3.14/180;
               Pdes_feedforward = modelp ->  InverseModel(reference_);
               //mpc_u = mpc_controller.GetControl(xstate_, reference_);
               u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;

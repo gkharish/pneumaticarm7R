@@ -82,7 +82,7 @@ Controller::Controller()
   ref_init_[3] = 0;
   desired_position_[3] = 45;
   ref_slope_[3] = 15;
-  ref_type_[3] = 0;
+  ref_type_[3] = 2;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -382,7 +382,7 @@ void Controller::ComputeControlLaw(long double timestep)
     double init_pres2 = initconfig_controls_[3] ;
     double Pdes_feedforward;
     double sim_u_pres[2];
-    criterror_ = 0.0001;
+    criterror_ = 1e-8;
       for (unsigned int i =0; i<7; i++)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
@@ -396,7 +396,7 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_derivative_[i] = simulated_error_now_[i] - simulated_error_prev_[i];
 	      error_prev_[i] = error_now_[i];
               simulated_error_prev_[i]  = simulated_error_now_[i];
-              if(error_now_[i] >= criterror_)
+              if(abs(error_now_[i]) >= criterror_)
                 integrated_error_ = integrated_error_ + 0.005*error_now_[i];
 
 	      ODEBUGL("error_now: " << error_now_[i],3);
@@ -414,12 +414,12 @@ void Controller::ComputeControlLaw(long double timestep)
               double poscur = positions_[3]*PI/180;
               double Terror = torquedes - torque;
               double poserror = thetades - poscur;
-              if(Terror >= criterror_)
+              if(abs(Terror) >= criterror_)
                 integrated_Terror_ = integrated_Terror_ + 0.005*Terror;
               //cout << "Terror: " << poserror << " Int error" << integrated_error_ <<endl;
-              Pdes_feedforward = Pdes_feedforward ;//+ 1.5*poserror;// + 0.2*integrated_error_;
+              Pdes_feedforward = Pdes_feedforward + 0.6*poserror + 0.1*integrated_error_;
 
-              //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror);// + 0.2*integrated_Terror_;
+              //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror) + 3.0*integrated_Terror_;
               //cout <<" Pdes" << Pdes_feedforward << endl;
               //mpc_u = mpc_controller.GetControl(xstate_, reference_);
               u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;
@@ -439,8 +439,8 @@ void Controller::ComputeControlLaw(long double timestep)
               //cout << "sim_cont" << simulated_controls_[2*i] << endl;
               //if(Pdes_feedforward <=  initconfig_controls_[6] )
               //{
-                  controls_[2*i] =  initconfig_controls_[6] + Pdes_feedforward;;//pmodel -> Get_StateVector(0);
-                  controls_[2*i+1] = initconfig_controls_[7]- Pdes_feedforward;;//pmodel -> Get_StateVector(2);
+                  controls_[2*i] =  initconfig_controls_[6] + Pdes_feedforward;//pmodel -> Get_StateVector(0);
+                  controls_[2*i+1] = initconfig_controls_[7]- Pdes_feedforward;//pmodel -> Get_StateVector(2);
              // }
              // else
               /*{
@@ -676,7 +676,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-        double f = 2*PI*0.1;
+        double f = 2*PI*0.2;
         ref_traj_[joint_num] = 30+20*(sin((double)timestep*f ));
         ref_vel_[joint_num] = f*20*(cos((double)timestep*f));
         ref_acl_[joint_num] = -f*f *20*(sin((double)timestep*f ));

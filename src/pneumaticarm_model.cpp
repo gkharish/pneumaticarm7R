@@ -61,7 +61,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
     //Parameters Muscles
     //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
     double lo = 0.185;
-    double alphao = 23.0*PI/180;
+    double alphao = 20.0*PI/180;
     //double epsilono = 0.15;
     double k = 1.25;
     double ro = 0.0085;
@@ -80,7 +80,8 @@ void PneumaticarmModel::computeStateDerivative(double time)
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
     emax = (1/k)*(1 - sqrt(b/a));
-    lb = lo- R*state_vector_[0];
+    double lreal = lo - R*0.25;
+    lb = lreal- R*state_vector_[0];
     epsb = (1-(lb/lo));
     lt = lo*(1-emax) + R*state_vector_[0];
     epst = (1-(lt/lo));
@@ -137,6 +138,50 @@ jointstate_deriv(2) = ((F1 -F2 )*R  - fv*theta_dot - m*g*0.5*link_l*sin(theta))/
 /* Numerical Integrator Rungee Kutta */
 void PneumaticarmModel::integrateRK4 (double t, double h)
 {
+    vector<double> st1, st2, st3, st4, state_temp_;
+    st1.resize(n_);
+    st2.resize(n_);
+    st3.resize(n_);
+    st4.resize(n_);
+    state_temp_.resize(n_);
+    for (unsigned int i =0; i <n_; i++)
+    {
+        state_temp_[i] = state_vector_[i];
+    }
+    computeStateDerivative (t);
+    for (unsigned int i =0; i <n_; i++)
+    {
+        st1[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + 0.5*h*st1[i];
+    }
+    ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
+
+    computeStateDerivative (t + (0.5 * h));
+    for (unsigned int i =0; i <n_; i++)
+    {
+        st2[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + 0.5*h*st2[i];
+    }
+        
+   computeStateDerivative (t + (0.5 * h));
+   for (unsigned int i =0; i <n_; i++)
+   {
+        st3[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + h*st3[i];
+   }
+   
+   computeStateDerivative (t + h);
+   for (unsigned int i =0; i <n_; i++)
+        st4[i] = state_derivative_[i];
+  
+  
+   for (unsigned int i =0; i <n_; i++)
+       state_vector_[i]= state_temp_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
+   ODEBUGL("State vector: " << state_vector_[0],0);
+}
+/*
+void PneumaticarmModel::integrateRK4 (double t, double h)
+{
     vector<double> st1, st2, st3, st4;
     st1.resize(n_);
     st2.resize(n_);
@@ -173,7 +218,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
        state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
    ODEBUGL("State vector: " << state_vector_[0],0);
 }
-        
+*/        
         
 /* Numerical Integrator Euler */
 /*VectorXd PneumaticarmModel::integrateEuler (double t, VectorXd state, VectorXd u, double h)
@@ -188,7 +233,7 @@ double  PneumaticarmModel::InverseModel (vector<double>& reference)
     //Parameters Muscles
     //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
     double lo = 0.185;
-    double alphao = 23.0*PI/180;
+    double alphao = 20.0*PI/180;
     //double epsilono = 0.15;
     double k = 1.25;
     double ro = 0.0085;
@@ -209,19 +254,20 @@ double  PneumaticarmModel::InverseModel (vector<double>& reference)
     theta_dot2 = reference[2];
     //theta_dot3 = reference[3];
     //theta_dot4 = reference[4];
+    double lreal = lo -R*0.25;
     Pmax = 4.0*1e5;
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);
     emax = (1/k)*(1 - sqrt(b/a));
     Fmax = (pi*pow(ro,2))*(a-b)*Pmax;
-    t1 = R*theta/(lo*emax);
+    t1 = R*theta/(lreal*emax);
     t2 = (I*theta_dot2 + fv*theta_dot + m*g*link_l*0.5*sin(theta))/(R*Fmax);
    
     P_meanDes = Pmax*(t1 + t2);
     tor1 = P_meanDes/Pmax;
     tor2 = R*theta/(lo*emax);
     TorqueDes_ = R*Fmax*(tor1 -tor2);
-    return(P_meanDes);
+    return(P_meanDes*1e-5);
 
    /* t1dot = R*theta_dot/(lo*emax);
     t2dot = (I*theta_dot3 + fv*theta_dot2 + m*g*link_l*0.5*cos(theta))/(R*Fmax);

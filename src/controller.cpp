@@ -17,6 +17,7 @@
 using namespace std;
 PneumaticarmModel *modelp = new PneumaticarmModel();
 PressureModel *pmodel = new PressureModel();
+PressureModel *sim_pmodel = new PressureModel();
 //PneumaticarmModel model;
 void principale_controller_function(void *arg)
 {
@@ -88,9 +89,9 @@ Controller::Controller()
   D_[2] = 0;
   Pid_factor_[2] = 1;
   ref_init_[2] = 0;
-  desired_position_[2] = 30;
+  desired_position_[2] = 50;
   ref_slope_[2] = 4;
-  ref_type_[2] = 2;
+  ref_type_[2] = 0;
   // Elbow rotation
   P_[4] = 0.001;
   D_[4] = 0;
@@ -156,6 +157,8 @@ void Controller::ApplyControlLaw()
       ODEBUGL("Pressure model object is created",4);
   //pmodel -> setProblemDimension(2);
   pmodel -> setParameters();
+  sim_pmodel -> setParameters();
+
   //model -> server_start();
   double integrator_timestep = 0.005;
   double time_step = TASK_PERIOD/1e9;
@@ -188,17 +191,22 @@ void Controller::ApplyControlLaw()
      loop_reference_traj_[i] = 0;
     }
     modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
-    pmodel -> Set_StateVector(0.75,0); 
+    cout << "init pos: " <<modelp ->Get_StateVector(0) << endl;
+    pmodel -> Set_StateVector(0.67,0); 
     pmodel -> Set_StateVector(0,1); 
     pmodel -> Set_StateVector(4.0,2); 
     pmodel -> Set_StateVector(0,3);
+    sim_pmodel -> Set_StateVector(0.0,0); 
+    sim_pmodel -> Set_StateVector(0,1); 
+    sim_pmodel -> Set_StateVector(4.0,2); 
+    sim_pmodel -> Set_StateVector(0,3);
 
     simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
     previous_state[0] = simulated_positions_[3];
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
-    u[0] = 0.75;///;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
+    u[0] = 0.0;///;  //shmaddr_[6];  //modelp -> Get_ControlVector(0);  //shmaddr_[6];
     u[1] = 4;  //shmaddr_[7];  //modelp -> Get_ControlVector(1); //shmaddr_[7];
     simulated_initconfig_controls_[6] = 0.0; 
     simulated_initconfig_controls_[7] = 0.0; 
@@ -226,9 +234,12 @@ void Controller::ApplyControlLaw()
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
       //modelp -> Get_StateVector(0);
       //cout << "POSITION[3] = " << positions_[3] << endl;
-      //pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
-      pmodel -> Set_PositionFeedback(modelp -> Get_StateVector(0));
+      sim_pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
+      pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
 
+      //pmodel -> Set_PositionFeedback(modelp -> Get_StateVector(0));
+      //sim_pmodel -> Set_PositionFeedback(modelp -> Get_StateVector(0));
+      
       if(filter_loop <=2)
       {
           position_store_[2] = position_store_[1];
@@ -255,12 +266,12 @@ void Controller::ApplyControlLaw()
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
 
-      u[0] = controls_[6];
-      u[1] = controls_[7];
-      cout << "Pmodel output:" <<u[0];
+     /* u[0] = simulated_controls_[6] ;
+      u[1] = simulated_controls_[7];
+      //cout << "sim_Pmodel output:" <<u[0];
       for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
-      ODEBUGL("DEbug after set_Controlvector", 4);
+      ODEBUGL("DEbug after set_Controlvector", 4);*/
       /*u_pres[0] = initconfig_controls_[6] + mpc_u;
       u_pres[1] = initconfig_controls_[7] - mpc_u;
       for (unsigned int i =0; i<2; i++)
@@ -274,7 +285,7 @@ void Controller::ApplyControlLaw()
       t = present_time - previous_time;
       /* Ste*/
 
-      modelp -> integrateRK4(t, integrator_timestep);
+      //modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
       previous_time = present_time;
@@ -299,7 +310,7 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-        shmaddr_[24] = simulated_positions_[3];// ref_traj_[3];
+        shmaddr_[24] =  ref_traj_[3];//simulated_positions_[3];//
       //shmaddr_[20] = velocity_[3];
       //shmaddr_[21] = acceleration_[3];
       //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
@@ -370,7 +381,8 @@ void Controller::ComputeControlLaw(long double timestep)
     double init_pres1 = initconfig_controls_[2] ;
     double init_pres2 = initconfig_controls_[3] ;
     double Pdes_feedforward;
-
+    double sim_u_pres[2];
+    criterror_ = 0.0001;
       for (unsigned int i =0; i<7; i++)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
@@ -384,6 +396,9 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_derivative_[i] = simulated_error_now_[i] - simulated_error_prev_[i];
 	      error_prev_[i] = error_now_[i];
               simulated_error_prev_[i]  = simulated_error_now_[i];
+              if(error_now_[i] >= criterror_)
+                integrated_error_ = integrated_error_ + 0.005*error_now_[i];
+
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
 	      // mpc_u = PidController(error_now_[i], error_derivative_[i],i);
@@ -393,29 +408,65 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[1] = ref_vel_[i]*3.14/180;
               reference_[2] = ref_acl_[i]*3.14/180;
               Pdes_feedforward = modelp ->  InverseModel(reference_);
+              double torquedes = modelp -> Get_TorqueDes();
+              double torque = modelp -> Get_Torque();
+              double thetades = ref_traj_[3]*PI/180;//modelp -> Get_StateVector(0);
+              double poscur = positions_[3]*PI/180;
+              double Terror = torquedes - torque;
+              double poserror = thetades - poscur;
+              if(Terror >= criterror_)
+                integrated_Terror_ = integrated_Terror_ + 0.005*Terror;
+              //cout << "Terror: " << poserror << " Int error" << integrated_error_ <<endl;
+              Pdes_feedforward = Pdes_feedforward ;//+ 1.5*poserror;// + 0.2*integrated_error_;
+
+              //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror);// + 0.2*integrated_Terror_;
+              //cout <<" Pdes" << Pdes_feedforward << endl;
               //mpc_u = mpc_controller.GetControl(xstate_, reference_);
               u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;
               u_pres[1] = initconfig_controls_[7] - Pdes_feedforward;
               for (unsigned int i =0; i<2; i++)
                   pmodel -> Set_ControlVector(u_pres[i], i);
               pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
-              controls_[2*i] = pmodel -> Get_StateVector(0);
-              controls_[2*i+1] = pmodel -> Get_StateVector(2);
-
- 
               
-              if(controls_[2*i +1] >=4.0)
-                  controls_[2*i +1] = 4.0;
+              sim_u_pres[0] = 0 + Pdes_feedforward;
+              sim_u_pres[1] = 4.0- Pdes_feedforward;
+
+              for (unsigned int i =0; i<2; i++)
+                  sim_pmodel -> Set_ControlVector(sim_u_pres[i], i);
+              sim_pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
+              simulated_controls_[2*i] = sim_pmodel -> Get_StateVector(0);
+              simulated_controls_[2*i+1] = sim_pmodel -> Get_StateVector(2);
+              //cout << "sim_cont" << simulated_controls_[2*i] << endl;
+              //if(Pdes_feedforward <=  initconfig_controls_[6] )
+              //{
+                  controls_[2*i] =  initconfig_controls_[6] + Pdes_feedforward;;//pmodel -> Get_StateVector(0);
+                  controls_[2*i+1] = initconfig_controls_[7]- Pdes_feedforward;;//pmodel -> Get_StateVector(2);
+             // }
+             // else
+              /*{
+                  controls_[2*i] =  Pdes_feedforward;//pmodel -> Get_StateVector(0);
+                  controls_[2*i+1] = initconfig_controls_[7] - Pdes_feedforward;
+              }*/
+              
+            
+             //cout << "sim_Pmodel output:" <<u[0];
+             modelp -> Set_ControlVector(sim_pmodel -> Get_StateVector(0), 0);
+             modelp -> Set_ControlVector(sim_pmodel -> Get_StateVector(2), 1);
+            
+             
+             modelp -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
+
+              if(controls_[2*i +1] >=4.5)
+                  controls_[2*i +1] = 4.5;
               else if (controls_[2*i+1] <= 0.0)
                   controls_[2*i+1] = 0.0;
               
-              if(controls_[2*i] >=3.75)
-                  controls_[2*i] = 3.75;
+              if(controls_[2*i] >=4.5)
+                  controls_[2*i] = 4.5;
               else if (controls_[2*i] <= 0.0)
                   controls_[2*i] = 0.0;
              
-              simulated_controls_[2*i] = 0.5;
-              simulated_controls_[2*i +1] = 0.5;
+             
 	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
 	    }
 	  else
@@ -432,7 +483,20 @@ void Controller::ComputeControlLaw(long double timestep)
 
 
 }
+/*double Integrator(double t, double error, double h)
+{
+    double st1, st2, st3, st4, integrated_Error;
+    error_temp = error;
+    st1 = error;
+    integrated_Error = error_temp + 0.5*h*st1;
+    st2 = error;
+    integrated_Error = error_temp + 0.5*h*st2;
+    st3 = error;
+    integrated_Error = error_temp + h*st3;
+    st4 = error;
+    integrated_Error = error_temp + ( (1/6.0) * h * (st1 + 2.0*st2 + 2.0*st3 + st4) );
 
+}*/
 void Controller::ResetControl(bool idx)
 {
   reset_control_ = idx;
@@ -537,8 +601,41 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   if (type == 0)
   {
 
-      
-    if(ref_init_[joint_num] <= ref_final_[joint_num])
+     if (timestep <= 3.0)
+     {
+        ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
+        ref_vel_[joint_num] = ref_slope_[joint_num];
+        ref_acl_[joint_num] = 0;
+        ref_final_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*3.0;
+
+
+     }
+    
+     if (timestep <= 8.0 && timestep > 3.0)
+     {
+        ref_traj_[joint_num] = ref_final_[joint_num];
+        ref_vel_[joint_num] = 0;
+        ref_acl_[joint_num] = 0;
+
+     }
+
+     if (timestep <= 11.0 && timestep > 8.0) 
+     {
+        ref_traj_[joint_num] = ref_final_[joint_num] - ref_slope_[joint_num]*((double)timestep - 8.0);
+        ref_vel_[joint_num] = -ref_slope_[joint_num];
+        ref_acl_[joint_num] = 0;
+
+     }
+
+     if (timestep > 11.0)
+     {
+        ref_traj_[joint_num] = 0;
+        ref_vel_[joint_num] = 0;
+        ref_acl_[joint_num] = 0;
+
+     }
+
+   /* if(ref_init_[joint_num] <= ref_final_[joint_num])
     {
       if(ref_traj_[joint_num] >= ref_final_[joint_num])
       {
@@ -566,7 +663,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
         ref_vel_[joint_num] = -ref_slope_[joint_num]; 
         ref_acl_[joint_num] = 0;
       }
-    }
+    }*/
   }
   
   if (type == 1)
@@ -579,10 +676,13 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 3)
       {
-        ref_traj_[joint_num] = 20+25*(sin((double)timestep*2*PI/10 ));
+        double f = 2*PI*0.1;
+        ref_traj_[joint_num] = 30+20*(sin((double)timestep*f ));
+        ref_vel_[joint_num] = f*20*(cos((double)timestep*f));
+        ref_acl_[joint_num] = -f*f *20*(sin((double)timestep*f ));
       }
       else 
-        ref_traj_[joint_num] = 25* sin((double)timestep*2*PI/10);
+        ref_traj_[joint_num] = 20* sin((double)timestep*2*PI/10);
   }
 
 

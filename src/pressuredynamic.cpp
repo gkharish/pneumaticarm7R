@@ -23,9 +23,9 @@
 
 PressureModel::PressureModel()
 {
-    state_vector_.resize(2);
-    state_derivative_.resize(2);
-    control_vector_.resize(2);
+    state_vector_.resize(4);
+    state_derivative_.resize(4);
+    control_vector_.resize(4);
 }
 
 /* Setting Number of Joints or degree of freedom*/
@@ -64,16 +64,16 @@ void PressureModel::computeStateDerivative(double time)
     double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
     double lo = 0.185;
     double alphao = 20.0*PI/180;
-    double epsilono = 0.15;
+    //double epsilono = 0.15;
     double k = 1.25;
     double ro = 0.0085;
     double R = 0.015;
-    double m = 2.5;
-    double pi = 3.14;
-    double link_l = 0.32;
+    //double m = 2.5;
+    double pi = PI;
+    /*double link_l = 0.32;
     double time_constant = 0.1;
     double velocity_constant = 0.15;
-    double I = m*link_l*link_l/3; //0.0036;
+    double I = m*link_l*link_l/3; //0.0036;*/
     double term1, term2, term3, Po_1, Po_2, epsilono1, epsilono2;
     double Vb,Vt, wnb, wnt, emax;
     //theta = state_vector_[0];
@@ -83,15 +83,16 @@ void PressureModel::computeStateDerivative(double time)
                
     /*K1 = 1e5*(PI*pow(ro,2))*R*( a*(pow(1 - k*epsilono, 2)) - b);
     K2 = 1e5*(PI*pow(ro,2))*R*2*a*(1 - k*epsilono)*k*R/lo;*/
-    Po_1 = 0.67*1e5;
-    Po_2 = 4.0*1e5;
+    //Po_1 = 0.67*1e5;
+    //Po_2 = 4.0*1e5;
     //epsilono1 = 0.05;
     //epsilono2 = 0.25;
    
     emax = (1/k)*(1 - sqrt(b/a));
     //%% Calculate Volume 
     //% biceps agonistic muscle
-    double lb = lo - R*theta;
+    double lreal = lo ;//- R*0.25;
+    double lb = lreal - R*theta;
     double cs2 = pow(cos(alphao),2);
     double epsb2 = pow((1-(lb/lo)),2);
     double termb1 = (1 - cs2*epsb2);
@@ -125,6 +126,50 @@ void PressureModel::computeStateDerivative(double time)
         
 /* Numerical Integrator Rungee Kutta */
 void PressureModel::integrateRK4 (double t, double h)
+{
+    vector<double> st1, st2, st3, st4, state_temp_;
+    st1.resize(n_);
+    st2.resize(n_);
+    st3.resize(n_);
+    st4.resize(n_);
+    state_temp_.resize(n_);
+    for (unsigned int i =0; i <n_; i++)
+    {
+        state_temp_[i] = state_vector_[i];
+    }
+    computeStateDerivative (t);
+    for (unsigned int i =0; i <n_; i++)
+    {
+        st1[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + 0.5*h*st1[i];
+    }
+    ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
+
+    computeStateDerivative (t + (0.5 * h));
+    for (unsigned int i =0; i <n_; i++)
+    {
+        st2[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + 0.5*h*st2[i];
+    }
+        
+   computeStateDerivative (t + (0.5 * h));
+   for (unsigned int i =0; i <n_; i++)
+   {
+        st3[i] = state_derivative_[i];
+        state_vector_[i] = state_temp_[i] + h*st3[i];
+   }
+   
+   computeStateDerivative (t + h);
+   for (unsigned int i =0; i <n_; i++)
+        st4[i] = state_derivative_[i];
+  
+  
+   for (unsigned int i =0; i <n_; i++)
+       state_vector_[i]= state_temp_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
+   ODEBUGL("State vector: " << state_vector_[0],0);
+}
+
+/*void PressureModel::integrateRK4 (double t, double h)
 {
     vector<double> st1, st2, st3, st4;
     st1.resize(n_);
@@ -161,7 +206,7 @@ void PressureModel::integrateRK4 (double t, double h)
    for (unsigned int i =0; i <n_; i++)
        state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
    ODEBUGL("State vector: " << state_vector_[0],0);
-}
+}*/
         
         
 /* Numerical Integrator Euler */

@@ -36,7 +36,7 @@ Controller::Controller()
   velocity_.resize(7);
   acceleration_.resize(7);
   position_store_.resize(4);
-  xstate_.resize(2);
+  xstate_.resize(4);
   simulated_positions_.resize(7);
   controls_.resize(16);
   simulated_controls_.resize(16);
@@ -62,6 +62,7 @@ Controller::Controller()
   ref_vel_.resize(7);
   ref_acl_.resize(7);
   reference_.resize(3);
+  reference_mpc_.resize(4);
   ref_slope_.resize(7);
   ref_type_.resize(7);
   desired_position_.resize(7);
@@ -82,7 +83,7 @@ Controller::Controller()
   ref_init_[3] = 0;
   desired_position_[3] = 45;
   ref_slope_[3] = 15;
-  ref_type_[3] = 2;
+  ref_type_[3] = 0;
   ref_traj_[3] = 0;
 // Arm rotation
   P_[2] = 0.0005;
@@ -408,6 +409,14 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[1] = ref_vel_[i]*3.14/180;
               reference_[2] = ref_acl_[i]*3.14/180;
               Pdes_feedforward = modelp ->  InverseModel(reference_);
+
+              reference_mpc_[0] = reference_[0];
+              reference_mpc_[1] = reference_[1];
+              reference_mpc_[2] = Pdes_feedforward;
+              reference_mpc_[3] = 4.0 - Pdes_feedforward;
+              // Calling MPC controller
+              mpc_u = mpc_controller.GetControl(xstate_, reference_mpc_);
+              
               double torquedes = modelp -> Get_TorqueDes();
               double torque = modelp -> Get_Torque();
               double thetades = ref_traj_[3]*PI/180;//modelp -> Get_StateVector(0);
@@ -421,7 +430,6 @@ void Controller::ComputeControlLaw(long double timestep)
 
               //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror) + 3.0*integrated_Terror_;
               //cout <<" Pdes" << Pdes_feedforward << endl;
-              //mpc_u = mpc_controller.GetControl(xstate_, reference_);
               u_pres[0] = initconfig_controls_[6] + Pdes_feedforward;
               u_pres[1] = initconfig_controls_[7] - Pdes_feedforward;
               for (unsigned int i =0; i<2; i++)
@@ -439,8 +447,8 @@ void Controller::ComputeControlLaw(long double timestep)
               //cout << "sim_cont" << simulated_controls_[2*i] << endl;
               //if(Pdes_feedforward <=  initconfig_controls_[6] )
               //{
-                  controls_[2*i] =  initconfig_controls_[6] + Pdes_feedforward;//pmodel -> Get_StateVector(0);
-                  controls_[2*i+1] = initconfig_controls_[7]- Pdes_feedforward;//pmodel -> Get_StateVector(2);
+                  controls_[2*i] =  initconfig_controls_[6] + mpc_u;//pmodel -> Get_StateVector(0);
+                  controls_[2*i+1] = initconfig_controls_[7]- mpc_u;//pmodel -> Get_StateVector(2);
              // }
              // else
               /*{

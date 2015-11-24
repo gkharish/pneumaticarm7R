@@ -54,7 +54,7 @@ SET(${PROJECT_NAME}_HEADERS
         include/ilqrsolver.h
         include/MPCcontroller.hh
         #include/pneumaticarmelbowlinear.h
-        include/pneumaticarm2ordermodel.h
+        include/pneumaticarmnonlinearmodel.h
         include/pressuredynamic.hh
 
  )

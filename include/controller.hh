@@ -71,6 +71,7 @@ public:
   /* MPC controller */
   MPCcontroller mpc_controller;
   double mpc_u;
+  std::vector<double> reference_mpc_;
   double  MeanPressure(int);
  /** \ Reference generator function   */
   double GetDesiredPosition(unsigned int idx);

@@ -1,16 +1,16 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-Pneumaticarm2orderModel pneumaticarm2orderModel(dt);
+PneumaticarmNonlinearModel pneumaticarmModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
-ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarm2orderModel, costPneumaticArmElbow);
+ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 
 
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit << 0.0,0.0;
-    xDes << 0.0,0.0;
+    xinit << 0.0,0.0, 0.0, 4.0;
+    xDes << 0.0,0.0,0.0, 0.0;
 
     T = 80;
     //M = 400;
@@ -45,21 +45,26 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 {
     xinit(0) = xstate[0];
     xinit(1) = xstate[1];
+    /*xinit(2) = xstate[2];
+    xinit(3) = xstate[3];*/
+
     //xinit(2) = xstate[2];
 
     xDes(0) = reference[0]*3.14/180;
     xDes(1) = reference[1]*3.14/180;
+    xDes(2) = reference[2];
+    xDes(3) = reference[3];
     //xDes(2) = reference[2]*3.14/180;
     //cout << "Reference position" << xDes(1) << endl;
 
-    iLQRsolverpneumaticarmElbowLinear.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
+    iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
     gettimeofday(&tbegin,NULL);
     /*for(int i=0;i<M;i++)
     {*/
-        iLQRsolverpneumaticarmElbowLinear.initSolver(xinit,xDes,T);
-        iLQRsolverpneumaticarmElbowLinear.solveTrajectory();
-        lastTraj = iLQRsolverpneumaticarmElbowLinear.getLastSolvedTrajectory();
+        iLQRsolver.initSolver(xinit,xDes,T);
+        iLQRsolver.solveTrajectory();
+        lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
         //xinit = xList[1];

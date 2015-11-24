@@ -60,7 +60,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   ilqrsolver.cpp
   MPCcontroller.cpp
   #pneumaticarmelbowlinear.cpp
-  pneumaticarmelbow2ndordermodel.cpp
+  pneumaticarmnonlinearmodel.cpp
   pressuredynamic.cpp
 
 

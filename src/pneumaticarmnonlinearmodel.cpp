@@ -128,7 +128,7 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
     //A10 = dt*(m*g*0.5*link_l/I);
 //%% J(2,1)
     double t1_j21,t2_j21,t3_j21,t4_j21,t1_j23,t2_j23,t3_j23,t1_j24,t2_j24,t3_j24;
-    t1_j21  = - m*g*0.5*link_l*cos(theta)/I;
+    t1_j21  = -m*g*0.5*link_l*cos(theta)/I;
     t2_j21 = 2*co*a*pow(k,2)*emax*(R/lo)*P2;
     t3_j21 = 2*co*a*pow((k*R/lo),2)*(P1 - P2)*theta;
     t4_j21 = -2*co*a*k*(R/lo)*(P1 + P2);
@@ -174,8 +174,8 @@ void PneumaticarmNonlinearModel::computeAllModelDeriv(double& dt, const stateVec
     co = pi*ro*ro*1e5;
 //
     fxx[1](0,0) = (m*g*0.5*link_l*sin(theta)/I) + 2*co*a*pow((k*R/lo),2)*(P1 - P2)*(R/I);
-    fxx[1](2,0) = (-2*co*a*k*(R/lo) + 2*co*a*pow((k*R/lo),2)*theta)*(R/I);
-    fxx[1](3,0) =  (-2*co*a*k*(R/lo) + 2*co*a*pow(k,2)*emax*(R/lo))*(R/I);
+   // fxx[1](2,0) = (-2*co*a*k*(R/lo) + 2*co*a*pow((k*R/lo),2)*theta)*(R/I);
+    //fxx[1](3,0) =  (-2*co*a*k*(R/lo) + 2*co*a*pow(k,2)*emax*(R/lo))*(R/I);
 
     //fxx[3](1,3) = -((2*dt*Jm*R)/(pi*Jl))*Cf0*((2*a*a*a*X(3,0))/((1+(a*a*X(3,0)*X(3,0)))*(1+(a*a*X(3,0)*X(3,0)))));
     //fxx[3](3,3) = +((2*dt*Cf0)/(pi*Jl))*((2*a*a*a*X(3,0))/((1+(a*a*X(3,0)*X(3,0)))*(1+(a*a*X(3,0)*X(3,0)))));

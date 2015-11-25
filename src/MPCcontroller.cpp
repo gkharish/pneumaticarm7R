@@ -9,8 +9,8 @@ ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit << 0.0,0.0, 0.0, 4.0;
-    xDes << 0.0,0.0,0.0, 0.0;
+    //xinit << 0.0,0.0, 0.0, 4.0;
+    //xDes << 0.0,0.0,0.0, 0.0;
 
     T = 80;
     //M = 400;
@@ -45,8 +45,8 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 {
     xinit(0) = xstate[0];
     xinit(1) = xstate[1];
-    /*xinit(2) = xstate[2];
-    xinit(3) = xstate[3];*/
+    xinit(2) = 0;//xstate[2];
+    xinit(3) = 0;//xstate[3];
 
     //xinit(2) = xstate[2];
 

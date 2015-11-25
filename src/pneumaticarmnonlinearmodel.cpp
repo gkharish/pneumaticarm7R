@@ -55,6 +55,14 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
         0.0, 0.0,
         1, 0.0,
         0.0, 1;*/
+    B(0,0) = 0.0;
+    B(0,1) = 0.0;
+    B(1,0) = 0.0;
+    B(1,1) = 0.0;
+    B(2,0) = 1.0;
+    B(2,1) = 0.0;
+    B(3,0) = 0.0;
+    B(3,1) = 1.0;
     Bd = dt*B;
 
     fxx[0].setZero();
@@ -68,6 +76,7 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
              0.0, 0.0,
              1, 0.0,
              0.0, 1;*/
+    fuBase = B;
     fu = dt* fuBase;
     fuu[0].setZero();
     fux[0].setZero();
@@ -111,10 +120,10 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
 
     T = (F1 -F2 )*R;
     //F = [F1 F2 T];
-    A(0,1) = 1.0;
+    /*A(0,1) = 1.0;
     A(2,2) = -1/time_constant;
     A(3,3) = -1/time_constant;
-    A(1,1) = -fv;
+    A(1,1) = -fv;*/
     
     //A10 = dt*(m*g*0.5*link_l/I);
 //%% J(2,1)

@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
+#include <unistd.h>
 /* Ncurses includes */
 #include <ncurses_ui.hh>
 
@@ -56,16 +56,32 @@ NCursesUI::NCursesUI(Controller *aController):
     1.2, 0.67, 4.0, 0.1, 0.1,
     0.0, 0.0, 0.0, 0.0, 
     0.0, 0.0};
-  
-  ODEBUGL(" Controler:" << Controller_,3);
+   ODEBUGL(" Controler:" << Controller_,3);
+   double Pressurecur[NB_CONTROLS];
+   unsigned int increment_step = 0;
   if (Controller_!=0)
     {
-      for(unsigned int i=0;i<NB_CONTROLS;i++)
-	{
-	  ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
-	  Controller_->SetUserControl(i,
-				      PressureForMuscles[i]);
-	}
+       while(Pressurecur[0]<=PressureForMuscles[0] || Pressurecur[1]<=PressureForMuscles[1] || 
+               Pressurecur[2]<=PressureForMuscles[2] || Pressurecur[3]<=PressureForMuscles[3] || 
+               Pressurecur[4]<=PressureForMuscles[4] || Pressurecur[5]<=PressureForMuscles[5] || 
+               Pressurecur[6]<=PressureForMuscles[6] || Pressurecur[7]<=PressureForMuscles[7] || 
+               Pressurecur[8]<=PressureForMuscles[8] || Pressurecur[9]<=PressureForMuscles[9] || 
+               Pressurecur[10]<=PressureForMuscles[10] || Pressurecur[11]<=PressureForMuscles[11] || 
+               Pressurecur[12]<=PressureForMuscles[12] || Pressurecur[13]<=PressureForMuscles[13])
+       {
+            for(unsigned int i=0;i<NB_CONTROLS;i++)
+            {
+                Pressurecur[i] = PressureForMuscles[i]*increment_step*1e-3/5;
+                ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
+                if( Pressurecur[i] <=  PressureForMuscles[i])
+                    Controller_->SetUserControl(i, Pressurecur[i]); 
+                else
+                    Controller_->SetUserControl(i, PressureForMuscles[i]); 
+
+	    }
+            //usleep(5000);
+            increment_step++;
+       }
     }
 
 }

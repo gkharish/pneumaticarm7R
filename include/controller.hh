@@ -98,6 +98,7 @@ public:
   std::vector<double> acceleration_;
   std::vector<double> position_store_;
   std::vector<double> xstate_;
+  std::vector<double> state_mpc_;
   std::vector<double> simulated_positions_;
 
   // Control values

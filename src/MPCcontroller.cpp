@@ -45,8 +45,8 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 {
     xinit(0) = xstate[0];
     xinit(1) = xstate[1];
-    //xinit(2) = xstate[2];
-    //xinit(3) = xstate[3];
+    xinit(2) = xstate[2];
+    xinit(3) = xstate[3];
     
     /*xinit(0) = reference[0];//xstate[0];
     xinit(1) = reference[0];//xstate[1];
@@ -71,9 +71,10 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        xinit = xList[1];
+        //xinit(2) = xList[1](2,0);
+        //xinit(3) = xList[1](3,0);
         
-        //cout  "mpc position: " << xList[1](0,0);
+        cout  << "mpc position: " << xList[1](0,0) << endl;
        // cout  "mpc control: " << uList[0](0,0);
         // state feedback
         /*for(int j=0;j<T;j++) fichier  xList[j](0,0) << "," << xList[j](1,0) << "," << xList[j](2,0)  << "," << uList[j](0,0) << endl;

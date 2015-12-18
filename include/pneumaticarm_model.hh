@@ -16,13 +16,22 @@
 
 using namespace std;
 //using namespace Eigen;
-
+struct
+{
+    double lo;
+    double alphao;
+    double k;
+    double ro;
+    double R;
+    double m;
+    double link_l;
+    double fv;
+}musclejointdata;
 class PneumaticarmModel
 {
  protected:
-            double length_;
-            double mass_;
-            double friction_;
+            double a_, b_, emax_, lb_, lt_, epsb_, epst_, F1_, F2_, P1_, P2_;
+            double lo_, alphao_, k_,ro_, R_, m_, link_l_, g, I_, fv_;
             double Torque_, TorqueDes_;
             float pressure_muscle1_, pressure_muscle2_, pressure_musclebase_;
             
@@ -36,7 +45,15 @@ class PneumaticarmModel
                 PneumaticarmModel();   
                 virtual  ~PneumaticarmModel();
                 void setProblemDimension (int n);
-                void setParameters (void);
+                void setParameters (double lo, 
+                                    double alphao, 
+                                    double k, 
+                                    double ro, 
+                                    double R, 
+                                    double m,
+                                    double l, 
+                                    double fv);
+                //void setParameters (musclejointdata data);
                 //void setpidcoeff(int p, int i, int d);
                 void computeStateDerivative (double time);
                 void integrateRK4 (double time, double timeStep);

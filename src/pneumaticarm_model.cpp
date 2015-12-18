@@ -20,7 +20,7 @@
 
 #include "pneumaticarm_model.hh"
 
-double pi =3.14;
+double pi =PI;
 PneumaticarmModel::PneumaticarmModel()
 {
     state_vector_.resize(2);
@@ -36,21 +36,44 @@ void PneumaticarmModel::setProblemDimension (int n)
 }
         
 /* Initialization or setting the parameters */
-void PneumaticarmModel::setParameters (void)
+void PneumaticarmModel::setParameters (double lo, 
+                                    double alphao, 
+                                    double k, 
+                                    double ro, 
+                                    double R, 
+                                    double m,
+                                    double link_l, 
+                                    double fv) 
 {
-            
-            
-    length_ = 1.0; // m
-    mass_ = 1.0;   // kg
-    friction_ = 0.1; // kg/s
-    pressure_musclebase_ = 2.5; //bar
-    n_ = 2; // Number of states in the state space model
-    /* M=1; //Mass (kg)
-    K = 30000; //stiffness 
-    L = 1; //Length of the rod
-    g = 9.8;
-    I = 1; //Inertia of the primary motor
-    J = 1; */ // Inertia of the other m*/
+    n_ = 2; 
+    lo_ = lo ; //0.185;
+    alphao_ = alphao; //20.0*PI/180;
+    //double epsilono = 0.15;
+    k_ = k; // 1.25;
+    ro_ = ro; //0.0085;
+    // Parameters Joint
+    R_ = R; //0.015;
+    m_ = m; //2.6;
+    link_l_ = link_l; //0.32;
+    g = GRAVITY;
+    //double time_constant = 0.1;
+    //double velocity_constant = 0.15;
+    I_ = m*link_l*link_l/3; //0.0036;
+    fv_ = fv; //0.25;  
+    /*lo = data.lo ; //0.185;
+    alphao = data.alphao; //20.0*PI/180;
+    //double epsilono = 0.15;
+    k = data.k; // 1.25;
+    ro = data.ro; //0.0085;
+    // Parameters Joint
+    R = data.R; //0.015;
+    m = data.m; //2.6;
+    link_l = data.link_l; //0.32;
+    g = GRAVITY;
+    //double time_constant = 0.1;
+    //double velocity_constant = 0.15;
+    I = m*link_l*link_l/3; //0.0036;
+    fv = data.fv; //0.25; */
 }
         
  /*PAM system dynamics and Compute state derivatives*/
@@ -60,37 +83,23 @@ void PneumaticarmModel::computeStateDerivative(double time)
     //VectorXd state_derivative(statevector.size());
     //Parameters Muscles
     //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
-    double lo = 0.185;
-    double alphao = 20.0*PI/180;
-    //double epsilono = 0.15;
-    double k = 1.25;
-    double ro = 0.0085;
-    // Parameters Joint
-    double R = 0.015;
-    double m = 2.6;
-    double link_l = 0.32;
-    double g = 9.81;
-    //double time_constant = 0.1;
-    //double velocity_constant = 0.15;
-    double I = m*link_l*link_l/3; //0.0036;
-    double fv = 0.25;
-    double a, b, emax, lb, lt, epsb, epst, F1, F2, P1, P2;
-    P1 = control_vector_[0];
-    P2 = control_vector_[1];
-    a = 3/pow(tan(alphao), 2);
-    b = 1/pow(sin(alphao), 2);
-    emax = (1/k)*(1 - sqrt(b/a));
-    double lreal = lo - R*0.25;
-    lb = lreal- R*state_vector_[0];
-    epsb = (1-(lb/lo));
-    lt = lo*(1-emax) + R*state_vector_[0];
-    epst = (1-(lt/lo));
-    F1 =  pi*pow(ro,2)*P1*1e5*(a*pow((1-k*epsb),2) - b);
-    F2 =  pi*pow(ro,2)*P2*1e5*(a*pow((1-k*epst),2) - b);
-    //F2max = 1*pi*ro^2*4*1e5*(a*(1-k*emax)^2 - b);
-    Torque_ = (F1 -F2 )*R;
+   
+   
+    P1_ = control_vector_[0];
+    P2_ = control_vector_[1];
+    a_ = 3/pow(tan(alphao_), 2);
+    b_ = 1/pow(sin(alphao_), 2);
+    emax_ = (1/k_)*(1 - sqrt(b_/a_));
+    double lreal = lo_ - R_*0.0;
+    lb_ = lreal- R_*state_vector_[0];
+    epsb_ = (1-(lb_/lo_));
+    lt_ = lo_*(1-emax_) + R_*state_vector_[0];
+    epst_ = (1-(lt_/lo_));
+    F1_ =  pi*pow(ro_,2)*P1_*1e5*(a_*pow((1-k_*epsb_),2) - b_);
+    F2_ =  pi*pow(ro_,2)*P2_*1e5*(a_*pow((1-k_*epst_),2) - b_);
+    Torque_ = (F1_ -F2_ )*R_;
     state_derivative_[0] = state_vector_[1];
-    state_derivative_[1] =  ((F1 -F2 )*R  - fv*state_vector_[1] - m*g*0.5*link_l*sin(state_vector_[0]))/I;
+    state_derivative_[1] =  ((F1_ -F2_ )*R_  - fv_*state_vector_[1] - m_*g*0.5*link_l_*sin(state_vector_[0]))/I_;
                
      //P_m1 = 0.675;
     //P_m2 = 4.0;
@@ -254,7 +263,7 @@ double  PneumaticarmModel::InverseModel (vector<double>& reference)
     theta_dot2 = reference[2];
     //theta_dot3 = reference[3];
     //theta_dot4 = reference[4];
-    double lreal = lo -R*0.25;
+    double lreal = lo -R*0.0;
     Pmax = 4.0*1e5;
     a = 3/pow(tan(alphao), 2);
     b = 1/pow(sin(alphao), 2);

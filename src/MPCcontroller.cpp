@@ -1,18 +1,18 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-Pneumaticarm3orderModel pneumaticarmModel(dt);
+PneumaticarmNonlinearModel pneumaticarmModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
-ILQRSolver iLQRsolverpneumaticarmElbowLinear(pneumaticarmModel, costPneumaticArmElbow);
+ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 
 
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit << 0.0,0.0,0.0;
-    xDes << 0.0,0.0,0.0;
+    xinit  <<0.0,0.0, 0.0, 4.0*1e5;
+    //xDes  0.0,0.0,0.0, 0.0;
 
-    T =80;
+    T = 20;
     //M = 400;
     dt=5e-3;
     iterMax = 20;
@@ -34,37 +34,48 @@ MPCcontroller::MPCcontroller()
     /*ofstream fichier("resultsMPC.csv",ios::out | ios::trunc);
     if(!fichier)
     {
-        cerr << "erreur fichier ! " << endl;
+        cerr  "erreur fichier ! " << endl;
         //return 1;
     }
-    fichier << T << "," << M << endl;
-    fichier << "tau,tauDot,q,qDot,u" << endl;a*/
+    fichier  T << "," << M << endl;
+    fichier  "tau,tauDot,q,qDot,u" << endl;a*/
 }
 
 double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& reference)
 {
-    /*xinit(0) = xstate[0];
+    xinit(0) = xstate[0];
     xinit(1) = xstate[1];
-    //xinit(2) = xstate[2];*/
+    //xinit(2) = xstate[2];
+    //xinit(3) = xstate[3];
+    
+    /*xinit(0) = reference[0];//xstate[0];
+    xinit(1) = reference[0];//xstate[1];
+    xinit(2) = reference[2]; //xstate[2];
+    xinit(3) = reference[3]; //xstate[3];*/
+    
 
-    xDes(0) = reference[0]*3.14/180;
-    xDes(1) = reference[1]*3.14/180;
-    xDes << 1.0, 0.0, 0.0;
+    xDes(0) = reference[0];
+    xDes(1) = reference[1];
+    xDes(2) = reference[2];
+    xDes(3) = reference[3];
     //xDes(2) = reference[2]*3.14/180;
     //cout << "Reference position" << xDes(1) << endl;
 
-    iLQRsolverpneumaticarmElbowLinear.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
+    iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
     gettimeofday(&tbegin,NULL);
     /*for(int i=0;i<M;i++)
     {*/
-        iLQRsolverpneumaticarmElbowLinear.initSolver(xinit,xDes,T);
-        iLQRsolverpneumaticarmElbowLinear.solveTrajectory();
-        lastTraj = iLQRsolverpneumaticarmElbowLinear.getLastSolvedTrajectory();
+        iLQRsolver.initSolver(xinit,xDes,T);
+        iLQRsolver.solveTrajectory();
+        lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        xinit = xList[1];
+        xinit(2) = xList[1](2,0);
+        xinit(3) = xList[1](3,0);
         
+        //cout  << "mpc position: " << xList[1](0,0) << endl;
+       // cout  <<"mpc control: " << uList[0](0,0);
         // state feedback
         /*for(int j=0;j<T;j++) fichier << xList[j](0,0) << "," << xList[j](1,0) << "," << xList[j](2,0)  << "," << uList[j](0,0) << endl;
         fichier << xList[T](0,0) << "," << xList[T](1,0) << "," << xList[T](2,0)  << "," << 0.0 << endl;
@@ -82,7 +93,7 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 
 //    fichier.close();
 
-    return(uList[1](0,0));
+    return(uList[0](0,0));
 
 }
 

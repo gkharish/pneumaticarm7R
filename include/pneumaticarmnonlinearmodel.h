@@ -1,5 +1,5 @@
-#ifndef PNEUMATICARM3ORDERMODEL_H
-#define PNEUMATICARM3ORDERMODEL_H
+#ifndef PNEUMATICARMNONLINEARMODEL_H
+#define PNEUMATICARMNONLINEARMODEL_H
 
 #include "config.h"
 
@@ -8,10 +8,10 @@
 
 using namespace Eigen;
 
-class Pneumaticarm3orderModel : public DynamicModel
+class PneumaticarmNonlinearModel : public DynamicModel
 {
 public:
-    Pneumaticarm3orderModel(double& mydt);
+    PneumaticarmNonlinearModel(double& mydt);
 private:
 protected:
 
@@ -21,24 +21,18 @@ private:
     double dt;
     unsigned int stateNb;
     unsigned int commandNb;
-    double k;
-    double R;
-    double Jm;
-    double Jl;
-    double fvm;
-    double Cf0;
-    double a;
-    
-    double m ;
-    double link_l ;
-   
-    double g ;
-    double K1 ;
-    double K2 ;
-    double Pm ;
-    double fv ;
-    double I;
+    // Muscle parameters
+    double lo, alphao, k,ro,R,a,b,emax,lb,lt,epsb,epst;
+    double time_constant1, time_constant2;
 
+   // Joint parameters 
+    double m;
+    double link_l;
+    double g;
+    double I;
+    double fv;
+
+   
     stateMat_t Id;
     stateMat_t A;
     stateMat_t Ad;
@@ -80,4 +74,4 @@ public:
 
 };
 
-#endif // PNEUMATICARM2ORDERMODEL_H
+#endif // PNEUMATICARMNONLINEARMODEL_H

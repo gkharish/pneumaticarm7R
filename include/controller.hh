@@ -18,6 +18,7 @@
 #define PI 3.14159265
 #include "shared_memory.hh"
 #include "pneumaticarm_model.hh"
+#include "pressuredynamic.hh"
 #include "MPCcontroller.hh"
 using namespace std;
 //using namespace Eigen;
@@ -63,13 +64,14 @@ public:
   /** \ Get COntroller Type */
   void SetControllerType(int idx);
   /** \ PID controller design  */
-  void  PidController(double error, double error_derivative , int joint_num);
+  double  PidController(double error, double error_derivative , int joint_num);
   void  SimulatedPidController(double error, double error_derivative , int joint_num);
   //double GetPidParameter();
   //void SetPidParameter();
   /* MPC controller */
   MPCcontroller mpc_controller;
   double mpc_u;
+  std::vector<double> reference_mpc_;
   double  MeanPressure(int);
  /** \ Reference generator function   */
   double GetDesiredPosition(unsigned int idx);
@@ -92,8 +94,11 @@ public:
 
   // Positions values 
   std::vector<double> positions_;
+  std::vector<double> velocity_;
+  std::vector<double> acceleration_;
   std::vector<double> position_store_;
   std::vector<double> xstate_;
+  std::vector<double> state_mpc_;
   std::vector<double> simulated_positions_;
 
   // Control values
@@ -118,6 +123,7 @@ public:
   std::vector<double> D_;
   std::vector<double> delta;
   std::vector<double> simulated_delta_;
+  double criterror_, integrated_error_, integrated_Terror_;
 
   /*! @{ Errors computation */
   /* \brief Current error */

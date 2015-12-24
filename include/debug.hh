@@ -10,7 +10,7 @@
 #define DBG_INFO  std::endl << __FILE__ << "\n" << __LINE__
 #ifndef NDEBUG
 #ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL 1
+#define DEBUG_LEVEL 0
 #endif 
 #define ODEBUG(x) std::cerr << x << std::endl
 #define ODEBUGL(x,y) if (y<DEBUG_LEVEL) std::cerr << x << std::endl;

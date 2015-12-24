@@ -21,22 +21,22 @@ private:
     double dt;
     unsigned int stateNb;
     unsigned int commandNb;
-    /*static const double k;
-    static const double R;
-    static const double Jm;
-    static const double Jl;
-    static const double fvm;
-    static const double Cf0;
-    static const double a;*/
+    double k;
+    double R;
+    double Jm;
+    double Jl;
+    double fvm;
+    double Cf0;
+    double a;
     
-    double m;
+    double m ;
     double link_l ;
-    
+   
     double g ;
-    double K1;
-    double K2;
-    double Pm;
-    double fv;
+    double K1 ;
+    double K2 ;
+    double Pm ;
+    double fv ;
     double I;
 
     stateMat_t Id;

@@ -11,7 +11,8 @@
 /*#include "romeosimpleactuator.h"
 #include "romeolinearactuator.h"
 #include "costfunctionromeoactuator.h"*/
-#include "pneumaticarm3ordermodel.h"
+//#include "pneumaticarm2ordermodel.h"
+#include "pneumaticarmnonlinearmodel.h"
 //#include "pneumaticarmelbowlinear.h"
 // #include "pneumaticarmelbowpiecelinear.h"
 #include "costfunctionpneumaticarmelbow.h"

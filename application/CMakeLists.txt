@@ -18,13 +18,14 @@ ADD_EXECUTABLE(test_ncurses_ui test_ncurses_ui.cpp
   ${CMAKE_SOURCE_DIR}/src/controller.cpp 
   ${CMAKE_SOURCE_DIR}/src/shared_memory.cpp
   ${CMAKE_SOURCE_DIR}/src/pneumaticarm_model.cpp
+  ${CMAKE_SOURCE_DIR}/src/pressuredynamic.cpp
+
   ${CMAKE_SOURCE_DIR}/src/MPCcontroller.cpp
   ${CMAKE_SOURCE_DIR}/src/ilqrsolver.cpp
   ${CMAKE_SOURCE_DIR}/src/dynamicmodel.cpp
   ${CMAKE_SOURCE_DIR}/src/costfunction.cpp
   ${CMAKE_SOURCE_DIR}/src/costfunctionpneumaticarmelbow.cpp
-  # ${CMAKE_SOURCE_DIR}/src/pneumaticarmelbow2ndordermodel.cpp  #pneumaticarmelbowlinear.cpp
-  ${CMAKE_SOURCE_DIR}/src/pneumaticarm3ordermodel.cpp 
+  ${CMAKE_SOURCE_DIR}/src/pneumaticarmnonlinearmodel.cpp  #pneumaticarmelbowlinear.cpp
   )    
 
 

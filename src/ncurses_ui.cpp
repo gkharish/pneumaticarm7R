@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
+#include <unistd.h>
 /* Ncurses includes */
 #include <ncurses_ui.hh>
 
@@ -53,19 +53,23 @@ NCursesUI::NCursesUI(Controller *aController):
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
     0.0, 0.0, 0.5, 3.0, 1.2,
-    1.2, 0.75, 4.0, 0.1, 0.1,
+    1.2, 0.67, 4.0, 0.1, 0.1,
     0.0, 0.0, 0.0, 0.0, 
     0.0, 0.0};
-  
-  ODEBUGL(" Controler:" << Controller_,3);
+   ODEBUGL(" Controler:" << Controller_,3);
+   double Pressurecur[NB_CONTROLS];
+   unsigned int increment_step = 0;
   if (Controller_!=0)
     {
-      for(unsigned int i=0;i<NB_CONTROLS;i++)
-	{
-	  ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
-	  Controller_->SetUserControl(i,
-				      PressureForMuscles[i]);
-	}
+            for(unsigned int i=0;i<NB_CONTROLS;i++)
+            {
+                Pressurecur[i] = PressureForMuscles[i]*increment_step*1e-3/5;
+                ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
+                Controller_->SetUserControl(i, PressureForMuscles[i]); 
+
+	    }
+           
+       
     }
 
 }
@@ -159,7 +163,7 @@ void NCursesUI::HandlingKeyboard()
           end_of_loop_=true;
           FINITE_STATE = 5;
         
-         }            
+        }            
      
     }
 

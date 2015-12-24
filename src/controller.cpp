@@ -21,7 +21,7 @@ PneumaticarmModel *Joint3modelp = new PneumaticarmModel();
 
 
 PressureModel *pmodel = new PressureModel();
-PressureModel *sim_pmodel = new PressureModel();
+PressureModel *sim_joint2pmodel = new PressureModel();
 
 // Joint 1 parameters
 // Joint 2 parameters
@@ -284,7 +284,7 @@ void Controller::ApplyControlLaw()
  
   if(Joint2modelp!=0)
       ODEBUGL("Pneumatic model object is created",4);
-  Jmedoint2modelp -> setProblemDimension(2);
+  Joint2modelp -> setProblemDimension(2);
   /*Joint2modelp -> setParameters(j3lo, 
                                 j3alphao, 
                                 j3k, 
@@ -306,8 +306,24 @@ void Controller::ApplyControlLaw()
   if(pmodel!=0)
       ODEBUGL("Pressure model object is created",4);
   //pmodel -> setProblemDimension(2);
-  pmodel -> setParameters();
-  sim_pmodel -> setParameters();
+  pmodel -> setParameters(j2lo, 
+                                j2alphao, 
+                                j2k, 
+                                j2ro, 
+                                j2R, 
+                                j2m,
+                                j2link_l, 
+                                j2fv) ;
+
+  sim_joint2pmodel ->setParameters(j2lo, 
+                                j2alphao, 
+                                j2k, 
+                                j2ro, 
+                                j2R, 
+                                j2m,
+                                j2link_l, 
+                                j2fv) ;
+
 
   //model -> server_start();
   double integrator_timestep = 0.005;
@@ -340,16 +356,16 @@ void Controller::ApplyControlLaw()
      
      loop_reference_traj_[i] = 0;
     }
-    Joint2modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
+    Joint2modelp -> Set_StateVector(0*positions_[3]*3.14/180, 0);
     cout << "init pos: " <<Joint2modelp ->Get_StateVector(0) << endl;
     pmodel -> Set_StateVector(0.67,0); 
     pmodel -> Set_StateVector(0,1); 
     pmodel -> Set_StateVector(4.0,2); 
     pmodel -> Set_StateVector(0,3);
-    sim_pmodel -> Set_StateVector(0.0,0); 
-    sim_pmodel -> Set_StateVector(0,1); 
-    sim_pmodel -> Set_StateVector(4.0,2); 
-    sim_pmodel -> Set_StateVector(0,3);
+    sim_joint2pmodel -> Set_StateVector(0.0,0); 
+    sim_joint2pmodel -> Set_StateVector(0,1); 
+    sim_joint2pmodel -> Set_StateVector(3.0,2); 
+    sim_joint2pmodel -> Set_StateVector(0,3);
 
     simulated_positions_[3] = (Joint2modelp -> Get_StateVector(0))*180/3.14;
     previous_state[0] = simulated_positions_[3];
@@ -357,7 +373,7 @@ void Controller::ApplyControlLaw()
     newstate[0] = previous_state[0];
     newstate[1] = 0;
     u[0] = 0.0;///;  //shmaddr_[6];  //Joint2modelp -> Get_ControlVector(0);  //shmaddr_[6];
-    u[1] = 4;  //shmaddr_[7];  //Joint2modelp -> Get_ControlVector(1); //shmaddr_[7];
+    u[1] = 3.0;  //shmaddr_[7];  //Joint2modelp -> Get_ControlVector(1); //shmaddr_[7];
     simulated_initconfig_controls_[2] = 0.0; 
     simulated_initconfig_controls_[3] = 0.0; 
     for (unsigned int i =0; i<2; i++)
@@ -381,13 +397,12 @@ void Controller::ApplyControlLaw()
       }
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
-      //Joint2modelp -> Get_StateVector(0);
-      //cout << "POSITION[3] = " << positions_[3] << endl;
-      sim_pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
-      pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
+      double j2st = Joint2modelp -> Get_StateVector(0);
+      cout << "POSITION[3] = " << j2st << endl;
+     
 
-      //pmodel -> Set_PositionFeedback(Joint2modelp -> Get_StateVector(0));
-      //sim_pmodel -> Set_PositionFeedback(Joint2modelp -> Get_StateVector(0));
+      pmodel -> Set_PositionFeedback(Joint2modelp -> Get_StateVector(0));
+      sim_joint2pmodel -> Set_PositionFeedback(Joint2modelp -> Get_StateVector(0));
       
       if(filter_loop <=2)
       {
@@ -398,8 +413,10 @@ void Controller::ApplyControlLaw()
       }
       if(filter_loop ==3)
           filter_loop = 0;
-      position_store_[0] = positions_[3]*3.14/180;
-
+      
+      //position_store_[0] = positions_[3]*3.14/180;    // In real robot
+      position_store_[0] = (Joint2modelp -> Get_StateVector(0))*180/3.14; // Simulator mode
+      
       velocity1 = (position_store_[1] - position_store_[2])/time_step;
       velocity2 = (position_store_[0] - position_store_[1])/time_step;
 
@@ -411,13 +428,15 @@ void Controller::ApplyControlLaw()
       acceleration_[3] = acceleration;
       xstate_[2] = acceleration;
       
+      //sim_joint2pmodel -> Set_PositionFeedback(position_store_[0]*3.14/180);
+      //pmodel -> Set_PositionFeedback(position_store_[0]*3.14/180);
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
 
      /* u[0] = simulated_controls_[6] ;
       u[1] = simulated_controls_[7];
-      //cout << "sim_Pmodel output:" <<u[0];
+      //cout << "sim_joint2pmodel output:" <<u[0];
       for (unsigned int i =0; i<2; i++)
           Joint2modelp -> Set_ControlVector(u[i], i);
       ODEBUGL("DEbug after set_Controlvector", 4);*/
@@ -435,7 +454,7 @@ void Controller::ApplyControlLaw()
       /* Ste*/
 
       //Joint2modelp -> integrateRK4(t, integrator_timestep);
-      simulated_positions_[3] = (Joint2modelp -> Get_StateVector(0))*180/3.14;
+      //simulated_positions_[3] = (Joint2modelp -> Get_StateVector(0))*180/3.14;
       ODEBUGL("DEbug after integrator" << simulated_positions_[3] , 1);
       previous_time = present_time;
      /* pmodel -> integrateRK4(t, integrator_timestep);
@@ -457,7 +476,7 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] =  ref_traj_[1]*3.14/180;;//simulated_positions_[3];// Joint2modelp -> Get_StateVector(0) ;state_mpc_[2]*1e-5;
+      shmaddr_[24] =  Joint2modelp -> Get_StateVector(0); // ref_traj_[1]*3.14/180;;//simulated_positions_[3];// Joint2modelp -> Get_StateVector(0) ;state_mpc_[2]*1e-5;
       //shmaddr_[20] = velocity_[3];
       //shmaddr_[21] = acceleration_[3];
       //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
@@ -545,6 +564,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_prev_[i]  = simulated_error_now_[i];
               if(abs(error_now_[i]) >= criterror_)
                 integrated_error_ = integrated_error_ + 0.005*error_now_[i]*PI/180;
+              if(abs(simulated_error_now_[i]) >= criterror_)
+                integrated_simerror_ = integrated_simerror_ + 0.005*simulated_error_now_[i]*PI/180;
 
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
@@ -573,16 +594,14 @@ void Controller::ComputeControlLaw(long double timestep)
               //mpc_u = mpc_controller.GetControl(state_mpc_, reference_mpc_);
               //cout << "mpc_u :" << mpc_u << endl;
               double torquedes = Joint2modelp -> Get_TorqueDes();
-              double torque = Joint2modelp -> Get_Torque();
-              double thetades = ref_traj_[1]*PI/180;//Joint2modelp -> Get_StateVector(0);
-              double poscur = positions_[1]*PI/180;
+              double torque = Joint2modelp -> Get_Torque();             
               double Terror = torquedes - torque;
-              double poserror = thetades - poscur;
+              
               if(abs(Terror) >= criterror_)
                 integrated_Terror_ = integrated_Terror_ + 0.005*Terror;
               //cout << "Terror: " << poserror << " Int error" << integrated_error_ <<endl;
-              Pdes_feedforward = Pdes_feedforward + 2.75*poserror + 1.75*integrated_error_;
-
+              //Pdes_feedforward = Pdes_feedforward + 2.75*error_now_[i[*PI/180 + 1.75*integrated_error_;
+              //Pdes_feedforward = Pdes_feedforward + 2.75*simulated_error_now_[i]*PI/180 + 1.75*integrated_simerror_; // Simulator mode
               //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror) + 3.0*integrated_Terror_;
               //cout <<" Pdes" << Pdes_feedforward << endl;
               u_pres[0] = initconfig_controls_[6] + mpc_u*1e-5; //Pdes_feedforward;
@@ -592,14 +611,14 @@ void Controller::ComputeControlLaw(long double timestep)
               pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
               
               sim_u_pres[0] = 0 + Pdes_feedforward;
-              sim_u_pres[1] = 4.0- Pdes_feedforward;
+              sim_u_pres[1] = 3.0- Pdes_feedforward;
 
               for (unsigned int i =0; i<2; i++)
-                  sim_pmodel -> Set_ControlVector(sim_u_pres[i], i);
-              sim_pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
-              simulated_controls_[2*i] = sim_pmodel -> Get_StateVector(0);
-              simulated_controls_[2*i+1] = sim_pmodel -> Get_StateVector(2);
-              //cout << "sim_cont" << simulated_controls_[2*i] << endl;
+                  sim_joint2pmodel -> Set_ControlVector(sim_u_pres[i], i);
+              sim_joint2pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
+              simulated_controls_[2*i] = sim_joint2pmodel -> Get_StateVector(0);
+              simulated_controls_[2*i+1] = sim_joint2pmodel -> Get_StateVector(2);
+              cout << "sim_cont" << simulated_controls_[2*i] << endl;
               //if(Pdes_feedforward <=  initconfig_controls_[6] )
               //{
                   controls_[2*i] =  initconfig_controls_[2*i] + Pdes_feedforward; //mpc_u*1e-5;//pmodel -> Get_StateVector(0);
@@ -612,9 +631,9 @@ void Controller::ComputeControlLaw(long double timestep)
               }*/
               
             
-             //cout << "sim_Pmodel output:" <<u[0];
-             Joint2modelp -> Set_ControlVector(sim_pmodel -> Get_StateVector(0), 0);
-             Joint2modelp -> Set_ControlVector(sim_pmodel -> Get_StateVector(2), 1);
+             //cout << "sim_joint2pmodel output:" <<u[0];
+             Joint2modelp -> Set_ControlVector(sim_joint2pmodel -> Get_StateVector(0), 0);
+             Joint2modelp -> Set_ControlVector(sim_joint2pmodel -> Get_StateVector(2), 1);
             
              
              Joint2modelp -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
@@ -690,7 +709,7 @@ double Controller::PidController(double error, double error_derivative, int join
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
-  ODEBUGL("Update delta:     " <<update_delta, 4);
+  /*ODEBUGL("Update delta:     " <<update_delta, 4);
   ODEBUGL("Pid command : " << delta[joint_num],4);*/
   return(delta[joint_num]);
 

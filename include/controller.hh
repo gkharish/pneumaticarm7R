@@ -123,7 +123,7 @@ public:
   std::vector<double> D_;
   std::vector<double> delta;
   std::vector<double> simulated_delta_;
-  double criterror_, integrated_error_, integrated_Terror_;
+  double criterror_, integrated_error_, integrated_simerror_, integrated_Terror_;
 
   /*! @{ Errors computation */
   /* \brief Current error */

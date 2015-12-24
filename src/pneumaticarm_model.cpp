@@ -187,46 +187,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
        state_vector_[i]= state_temp_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
    ODEBUGL("State vector: " << state_vector_[0],0);
 }
-/*
-void PneumaticarmModel::integrateRK4 (double t, double h)
-{
-    vector<double> st1, st2, st3, st4;
-    st1.resize(n_);
-    st2.resize(n_);
-    st3.resize(n_);
-    st4.resize(n_);
-    computeStateDerivative (t);
-    for (unsigned int i =0; i <n_; i++)
-    {
-        st1[i] = state_derivative_[i];
-        state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
-    }
-    ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
-
-    computeStateDerivative (t + (0.5 * h));
-    for (unsigned int i =0; i <n_; i++)
-    {
-        st2[i] = state_derivative_[i];
-        state_vector_[i] = state_vector_[i] + 0.5*h*st2[i];
-    }
-        
-   computeStateDerivative (t + (0.5 * h));
-   for (unsigned int i =0; i <n_; i++)
-   {
-        st3[i] = state_derivative_[i];
-        state_vector_[i] = state_vector_[i] + h*st3[i];
-   }
    
-   computeStateDerivative (t + h);
-   for (unsigned int i =0; i <n_; i++)
-        st4[i] = state_derivative_[i];
-  
-  
-   for (unsigned int i =0; i <n_; i++)
-       state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
-   ODEBUGL("State vector: " << state_vector_[0],0);
-}
-*/        
         
 /* Numerical Integrator Euler */
 /*VectorXd PneumaticarmModel::integrateEuler (double t, VectorXd state, VectorXd u, double h)
@@ -250,7 +211,7 @@ double  PneumaticarmModel::InverseModel (vector<double>& reference)
     //theta_dot3 = reference[3];
     //theta_dot4 = reference[4];
     double lreal = lo_ - R_*0.0;
-    Pmax = 4.0*1e5;
+    Pmax = 3.0*1e5;
     Fmax = (pi*pow(ro_,2))*(a_- b_)*Pmax;
     t1 = R_*theta/(lreal*emax_);
     t2 = (I_*theta_dot2 + fv_*theta_dot + m_*g*link_l_*0.5*sin(theta))/(R_*Fmax);

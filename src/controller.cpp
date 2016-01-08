@@ -24,7 +24,6 @@ PressureModel *pmodel = new PressureModel();
 PressureModel *sim_joint2pmodel = new PressureModel();
 
 // Joint 1 parameters
-// Joint 2 parameters
 double j2lo = 0.22;
 double j2alphao = 20*PI/180;
 double j2k = 1.25;
@@ -33,6 +32,15 @@ double j2R = 0.01533;
 double j2m = 5.20;
 double j2link_l = 0.67;
 double j2fv = 0.25;
+// Joint 2 parameters
+double j1lo = 0.195;
+double j1alphao = 17*PI/180;
+double j1k = 1.25;
+double j1ro = 0.012;
+double j1R = 1e-3*20.5/1.5;
+double j1m = 5.20;
+double j1link_l = 0.67;
+double j1fv = 0.25;
 // Joint 3 parameters
 double j3lo = 0.185;
 double j3alphao = 20*PI/180;
@@ -87,60 +95,6 @@ double  OpenInverseModel (vector<double>& reference)
     return(P_meanDes*1e-5);
 
 }
-/*double  PressureInverseModel (vector<double>& reference)
-{
-    //Parameters Muscles
-    //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
-    double pi = 3.14;
-    double lo = 0.185;
-    double alphao = 20.0*pi/180;
-    //double epsilono = 0.15;
-    double k = 1.25;
-    double ro = 0.0085;
-    // Parameters Joint
-    double R = 0.015;
-    double m = 2.6;
-    double link_l = 0.32;
-    double g = 9.81;
-    //double time_constant = 0.1;
-    //double velocity_constant = 0.15;
-    double I = m*link_l*link_l/3; //0.0036;
-    double fv = 0.25;
-    
-    double theta, theta_dot, theta_dot2;
-    double a, b, t1, t2, Pmax, tor1, tor2, P_meanDes, Fmax, emax;
-    theta = reference[0];//%(t-1)*5*pi/180;         %ref_traj(1);
-    theta_dot = reference[1];//%5*pi/180;     %ref_traj(2);
-    theta_dot2 = reference[2];
-    //theta_dot3 = reference[3];
-    //theta_dot4 = reference[4];
-    double lreal = lo -R*0.25;
-    Pmax = 4.0*1e5;
-    a = 3/pow(tan(alphao), 2);
-    b = 1/pow(sin(alphao), 2);
-    emax = (1/k)*(1 - sqrt(b/a));
-    Fmax = (pi*pow(ro,2))*(a-b)*Pmax;
-    double lb,lt,epsb,epst,F1,F2,Tstat,P_meanfeed;
-    lb = lreal- R*theta;
-    epsb = (1-(lb/lo));
-    lt = lo*(1-emax) + R*theta;
-    epst = (1-(lt/lo));
-    F1 =  pi*pow(ro,2)*P1*(a*pow((1-k*epsb),2) - b);
-    F2 =  pi*pow(ro,2)*P2*(a*pow((1-k*epst),2) - b);
-    //F2max = 1*pi*ro^2*4*1e5*(a*(1-k*emax)^2 - b);
-    Tstat = (F1 -F2 )*R;
-
-    t1 = R*theta/(lreal*emax);
-    //t2 = (I*theta_dot2 + fv*theta_dot + m*g*link_l*0.5*sin(theta))/(R*Fmax);
-    t2 = Tstat/(R*Fmax);
-    P_meanfeed = Pmax*(t1 + t2);
-    tor1 = P_meanDes/Pmax;
-    tor2 = R*theta/(lo*emax);
-    //TorqueDes_ = R*Fmax*(tor1 -tor2);
-    return(P_meanfeed*1e-5);
-
-}
-*/
 
 void principale_controller_function(void *arg)
 {
@@ -576,6 +530,7 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[1] = ref_vel_[i]*3.14/180;
               reference_[2] = ref_acl_[i]*3.14/180;
               Pdes_feedforward = Joint2modelp ->  InverseModel(reference_);
+              cout << "Pdes: " << Pdes_feedforward;
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
 
               //double Pcur =  OpenInverseModel(xstate_);

@@ -211,7 +211,7 @@ double  PneumaticarmModel::InverseModel (vector<double>& reference)
     //theta_dot3 = reference[3];
     //theta_dot4 = reference[4];
     double lreal = lo_ - R_*0.0;
-    Pmax = 3.0*1e5;
+    Pmax = 5.0*1e5;
     Fmax = (pi*pow(ro_,2))*(a_- b_)*Pmax;
     t1 = R_*theta/(lreal*emax_);
     t2 = (I_*theta_dot2 + fv_*theta_dot + m_*g*link_l_*0.5*sin(theta))/(R_*Fmax);

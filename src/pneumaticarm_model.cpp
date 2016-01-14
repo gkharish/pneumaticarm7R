@@ -119,7 +119,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
     state_derivative_[3] = -pow(wnb_,2)*state_vector_[2] - 2*wnb_*1*state_vector_[3] + pow(wnb_,2)*control_vector_[0];
     state_derivative_[4] = state_vector_[5];
     state_derivative_[5] = -pow(wnt_,2)*state_vector_[4] - 2*wnt_*1*state_vector_[5] + pow(wnt_,2)*control_vector_[1];
-     cout << "Vb1: " << Vb_  << "F2: " <<Vt_ << "P2: " << wnb_ << endl;       
+    // cout << "Vb1: " << Vb_  << "F2: " <<Vt_ << "P2: " << wnb_ << endl;       
     //P_m1 = 0.675;
     //P_m2 = 4.0;
 

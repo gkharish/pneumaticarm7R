@@ -287,8 +287,8 @@ void Controller::ApplyControlLaw()
       }
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
-      //Joint2modelp -> Get_StateVector(0);
-      //cout << "POSITION[3] = " << positions_[3] << endl;
+      double js2 = Joint2modelp -> Get_StateVector(0);
+      cout << "POSITION[1] = " <<js2  << endl;
       sim_pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
       pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
 
@@ -500,8 +500,8 @@ void Controller::ComputeControlLaw(long double timestep)
                   pmodel -> Set_ControlVector(u_pres[i], i);
               pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
               
-              sim_u_pres[0] = 0 + Pdes_feedforward;
-              sim_u_pres[1] = 4.0- Pdes_feedforward;
+              sim_u_pres[0] = 0 + 1*(loop_reference_traj_[i]*timestep/1.0e9); //Pdes_feedforward;
+              sim_u_pres[1] = 3 - 1*(loop_reference_traj_[i]*timestep/1.0e9); ; //Pdes_feedforward;
 
               for (unsigned int i =0; i<2; i++)
                   sim_pmodel -> Set_ControlVector(sim_u_pres[i], i);
@@ -511,8 +511,8 @@ void Controller::ComputeControlLaw(long double timestep)
               //cout << "sim_cont" << simulated_controls_[2*i] << endl;
               //if(Pdes_feedforward <=  initconfig_controls_[6] )
               //{
-                  controls_[2*i] =  initconfig_controls_[2*i] + Pdes_feedforward; //mpc_u*1e-5;//pmodel -> Get_StateVector(0);
-                  controls_[2*i+1] = initconfig_controls_[2*i+1]- Pdes_feedforward; //mpc_u*1e-5;//pmodel -> Get_StateVector(2);
+                  controls_[2*i] =  0.7 + sim_u_pres[0]; //Pdes_feedforward; //mpc_u*1e-5;//pmodel -> Get_StateVector(0);
+                  controls_[2*i+1] = sim_u_pres[1]; //Pdes_feedforward; //mpc_u*1e-5;//pmodel -> Get_StateVector(2);
              // }
              // else
               /*{
@@ -522,8 +522,8 @@ void Controller::ComputeControlLaw(long double timestep)
               
             
              //cout << "sim_Pmodel output:" <<u[0];
-             Joint2modelp -> Set_ControlVector(Pdes_feedforward*1e5, 0);
-             Joint2modelp -> Set_ControlVector((3-Pdes_feedforward)*1e5, 1);
+             Joint2modelp -> Set_ControlVector(sim_u_pres[0]*1e5, 0);
+             Joint2modelp -> Set_ControlVector(sim_u_pres[1]*1e5, 1);
             
              
              Joint2modelp -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);

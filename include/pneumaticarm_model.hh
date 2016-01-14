@@ -26,13 +26,15 @@ struct
     double m;
     double link_l;
     double fv;
+    double Pmax;
 }musclejointdata;
 class PneumaticarmModel
 {
  protected:
-            double a_, b_, emax_, lb_, lt_, epsb_, epst_, F1_, F2_, P1_, P2_;
+            double a_, b_, emax_, lb_, lt_, epsb_, epst_, F1_, F2_, P1_, P2_, Pmax_;
             double lo_, alphao_, k_,ro_, R_, m_, link_l_, g, I_, fv_;
             double Torque_, TorqueDes_;
+            double wnb_, wnt_, Vb_, Vt_;
             float pressure_muscle1_, pressure_muscle2_, pressure_musclebase_;
             
             int nDOF_;
@@ -52,7 +54,8 @@ class PneumaticarmModel
                                     double R, 
                                     double m,
                                     double l, 
-                                    double fv);
+                                    double fv,
+                                    double Pmax);
                 //void setParameters (musclejointdata data);
                 //void setpidcoeff(int p, int i, int d);
                 void computeStateDerivative (double time);

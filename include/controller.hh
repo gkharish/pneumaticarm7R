@@ -141,6 +141,8 @@ public:
   std::vector<double>ref_traj_;
   std::vector<double>ref_vel_;
   std::vector<double>ref_acl_;
+  std::vector<double> ref_jerk_;
+  std::vector<double> ref_jerkdot_;
   std::vector<double>reference_;
   std::vector<double>ref_slope_;
   

@@ -29,10 +29,10 @@ double j2lo = 0.23;
 double j2alphao = 20*PI/180;
 double j2k = 1.1;
 double j2ro = 0.012;
-double j2R = 0.01533;
+double j2R = 0.009;
 double j2m = 5.20;
 double j2link_l = 0.67;
-double j2fv = 0.25;
+double j2fv = 3.0;
 double j2Pmax = 3.0e5;
 // Joint 3 parameters
 double j3lo = 0.185;
@@ -87,7 +87,9 @@ Controller::Controller()
   ref_traj_.resize(7);
   ref_vel_.resize(7);
   ref_acl_.resize(7);
-  reference_.resize(3);
+  ref_jerk_.resize(7);
+  ref_jerkdot_.resize(7);
+  reference_.resize(5);
   reference_mpc_.resize(4);
   ref_slope_.resize(7);
   ref_type_.resize(7);
@@ -116,7 +118,7 @@ Controller::Controller()
   D_[1] = 0.000;
   Pid_factor_[1] = 1;
   ref_init_[1] = 0;
-  desired_position_[1] = 30;
+  desired_position_[1] = 40;
   ref_slope_[1] = 10;
   ref_type_[1] = 0;
   ref_traj_[1] = 0;
@@ -288,7 +290,7 @@ void Controller::ApplyControlLaw()
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
       double js2 = Joint2modelp -> Get_StateVector(0);
-      cout << "POSITION[1] = " <<js2  << endl;
+      //cout << "POSITION[1] = " <<js2  << endl;
       sim_pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
       pmodel -> Set_PositionFeedback(positions_[3]*3.14/180);
 
@@ -366,8 +368,8 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[24] =  Joint2modelp -> Get_StateVector(0) ;//state_mpc_[2]*1e-5;
-      //shmaddr_[20] = velocity_[3];
+      shmaddr_[24] =  Joint2modelp -> Get_PmeanRef() ;//state_mpc_[2]*1e-5;
+      //shmaddr_[24] = ref_traj_[1]*PI/180; //velocity_[3];
       //shmaddr_[21] = acceleration_[3];
       //shmaddr_[24] = mpc_controller.GetState()*180/3.14;
       //shmaddr_[23] = (int)( Joint2modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
@@ -436,7 +438,7 @@ void Controller::ComputeControlLaw(long double timestep)
               delc1 = 3;
     double init_pres1 = initconfig_controls_[2] ;
     double init_pres2 = initconfig_controls_[3] ;
-    double Pdes_feedforward;
+    //double Pdes_feedforward;
     double sim_u_pres[2];
     criterror_ = 1e-8;
       for (unsigned int i =0; i<7; i++)
@@ -463,14 +465,16 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_[0] = ref_traj_[i]*3.14/180;
               reference_[1] = ref_vel_[i]*3.14/180;
               reference_[2] = ref_acl_[i]*3.14/180;
-              Pdes_feedforward = Joint2modelp ->  InverseModel(reference_);
+              reference_[3] = ref_jerk_[i]*3.14/180;
+              reference_[4] = ref_jerkdot_[i]*3.14/180;
+              vector<double> Pdes_feedforward = Joint2modelp ->  InverseModel(reference_);
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
 
               //double Pcur =  OpenInverseModel(xstate_);
               //cout << "Pcur: " << Pdes_feedforward;
               reference_mpc_[0] = reference_[0];
               reference_mpc_[1] = reference_[1];
-              reference_mpc_[2] = Pdes_feedforward*1e5;
+              reference_mpc_[2] = Pdes_feedforward[0]*1e5;
               reference_mpc_[3] = 4.0*1e5 - reference_mpc_[2];
 
               // Calling MPC controller
@@ -490,18 +494,18 @@ void Controller::ComputeControlLaw(long double timestep)
               if(abs(Terror) >= criterror_)
                 integrated_Terror_ = integrated_Terror_ + 0.005*Terror;
               //cout << "Terror: " << poserror << " Int error" << integrated_error_ <<endl;
-              Pdes_feedforward = Pdes_feedforward ; //+ 1.0*poserror + 1.5*integrated_error_;
+              //Pdes_feedforward[0] = Pdes_feedforward[0] + 0.8*poserror + 1.5*integrated_error_;
 
               //Pdes_feedforward = Pdes_feedforward + 3.5*(Terror) + 3.0*integrated_Terror_;
-              cout <<" Pdes" << Pdes_feedforward << endl;
+              cout <<" Pdes" << Pdes_feedforward[0] << endl;
               u_pres[0] = initconfig_controls_[6] + mpc_u*1e-5; //Pdes_feedforward;
               u_pres[1] = initconfig_controls_[7] - mpc_u*1e-5; //Pdes_feedforward;
               for (unsigned int i =0; i<2; i++)
                   pmodel -> Set_ControlVector(u_pres[i], i);
-              pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
+              //pmodel -> integrateRK4(loop_reference_traj_[i]*timestep/1.0e9, 0.005);
               
-              sim_u_pres[0] = 0 + 1*(loop_reference_traj_[i]*timestep/1.0e9); //Pdes_feedforward;
-              sim_u_pres[1] = 3 - 1*(loop_reference_traj_[i]*timestep/1.0e9); ; //Pdes_feedforward;
+              sim_u_pres[0] = 0 + Pdes_feedforward[0]; //*(loop_reference_traj_[i]*timestep/1.0e9); //Pdes_feedforward;
+              sim_u_pres[1] =  3 - Pdes_feedforward[0]; //*(loop_reference_traj_[i]*timestep/1.0e9); ; //Pdes_feedforward;
 
               for (unsigned int i =0; i<2; i++)
                   sim_pmodel -> Set_ControlVector(sim_u_pres[i], i);
@@ -673,17 +677,17 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   if (type == 0)
   {
 
-     if (timestep <= 3.0)
+     if (timestep <= 4.0)
      {
         ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
         ref_vel_[joint_num] = ref_slope_[joint_num];
-        ref_acl_[joint_num] = 0;
-        ref_final_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*3.0;
+                
+        ref_final_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*4.0;
 
 
      }
     
-     if (timestep <= 8.0 && timestep > 3.0)
+     if (timestep <= 20.0 && timestep > 4.0)
      {
         ref_traj_[joint_num] = ref_final_[joint_num];
         ref_vel_[joint_num] = 0;
@@ -691,21 +695,24 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
 
      }
 
-     if (timestep <= 11.0 && timestep > 8.0) 
+     if (timestep <= 24.0 && timestep > 20.0) 
      {
-        ref_traj_[joint_num] = ref_final_[joint_num] - ref_slope_[joint_num]*((double)timestep - 8.0);
+        ref_traj_[joint_num] = ref_final_[joint_num] - ref_slope_[joint_num]*((double)timestep - 20.0);
         ref_vel_[joint_num] = -ref_slope_[joint_num];
         ref_acl_[joint_num] = 0;
 
      }
 
-     if (timestep > 11.0)
+     if (timestep > 24.0)
      {
         ref_traj_[joint_num] = 0;
         ref_vel_[joint_num] = 0;
         ref_acl_[joint_num] = 0;
 
      }
+     ref_acl_[joint_num] = 0;
+     ref_jerk_[joint_num] = 0.0;
+     ref_jerkdot_[joint_num] = 0.0;
 
    /* if(ref_init_[joint_num] <= ref_final_[joint_num])
     {
@@ -746,12 +753,16 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
 
   if (type == 2)
   {
-      if (joint_num == 3)
+      if (joint_num == 1)
       {
-        double f = 2*PI*0.2;
-        ref_traj_[joint_num] = 30+20*(sin((double)timestep*f ));
+        double f = 2*PI*0.1;
+        ref_traj_[joint_num] = 20+20*(sin((double)timestep*f ));
         ref_vel_[joint_num] = f*20*(cos((double)timestep*f));
         ref_acl_[joint_num] = -f*f *20*(sin((double)timestep*f ));
+        ref_jerk_[joint_num] = -f*f*f *20*(cos((double)timestep*f ));
+        ref_jerkdot_[joint_num] = f*f*f*f *20*(sin((double)timestep*f ));
+
+
       }
       else 
         ref_traj_[joint_num] = 20* sin((double)timestep*2*PI/10);

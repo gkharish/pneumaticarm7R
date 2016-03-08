@@ -42,14 +42,14 @@ CIODAS64::CIODAS64()
 ANGLE_MIN_[0] =  -12.0;
 ANGLE_MAX_[0] =  90.0;
 
-ANGLE_MIN_[1] =  -15.0;
-ANGLE_MAX_[1] =   90.0;
+ANGLE_MIN_[1] =  -25.0;
+ANGLE_MAX_[1] =   100.0;
 
 ANGLE_MIN_[2] =  -90;
 ANGLE_MAX_[2] =   50.0;
 
-ANGLE_MIN_[3] =   -5.0;
-ANGLE_MAX_[3] =   130.0;
+ANGLE_MIN_[3] =   -30.0;
+ANGLE_MAX_[3] =   135.0;
 
 ANGLE_MIN_[4] =  -90.0;
 ANGLE_MAX_[4] =   90.0;

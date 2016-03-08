@@ -56,9 +56,9 @@ void CIODAC16::daconv(int  , char header)
          /*      send_array[0] = 0;
          send_array[1] = 0;
          send_array[2] = 0;
-         send_array[3] = 0; */
+         send_array[3] = 0; 
          send_array[14] = 0;
-         send_array[15] = 0;
+         send_array[15] = 0;*/
          for(int loop =0; loop < 16; loop++)
             {
 	      send_packet.control_cmd[loop] = (unsigned short)(13107.0*send_array[loop]);
@@ -68,7 +68,7 @@ void CIODAC16::daconv(int  , char header)
          
       else
       {
-        for(int loop =0; loop < 16; loop++)
+        for(int loop =0; loop < 14; loop++)
 	{
 	  send_packet.control_cmd[loop] = 0.0;
 	}

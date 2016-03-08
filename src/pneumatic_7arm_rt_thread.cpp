@@ -37,7 +37,7 @@
 #define VOIE_4_1  7
 #define VOIE_4_2  6
 #define VOIE_5_1 10	//12
-#define VOIE_5_2 	9	//13
+#define VOIE_5_2  9	//13
 #define VOIE_6_1 11	//9
 #define VOIE_6_2 12	//8
 #define VOIE_7_1 13	//10
@@ -591,7 +591,7 @@ void Pneumatic7ArmRtThread::UpdateSharedMemory()
 void Pneumatic7ArmRtThread::ApplyPressure()
 {
   // Write desired pressure
-  for(unsigned int muscle_j=0;muscle_j<14;muscle_j++)
+  for(unsigned int muscle_j=0;muscle_j<16;muscle_j++)
     {
       
       double pressure =  shmaddr_[muscle_j];

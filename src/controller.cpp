@@ -420,7 +420,16 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (reset_control_ ==false)
           {
-              controls_[i] = initconfig_controls_[i];
+              if (controls_[i] <= initconfig_controls_[i])
+              {
+                  controls_[i] += 0.001;
+              }
+              if (controls_[i] > initconfig_controls_[i]+0.001)
+              {
+                  controls_[i] -=0.001;
+              }
+
+              
               simulated_controls_[i] = simulated_initconfig_controls_[i];
           }
           else 

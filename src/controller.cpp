@@ -454,8 +454,8 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_controls_[i] = 0.0;
           }
 	}
-        controls_[10] = initconfig_controls_[10] ;//+ 1.8;   // Step input open loop
-        controls_[11] = initconfig_controls_[11] ;//- 1.8;
+        controls_[2] = 0.8 + initconfig_controls_[2];   // Step input open loop
+        controls_[3] = initconfig_controls_[3] - 0.8;
     }
   if (CONTROLLER_TYPE_ == 2)
     {
@@ -563,7 +563,7 @@ void Controller::ComputeControlLaw(long double timestep)
               {
                  // if(uhat2[loop_reference_traj_[3]] > initconfig_controls_[6])
                  // {
-                    controls_[6] = uhat2[loop_reference_traj_[3]] + initconfig_controls_[6 ] + 0.1*(xtraj_des2[loop_reference_traj_[3]] - positions_[3]*3.14/180);  
+                    controls_[6] = uhat2[loop_reference_traj_[3]] + initconfig_controls_[6 ] + 0.5*(xtraj_des2[loop_reference_traj_[3]] - positions_[3]*3.14/180);  
                     controls_[7] = 5- controls_[6]; 
                  // }
                   /*else
@@ -574,8 +574,8 @@ void Controller::ComputeControlLaw(long double timestep)
 
                  //if(uhat1[loop_reference_traj_[3]] > initconfig_controls_[2])
                  // {
-                    controls_[2] = uhat1[loop_reference_traj_[3]] + initconfig_controls_[2 ] + 0.1*(xtraj_des1[loop_reference_traj_[3]] - positions_[1]*3.14/180);  
-                    controls_[3] = 4 - uhat1[loop_reference_traj_[3]]; 
+                    controls_[2] = uhat1[loop_reference_traj_[3]] + initconfig_controls_[2 ] + 0.5*(xtraj_des1[loop_reference_traj_[3]] - positions_[1]*3.14/180);  
+                    controls_[3] = 4 - controls_[2]; 
                  // }
                  /* else
                   {

@@ -152,7 +152,78 @@ void PneumaticarmModel::computeStateDerivative(double time)
     //cout << "Vb1: " << P1_  << "F2: " <<Vt_ << "P2: " << wnb_ << endl;       
     //P_m1 = 0.675;
     //P_m2 = 4.0;
+/////////// Matlab copy of the model function /////////////////
+//%% Delta P Pressure Dynamics
+//%%%%%%% 2nd order  %%%%%%%%%%%%%%%
+//%wnb2 = wnb1;
+state_deriv(4) = x(6);
+state_deriv(5) = x(7);
+state_deriv(6) = -pow(wnb1,2)*x(4) - 2*wnb1*x(6) + pow(wnb1,2)*Pdes1;
+state_deriv(7) = -pow(wnb2,2)*x(5) - 2*wnb2*x(7) + pow(wnb2,2)*Pdes2;
 
+//%% Force calculation
+double T1 = Torque_net(state_vector_,joint1_lo,joint1_alphaob,joint1_k,joint1_ro,joint1_R,1,4);
+double T2 = Torque_net(state_vector_,joint2_lo,joint2_alphaob,joint2_k,joint2_ro,joint2_R,2,5);
+//% T = [T1 T2]';
+
+//%% Mass Inertia Matrix 
+double m11_const = link1_I + m1*(link1_lc)^2 + link2_I + m2*(link1_l^2 + link2_lc^2) + mb*(link1_l^2 + link2_l^2);
+double m11_var = m2*2*link1_l*link2_lc.*cos(x(2,:)) + mb*2*link1_l*link2_l.*cos(x(2,:));
+double m11 = pp(m11_var,m11_const);
+
+m12_const = link2_I + m2*link2_lc^2 + mb*link2_l^2;
+m12_var = m2*link1_l*link2_lc.*cos(x(2,:)) + mb*link1_l*link2_l.*cos(x(2,:));
+m12 = pp(m12_var,m12_const);
+col = size(m12,2);
+m22 = link2_I + m2*link2_lc^2 + mb*link2_l^2;
+for k=1:col
+    M(1:2,1:2,k) = [m11(1,k) m12(1,k);m12(1,k) m22];
+end
+% sm = size(M)
+%M() = [m11 m12;m12 m22];
+%% Coriolis Matrix
+c1_const = -(m2*link2_lc + mb*link2_l)*link1_l;
+c1_var1 = sin(x(2,:));
+c1_var2 = 2*x(3,:).*x(4,:) + x(4,:).^2;
+c1 = c1_const.*tt(c1_var1,c1_var2);
+
+c2_const = (m2*link2_lc + mb*link2_l)*link1_l;
+c2_var1 = sin(x(2,:));
+c2_var2 = x(3,:).^2;
+c2 = c2_const.*tt(c2_var1,c2_var2);
+% C = [c1 c2]';
+%% Gravity Matrix
+g1 = (m1*link1_lc + m2*link1_l + mb*link1_l).*sin(x(1,:)) + (m2*link2_lc + mb*link2_l).*sin(x(1,:) + x(2,:));
+g2 = (m2*link2_lc + mb*link2_l).*sin(x(1,:) + x(2,:));
+sg = size(g1,2);
+%% viscous friction matrix
+tf1 = -fv1.*x(3,:);
+tf2 = -fv2.*x(4,:);
+
+
+for k=1:sg
+    T(1:2,1,k) = [T1(1,k);T2(1,k)];
+    G(1:2,1,k) = 9.8.*[g1(1,k);g2(1,k)];
+    C(1:2,1,k) = [c1(1,k);c2(1,k)];
+    Tf(1:2,1,k) = [tf1(1,k);tf2(1,k)];
+end
+%G = 9.8.*[g1 g2]';
+% sg = size(G);
+% st =size(T)
+% sc =size(C)
+%% Joint Dynamics
+% Mat = [q1_dotdot, q2_dotdot]'
+for k=1:col
+  Mat(:,1,k)   = inv(M(:,:,k))*(T(:,:,k)+Tf(:,:,k) - C(:,:,k) - G(:,:,k));
+end 
+state_deriv(1,:) = x(3,:); %joint_state(2);
+state_deriv(2,:) = x(4,:); %joint_state(2);
+state_deriv(3,:) = Mat(1,:);
+state_deriv(4,:) = Mat(2,:);
+%((F_biceps -F_triceps ).*R  - fv.*theta_dot - (m*g*0.5*link_l).*sin(theta))/I;
+
+y = x + dt.*state_deriv;
+///////////////////////////////////////////////////////////////
 
 
     ODEBUGL("State derivative: "<< state_derivative_[0],0);
@@ -212,113 +283,6 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
     VectorXd stNew = state + h*st;
     return (stNew);
 }*/
-vector<double>  PneumaticarmModel::InverseModel (vector<double>& reference)
-{
-    //Parameters Muscles
-    //double Tmax, fk,fs, a, b, K0, K1, K2, P_m1, P_m2;        
-    double P_meanDes, P_real, P_real_dot, P_real_dot2, P1o, P2o, P1,P2;
-    double P1dot, P2dot, P1dot2, P2dot2;
-    vector<double>P_num;
-    P_num.resize(2);
-    
-    double theta, theta_dot, theta_dot2,theta_dot3, theta_dot4, t1dot, t2dot, t1dot2, t2dot2, tor1, tor2, Pmax, Fmax, t1,t2;
-    double m = -0.0023;
-    double c = 0.0136;
-    P1o = 0.0e5;
-    P2o = Pmax_;
-    theta = reference[0];//%(t-1)*5*pi/180;         %ref_traj(1);
-    theta_dot = reference[1];//%5*pi/180;     %ref_traj(2);
-    theta_dot2 = reference[2];
-    theta_dot3 = reference[3];
-    theta_dot4 = reference[4];
-    //theta_dot3 = reference[3];
-    //theta_dot4 = reference[4]; 
-    //R_ = 0.012;//m*state_vector_[2]*1e-5 + c; 
-    //cout << "R: " << R_ << endl ;
-    double p1 = -0.009338;   //(-0.01208, -0.006597)
-    double p2 = 0.01444;
-    R_ = p1*theta + p2;
-    double lreal = lo_ - R_*0.0;
-    Fmax = (pi*pow(ro_,2))*(a_- b_)*Pmax_;
-    t1 = R_*theta/(lreal*emax_);
-    t2 = (I_*theta_dot2 + fv_*theta_dot + m_*g*link_l_*0.5*sin(theta))/(R_*Fmax);
-    //cout << "t2:" << t2 << "R:" << R_ << endl;
-    P_real = Pmax_*(t1 + t2);
-    tor1 = P_real/Pmax;
-    tor2 = R_*theta/(lo_*emax_);
-    TorqueDes_ = R_*Fmax*(tor1 -tor2);
-    t1dot = R_*theta_dot/(lo_*emax_);
-    t2dot = (I_*theta_dot3 + fv_*theta_dot2 + theta_dot*m_*g*link_l_*0.5*cos(theta))/(R_*Fmax);
-
-    P_real_dot = Pmax_*(t1dot + t2dot);
-
-    t1dot2 = R_*theta_dot2/(lo_*emax_);
-    t2dot2 = (I_*theta_dot4 + fv_*theta_dot3 + theta_dot2*m_*g*link_l_*0.5*cos(theta) - 
-                theta_dot*theta_dot*m_*g*link_l_*0.5*sin(theta))/(R_*Fmax);
-
-    P_real_dot2 = Pmax_*(t1dot2 + t2dot2);
-    P1 = P1o + P_real;
-    P2 = P2o - P_real;
-
-    P1dot = P_real_dot;
-    P2dot = -P_real_dot;
-
-    P1dot2 = P_real_dot2;
-    P2dot2 = -P_real_dot2;
-
-    a_ = 3/pow(tan(alphao_), 2);
-    b_ = 1/pow(sin(alphao_), 2);
-    emax_ = (1/k_)*(1 - sqrt(b_/a_));
-    double cs2 = pow(cos(alphao_),2);
-    double lb_ref, epsb_ref, lt_ref, epst_ref, Vb_ref,Vt_ref, wnb_ref, wnt_ref;
-    lb_ref = lreal- R_*theta;
-    epsb_ref = (1-(lb_ref/lo_));
-    lt_ref = lo_*(1-emax_) + R_*theta;
-    epst_ref = (1-(lt_ref/lo_));
-    double termb1 = (1-cs2*pow(epsb_ref,2));
-    double termt1 = (1-cs2*pow(epst_ref,2));
-    Vb_ref = 1e6*(pi*lb_ref*pow(ro_,2)/(pow((sin(alphao_)),2)))*termb1;
-    //Vb = 230;
-    wnb_ref = 2*pi*380*(1/Vb_ref);
-    
-    Vt_ref = 1e6*(pi*lt_ref*pow(ro_,2)/(pow((sin(alphao_)),2)))*termt1;
-    //Vt = 1e6*(pi*lt*ro^2/((sin(alphao))^2))*termt1
-    //Vt = 230;
-    wnt_ref = 2*pi*380*(1/Vt_ref);
-
-///////////////////////////////////////////////////
-/*t1dot = R*theta_dot/(lo*emax);
-t2dot = (I*theta_dot3 + fv*theta_dot2 + theta_dot*m*g*link_l*0.5*cos(theta))/(R*Fmax);
-
-P_real_dot = Pmax*(t1dot + t2dot);
-
-t1dot2 = R*theta_dot2/(lo*emax);
-t2dot2 = (I*theta_dot4 + fv*theta_dot3 + theta_dot2*m*g*link_l*0.5*cos(theta)- theta_dot*m*g*link_l*0.5*sin(theta))/(R*Fmax);
-
-P_real_dot2 = Pmax*(t1dot2 + t2dot2);
-
-P1 = P1o + P_real;
-P2 = P2o - P_real;
-
-P1dot = P_real_dot;
-P2dot = -P_real_dot;
-
-P1dot2 = P_real_dot2;
-P2dot2 = -P_real_dot2;
-
-%% Pressure dynamic
-P1_num = P(1) + 2*Pdot(1)/wnb + Pdot2(1)/(wnb^2);
-
-P2_num = P(2) + 2*Pdot(2)/wnt + Pdot2(2)/(wnt^2);*/
-/////////////////////////////////////////////////   
-    P_num[0] = P_real + 2*P1dot/wnb_ref + P1dot2/pow(wnb_ref,2);
-    P_num[1] = P2 + 2*P2dot/wnt_ref + P2dot2/pow(wnt_ref,2);
-    P_num[0] = P_num[0]*1e-5;
-    P_num[1] = P_num[1]*1e-5;
-    Pmean_ref_ = P_num[0]; //1dot2*1e-5; //P_num[0];
-    return(P_num);
-}
-       
 
 void PneumaticarmModel::Set_ControlVector (double value, unsigned int idx)
 

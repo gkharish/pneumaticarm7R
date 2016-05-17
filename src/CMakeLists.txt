@@ -52,7 +52,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   muscle.cpp
   shared_memory.cpp
   pneumatic_7arm_rt_thread.cpp
-  pneumaticarm_model.cpp
+  #pneumaticarm_model.cpp
   
   dynamicmodel.cpp
   costfunction.cpp
@@ -60,7 +60,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   ilqrsolver.cpp
   MPCcontroller.cpp
   #pneumaticarmelbowlinear.cpp
-  pneumaticarmnonlinearmodel.cpp
+  pneumaticarm_2linkmodel.cpp
   pressuredynamic.cpp
 
 

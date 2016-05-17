@@ -11,11 +11,14 @@
 //#include <Eigen/Core>
 #include <math.h>
 #include <vector>
+#include "config.h"
+#include "dynamicmodel.h"
+#include "Eigen/Dense"
 #define GRAVITY 9.81
 #define PI 3.14159265
 
 using namespace std;
-//using namespace Eigen;
+using namespace Eigen;
 struct
 {
     double lo;
@@ -28,7 +31,7 @@ struct
     double fv;
     double Pmax;
 }musclejointdata;
-class PneumaticarmModel
+class PneumaticarmModel : public DynamicModel
 {
  protected:
             double a_, b_, emax_, lb_, lt_, epsb_, epst_, F1_, F2_, P1_, P2_, Pmax_;
@@ -44,7 +47,7 @@ class PneumaticarmModel
             std::vector<double> control_vector_;
         public:
                 /// Constructor
-                PneumaticarmModel();   
+                PneumaticarmModel(double& mydt);   
                 virtual  ~PneumaticarmModel();
                 void setProblemDimension (int n);
                 void setParameters (double lo, 
@@ -62,7 +65,7 @@ class PneumaticarmModel
                 void integrateRK4 (double time, double timeStep);
                 //vector<double> InverseModel(vector<double>& reference);
                 // vector<double> integrateEuler (double time, double timeStep);
-                double Torque_net(double<vector> x,double lo,double alphaob,double k,double ro,double R,unsigned int i,double pmax)
+                double Torque_net(vector<double> x,double lo,double alphaob,double k,double ro,double R,unsigned int i,double pmax);
 
                 void Set_ControlVector(double value, unsigned int idx);
                 void Set_StateVector(double value, unsigned int idx);

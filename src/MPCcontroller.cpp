@@ -1,7 +1,7 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-PneumaticarmNonlinearModel pneumaticarmModel(dt);
+PneumaticarmModel pneumaticarmModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
 ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 
@@ -9,7 +9,7 @@ ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit  <<0.0,0.0, 0.0, 4.0*1e5;
+    xinit  <<0.0,0.0, 0.0,0.0,0,0,0,0;
     //xDes  0.0,0.0,0.0, 0.0;
 
     T = 20;

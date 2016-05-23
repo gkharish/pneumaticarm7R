@@ -12,10 +12,10 @@ MPCcontroller::MPCcontroller()
     xinit  <<0.0,0.0, 0.0,0.0,0,0,0,0;
     //xDes  0.0,0.0,0.0, 0.0;
 
-    T = 20;
+    T = 40;
     //M = 400;
     dt=5e-3;
-    iterMax = 20;
+    iterMax = 100;
     stopCrit = 1e-3;
   
     /* --- test on romeo actuator --- */
@@ -41,8 +41,10 @@ MPCcontroller::MPCcontroller()
     fichier  "tau,tauDot,q,qDot,u" << endl;a*/
 }
 
-double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& reference)
+vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>& reference)
 {
+    vector<double> u;
+    u.resize(2);
     xinit(0) = xstate[0];
     xinit(1) = xstate[1];
     //xinit(2) = xstate[2];
@@ -56,8 +58,8 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
 
     xDes(0) = reference[0];
     xDes(1) = reference[1];
-    xDes(2) = reference[2];
-    xDes(3) = reference[3];
+    //xDes(2) = reference[2];
+    //xDes(3) = reference[3];
     //xDes(2) = reference[2]*3.14/180;
     //cout  "Reference position" << xDes(1) << endl;
 
@@ -71,8 +73,8 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        xinit(2) = xList[1](2,0);
-        xinit(3) = xList[1](3,0);
+        xinit(0) = xList[1](0,0);
+        xinit(1) = xList[1](1,0);
         
         //cout  << "mpc position: " << xList[1](0,0) << endl;
        // cout  "mpc control: " << uList[0](0,0);
@@ -92,8 +94,9 @@ double MPCcontroller::GetControl(vector<double>& xstate, vector<double>& referen
     cout  texec/(T*1000000) << endl;*/
 
 //    fichier.close();
-
-    return(uList[0](0,0));
+    u[0] = uList[0](0,0);
+    u[1] = uList[0](1,0);
+    return(u);
 
 }
 

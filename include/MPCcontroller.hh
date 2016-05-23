@@ -56,7 +56,7 @@ private:
 public:
     MPCcontroller();
     virtual ~MPCcontroller();
-    double GetControl(vector<double>& xstate, vector<double>& reference);
+    std::vector<double> GetControl(vector<double>& xstate, vector<double>& reference);
     double GetState();
 };
 

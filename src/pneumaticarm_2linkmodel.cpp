@@ -21,7 +21,7 @@ double j2link1_l = 351.1*1e-3;
 double j2link1_lc = 125.4*1e-3;
 double j2link1_I = 0.02;
 double j2fv1 = 3.0;
-double J2Pmax1 = 3.0;
+double j2Pmax1 = 3.0;
 // Joint 3 parameters
 double j4lo = 0.185;
 double j4alphao = 20*PI/180;
@@ -91,8 +91,8 @@ stateVec_t computejointderiv(double& dt, const stateVec_t& X,const commandVec_t&
     jointstate_deriv(7) = -pow(wnb2,2)*X(5) - 2*wnb2*X(7) + pow(wnb2,2)*Pdes2;
     
     //%% Force calculation
-    double T1 = Torque_net(X,j2lo1,j2alphao1,j2k1,j2ro1,j2R1,0,4);
-    double T2 = Torque_net(X,j4lo,j4alphao,j4k,j4ro,j4R,1,5);
+    double T1 = Torque_net(X,j2lo1,j2alphao1,j2k1,j2ro1,j2R1,0,j2Pmax1);
+    double T2 = Torque_net(X,j4lo,j4alphao,j4k,j4ro,j4R,1,j4Pmax);
     
     //%% Mass Inertia Matrix 
     double m11_const = j2link1_I + j2m1*pow(j2link1_lc,2) + j4link2_I + j4m2*(pow(j2link1_l,2) + 
@@ -203,8 +203,8 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
     jointstate_deriv(7) = -pow(wnb2,2)*X(5) - 2*wnb2*X(7) + pow(wnb2,2)*Pdes2;
     
     //%% Force calculation
-    double T1 = Torque_net(X,j2lo1,j2alphao1,j2k1,j2ro1,j2R1,0,4);
-    double T2 = Torque_net(X,j4lo,j4alphao,j4k,j4ro,j4R,1,5);
+    double T1 = Torque_net(X,j2lo1,j2alphao1,j2k1,j2ro1,j2R1,0,j2Pmax1);
+    double T2 = Torque_net(X,j4lo,j4alphao,j4k,j4ro,j4R,1,j4Pmax);
     
     //%% Mass Inertia Matrix 
     double m11_const = j2link1_I + j2m1*pow(j2link1_lc,2) + j4link2_I + j4m2*(pow(j2link1_l,2) + 

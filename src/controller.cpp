@@ -13,11 +13,11 @@
 #include <debug.hh>
 #include <controller.hh>
 #include <shared_memory.hh>
-#include <pneumaticarm_model.hh>
+#include <pneumaticarm_2linkmodel.hh>
 using namespace std;
-PneumaticarmModel *Joint1modelp = new PneumaticarmModel();
-PneumaticarmModel *Joint2modelp = new PneumaticarmModel();
-PneumaticarmModel *Joint3modelp = new PneumaticarmModel();
+PneumaticarmaNonlinearModel *Joint1modelp = new PneumaticarmModel();
+PneumaticarmNonlinearModel *Joint2modelp = new PneumaticarmModel();
+PneumaticarmNonlinearModel *Joint3modelp = new PneumaticarmModel();
 
 
 PressureModel *pmodel = new PressureModel();

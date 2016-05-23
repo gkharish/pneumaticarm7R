@@ -1,7 +1,7 @@
 #include <MPCcontroller.hh>
 
 double dt = 5e-3;
-PneumaticarmModel pneumaticarmModel(dt);
+PneumaticarmNonlinearModel pneumaticarmModel(dt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
 ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 

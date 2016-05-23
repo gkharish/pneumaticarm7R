@@ -3,82 +3,81 @@
 
 
 /* This is a program to model the pneumatic muscle based joint of the Pneumatic 7R arm */
+#ifndef PNEUMATICARMNONLINEARMODEL_H
+#define PNEUMATICARMNONLINEARMODEL_H
 
-#ifndef PNEUMATICARMMODEL_HH
-#define PNEUMATICARMMODEL_HH
-
-//#include <Eigen/Dense>
-//#include <Eigen/Core>
-#include <math.h>
-#include <vector>
 #include "config.h"
-#include "dynamicmodel.h"
-#include "Eigen/Dense"
-#define GRAVITY 9.81
-#define PI 3.14159265
 
-using namespace std;
+#include "dynamicmodel.h"
+#include <Eigen/Dense>
+
 using namespace Eigen;
-struct
+
+class PneumaticarmNonlinearModel : public DynamicModel
 {
-    double lo;
-    double alphao;
-    double k;
-    double ro;
-    double R;
+public:
+    PneumaticarmNonlinearModel(double& mydt);
+private:
+protected:
+
+    // attributes //
+public:
+private:
+    double dt;
+    unsigned int stateNb;
+    unsigned int commandNb;
+    // Muscle parameters
+    double lo, alphao, k,ro,R,a,b,emax,lb,lt,epsb,epst;
+    double time_constant1, time_constant2;
+
+   // Joint parameters 
     double m;
     double link_l;
+    double g;
+    double I;
     double fv;
-    double Pmax;
-}musclejointdata;
-class PneumaticarmModel : public DynamicModel
-{
- protected:
-            double a_, b_, emax_, lb_, lt_, epsb_, epst_, F1_, F2_, P1_, P2_, Pmax_;
-            double lo_, alphao_, k_,ro_, R_, m_, link_l_, g, I_, fv_;
-            double Torque_, TorqueDes_, Pmean_ref_;
-            double wnb_, wnt_, Vb_, Vt_;
-            float pressure_muscle1_, pressure_muscle2_, pressure_musclebase_;
-            
-            int nDOF_;
-           unsigned int n_;
-            std::vector<double> state_vector_;
-            std::vector<double> state_derivative_;
-            std::vector<double> control_vector_;
-        public:
-                /// Constructor
-                PneumaticarmModel(double& mydt);   
-                virtual  ~PneumaticarmModel();
-                void setProblemDimension (int n);
-                void setParameters (double lo, 
-                                    double alphao, 
-                                    double k, 
-                                    double ro, 
-                                    double R, 
-                                    double m,
-                                    double l, 
-                                    double fv,
-                                    double Pmax);
-                //void setParameters (musclejointdata data);
-                //void setpidcoeff(int p, int i, int d);
-                void computeStateDerivative (double time);
-                void integrateRK4 (double time, double timeStep);
-                //vector<double> InverseModel(vector<double>& reference);
-                // vector<double> integrateEuler (double time, double timeStep);
-                double Torque_net(vector<double> x,double lo,double alphaob,double k,double ro,double R,unsigned int i,double pmax);
 
-                void Set_ControlVector(double value, unsigned int idx);
-                void Set_StateVector(double value, unsigned int idx);
-                double Get_StateVector(unsigned idx);
-                double Get_PmeanRef();
-                double Get_ControlVector(unsigned int idx);
-                double Get_Torque();
-                double Get_TorqueDes();
-                //VectorXd getControl (VectorXd statevector, double reference_position, double position);
-   };
+   
+    stateMat_t Id;
+    stateMat_t A;
+    stateMat_t Ad;
+    stateR_commandC_t B;
+    stateR_commandC_t Bd;
+    double A13atan,A10;
+    double A33atan;
+    stateMat_t fx,fxBase;
+    stateTens_t fxx;
+    stateR_commandC_t fu,fuBase;
+    stateR_commandC_commandD_t fuu;
+    stateR_stateC_commandD_t fxu;
+    stateR_commandC_stateD_t fux;
 
-    
+    stateMat_t QxxCont;
+    commandMat_t QuuCont;
+    commandR_stateC_t QuxCont;
 
-    
-#endif
+protected:
+    // methods //
+public:
+    stateVec_t computeNextState(double& dt, const stateVec_t& X, const commandVec_t &U);
+    void computeAllModelDeriv(double& dt, const stateVec_t& X, const commandVec_t &U);
+    stateMat_t computeTensorContxx(const stateVec_t& nextVx);
+    commandMat_t computeTensorContuu(const stateVec_t& nextVx);
+    commandR_stateC_t computeTensorContux(const stateVec_t& nextVx);
+private:
+protected:
+        // accessors //
+public:
+    unsigned int getStateNb();
+    unsigned int getCommandNb();
+    stateMat_t &getfx();
+    stateTens_t& getfxx();
+    stateR_commandC_t &getfu();
+    stateR_commandC_commandD_t& getfuu();
+    stateR_stateC_commandD_t& getfxu();
+    stateR_commandC_stateD_t& getfux();
+
+};
+
+#endif // PNEUMATICARMNONLINEARMODEL_H
 

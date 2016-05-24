@@ -110,7 +110,7 @@ Controller::Controller()
   D_[3] = 0.000;
   Pid_factor_[3] = 1;
   ref_init_[3] = 0;
-  desired_position_[3] = 45;
+  desired_position_[3] = 60;
   ref_slope_[3] = 15;
   ref_type_[3] = 0;
   ref_traj_[3] = 0;

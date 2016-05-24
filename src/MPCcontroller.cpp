@@ -12,10 +12,10 @@ MPCcontroller::MPCcontroller()
     xinit  <<0.0,0.0, 0.0,0.0,0,0,0,0;
     //xDes  0.0,0.0,0.0, 0.0;
 
-    T = 40;
+    T = 10;
     //M = 400;
     dt=5e-3;
-    iterMax = 100;
+    iterMax = 120;
     stopCrit = 1e-3;
   
     /* --- test on romeo actuator --- */
@@ -73,11 +73,11 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        xinit(0) = xList[1](0,0);
-        xinit(1) = xList[1](1,0);
+        //xinit(0) = xList[1](0,0);
+        //xinit(1) = xList[1](1,0);
         
         //cout  << "mpc position: " << xList[1](0,0) << endl;
-       // cout  "mpc control: " << uList[0](0,0);
+        //cout  << "mpc control: " << xList[1](1,0);
         // state feedback
         /*for(int j=0;j<T;j++) fichier  xList[j](0,0) << "," << xList[j](1,0) << "," << xList[j](2,0)  << "," << uList[j](0,0) << endl;
         fichier  xList[T](0,0) << "," << xList[T](1,0) << "," << xList[T](2,0)  << "," << 0.0 << endl;

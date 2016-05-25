@@ -45,8 +45,8 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
 {
     vector<double> u;
     u.resize(2);
-    xinit(0) = xstate[0];
-    xinit(1) = xstate[1];
+    //xinit(0) = xstate[0];
+    //xinit(1) = xstate[1];
     //xinit(2) = xstate[2];
     //xinit(3) = xstate[3];
     
@@ -73,8 +73,8 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
-        //xinit(0) = xList[1](0,0);
-        //xinit(1) = xList[1](1,0);
+        xinit(0) = xList[1](0,0);
+        xinit(1) = xList[1](1,0);
         
         //cout  << "mpc position: " << xList[1](0,0) << endl;
         //cout  << "mpc control: " << xList[1](1,0);

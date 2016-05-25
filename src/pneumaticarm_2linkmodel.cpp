@@ -75,10 +75,10 @@ stateVec_t computejointderiv(double& dt, const stateVec_t& X,const commandVec_t&
     double m = -0.0023;
     double c = 0.0136;
 
-    //R_ = 0.012; //m*state_vector_[2]*1e-5 + c; 
+    j2R1 = m*X(4) + c; 
     //P1_ = X(4);
     //P2_ = X(5);
-    double wnb1 = 10;
+    double wnb1 = 9;
     double wnb2 = 8;
     //%% Delta P Pressure Dynamics
     ////%%%%%%% 2nd order  %%%%%%%%%%%%%%
@@ -157,17 +157,14 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
     //state_derivative_.resize(8);
     //control_vector_.resize(2);
    //////////////////////////////////////////////
-    fxx[0].setZero();
+    /*fxx[0].setZero();
     fxx[1].setZero();
     fxx[2].setZero();
     fxx[3].setZero();
 
     fxu[0].setZero();
     fxu[1].setZero();
-    /*fuBase <<0.0, 0.0,
-             0.0, 0.0,
-             1, 0.0,
-             0.0, 1;*/
+  
     fuBase = B;
     fu = dt* fuBase;
     fuu[0].setZero();
@@ -176,7 +173,7 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
 
     QxxCont.setZero();
     QuuCont.setZero();
-    QuxCont.setZero();
+    QuxCont.setZero();*/
 }
 
 stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateVec_t& X,const commandVec_t& U)
@@ -187,10 +184,10 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
     double m = -0.0023;
     double c = 0.0136;
 
-    //R_ = 0.012; //m*state_vector_[2]*1e-5 + c; 
+    j2R1 = m*X(4) + c; 
     //double P1_ = X(4);
     //double P2_ = X(5);
-    double wnb1 = 10;
+    double wnb1 = 9;
     double wnb2 = 8;
     //%% Delta P Pressure Dynamics
     ////%%%%%%% 2nd order  %%%%%%%%%%%%%%
@@ -273,10 +270,10 @@ void PneumaticarmNonlinearModel::computeAllModelDeriv(double& dt, const stateVec
         {
             tempX = X;
             tempX(j) = X(j) + dh;
-            derivplus = computejointderiv(dt, tempX, U);
+            derivplus = this->computeNextState(dt, tempX, U);
             tempX = X;
             tempX(j) = X(j)-dh;
-            derivminus = computejointderiv( dt, tempX, U);
+            derivminus = this->computeNextState(dt, tempX, U);
             fx(i,j) = (derivplus(i) - derivminus(i))/(2*dh);
         }
     }

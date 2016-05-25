@@ -262,12 +262,12 @@ void Controller::ApplyControlLaw()
       velocity2 = (position_store_[0] - position_store_[1])/time_step;
 
       acceleration = (velocity2 - velocity1)/time_step;
-      xstate_[0] = position_store_[0];
-      xstate_[1] = velocity2;
+      //xstate_[0] = position_store_[0];
+      //xstate_[1] = velocity2;
       //xstate_[
       velocity_[3] = velocity2;
       acceleration_[3] = acceleration;
-      xstate_[2] = acceleration;
+      //xstate_[2] = acceleration;
       
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
@@ -308,8 +308,14 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (reset_control_ ==false)
           {
-              controls_[i] = initconfig_controls_[i];
-              simulated_controls_[i] = simulated_initconfig_controls_[i];
+               if (controls_[i] <= initconfig_controls_[i])
+              {
+                  controls_[i] += 0.001;
+              }
+              if (controls_[i] > initconfig_controls_[i]+0.001)
+              {
+                  controls_[i] -=0.001;
+              }
           }
           else 
           {
@@ -366,7 +372,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator((loop_reference_traj_[i]+9)*timestep/1.0e9, i,  ref_type_[i]);
+	      ReferenceGenerator((loop_reference_traj_[i]+1)*timestep/1.0e9, i,  ref_type_[i]);
 	      //ODEBUG("Inside Joint num:" << i );
              //ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_[i] - positions_[i];
@@ -377,9 +383,9 @@ void Controller::ComputeControlLaw(long double timestep)
 
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
-	      loop_reference_traj_[i]++;
-              reference_[0] = 0.5*ref_traj_[i]*3.14/180;
-              reference_[1] = ref_traj_[i]*3.14/180;
+	      
+              reference_[0] = 0.5*ref_traj_[i]*PI/180;
+              reference_[1] = ref_traj_[i]*PI/180;
              
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
               reference_mpc_[0] = reference_[0];
@@ -392,11 +398,11 @@ void Controller::ComputeControlLaw(long double timestep)
               //cout << "mpc_u :" << mpc_u[1] << endl;
         
              
-             
-              controls_[2*i] =  0.7 + mpc_u[1];//pmodel -> Get_StateVector(0);
+ 
+              controls_[2*i] =  mpc_u[1];//pmodel -> Get_StateVector(0);
               controls_[2*i+1] = 4 - mpc_u[1]; //pmodel -> Get_StateVector(2); 
               
-              controls_[2] =  0.5 + mpc_u[0] ;//pmodel -> Get_StateVector(0);
+              controls_[2] =  mpc_u[0] ;//pmodel -> Get_StateVector(0);
               controls_[3] = 3 - mpc_u[0]; 
                          
              if(controls_[2*i +1] >=4.5)
@@ -411,6 +417,7 @@ void Controller::ComputeControlLaw(long double timestep)
              
              
 	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
+              loop_reference_traj_[i]++;
 	    }
 	  else
 	    {

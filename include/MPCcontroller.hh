@@ -12,7 +12,8 @@
 #include "romeolinearactuator.h"
 #include "costfunctionromeoactuator.h"*/
 //#include "pneumaticarm2ordermodel.h"
-#include "pneumaticarmnonlinearmodel.h"
+//#include "pneumaticarmnonlinearmodel.h"
+#include "pneumaticarm_2linkmodel.hh"
 //#include "pneumaticarmelbowlinear.h"
 // #include "pneumaticarmelbowpiecelinear.h"
 #include "costfunctionpneumaticarmelbow.h"
@@ -55,7 +56,7 @@ private:
 public:
     MPCcontroller();
     virtual ~MPCcontroller();
-    double GetControl(vector<double>& xstate, vector<double>& reference);
+    std::vector<double> GetControl(vector<double>& xstate, vector<double>& reference);
     double GetState();
 };
 

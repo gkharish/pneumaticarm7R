@@ -45,7 +45,7 @@ SET(${PROJECT_NAME}_HEADERS
 	include/joystick.h
 	include/modele.h
 	include/port.hh
-        include/pneumaticarm_model.hh
+        #include/pneumaticarm_model.hh
 	include/main_controleur.hh
         include/dynamicmodel.h
         include/config.h
@@ -54,7 +54,7 @@ SET(${PROJECT_NAME}_HEADERS
         include/ilqrsolver.h
         include/MPCcontroller.hh
         #include/pneumaticarmelbowlinear.h
-        include/pneumaticarmnonlinearmodel.h
+        include/pneumaticarm_2linkmodel.hh
         include/pressuredynamic.hh
 
  )

@@ -1,7 +1,7 @@
 #include <MPCcontroller.hh>
 
-double dt = 5e-3;
-PneumaticarmNonlinearModel pneumaticarmModel(dt);
+double mdt = 50e-3;
+PneumaticarmNonlinearModel pneumaticarmModel(mdt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
 ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 
@@ -14,8 +14,8 @@ MPCcontroller::MPCcontroller()
 
     T = 10;
     //M = 400;
-    dt=5e-3;
-    iterMax = 120;
+    dt=50e-3;
+    iterMax = 100;
     stopCrit = 1e-3;
   
     /* --- test on romeo actuator --- */
@@ -61,7 +61,7 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
     //xDes(2) = reference[2];
     //xDes(3) = reference[3];
     //xDes(2) = reference[2]*3.14/180;
-    //cout  "Reference position" << xDes(1) << endl;
+    //cout  << "Reference position" << xDes(0) << endl;
 
     iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
@@ -76,7 +76,7 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
         xinit(0) = xList[1](0,0);
         xinit(1) = xList[1](1,0);
         
-        //cout  << "mpc position: " << xList[1](0,0) << endl;
+        cout  << "mpc position: " << xList[1](1,0) << endl;
         //cout  << "mpc control: " << xList[1](1,0);
         // state feedback
         /*for(int j=0;j<T;j++) fichier  xList[j](0,0) << "," << xList[j](1,0) << "," << xList[j](2,0)  << "," << uList[j](0,0) << endl;

@@ -15,10 +15,10 @@
 #include <time.h>
 #include <math.h>
 //#include <random>
-#define PI 3.14159265
+#define PIc 3.14159265
 #include "shared_memory.hh"
 //#include "pneumaticarm_model.hh"
-#include "pressuredynamic.hh"
+//#include "pressuredynamic.hh"
 #include "MPCcontroller.hh"
 using namespace std;
 //using namespace Eigen;

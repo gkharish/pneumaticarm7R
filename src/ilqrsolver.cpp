@@ -76,7 +76,7 @@ void ILQRSolver::initTrajectory()
     zeroCommand.setZero();
     for(unsigned int i=0;i<T;i++)
     {
-        //uList[i] = zeroCommand;
+        uList[i] = zeroCommand;
         xList[i+1] = dynamicModel->computeNextState(dt,xList[i],uList[i]);
     }
 }

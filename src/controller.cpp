@@ -15,9 +15,14 @@
 #include <shared_memory.hh>
 #include <pneumaticarm_2linkmodel.hh>
 using namespace std;
-//PneumaticarmaNonlinearModel *Joint1modelp = new PneumaticarmModel();
+//double dt = 50e-3;
+//PneumaticarmaNonlinearModel Joint1modelp(dt); // = new PneumaticarmNonlinearModel(dt);
 //PneumaticarmNonlinearModel *Joint2modelp = new PneumaticarmModel();
 //PneumaticarmNonlinearModel *Joint3modelp = new PneumaticarmModel();
+double mdt1 = 50e-3;
+PneumaticarmNonlinearModel Joint1modelp(mdt1);
+stateVec_t xt, xtemp ;
+commandVec_t mpcU;
 
 
 //PressureModel *pmodel = new PressureModel();
@@ -26,7 +31,7 @@ using namespace std;
 // Joint 1 parameters
 // Joint 2 parameters
 double j2lo = 0.23;
-double j2alphao = 20*PI/180;
+double j2alphao = 20*PIc/180;
 double j2k = 1.1;
 double j2ro = 0.012;
 double j2R = 0.009;
@@ -36,7 +41,7 @@ double j2fv = 3.0;
 double j2Pmax = 3.0e5;
 // Joint 3 parameters
 double j3lo = 0.185;
-double j3alphao = 20*PI/180;
+double j3alphao = 20*PIc/180;
 double j3k = 1.25;
 double j3ro = 0.0085;
 double j3R = 0.015;
@@ -179,7 +184,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   now, TASK_PERIOD = 5e6;//1000000; ..present,
+  RTIME   now, TASK_PERIOD = 50e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   unsigned int loop = 0;
   unsigned int filter_loop =0;
@@ -294,7 +299,7 @@ void Controller::ApplyControlLaw()
       //shmaddr_[24] =  Joint2modelp -> Get_PmeanRef() ;//state_mpc_[2]*1e-5;
       //shmaddr_[24] = ref_traj_[1]*PI/180; //velocity_[3];
       //shmaddr_[21] = acceleration_[3];
-      shmaddr_[24] = mpc_controller.GetState()*180/3.14;
+      shmaddr_[24] = 0.4; //Joint1modelp.getX(0);//mpc_controller.GetState()*179/3.14;
       //shmaddr_[23] = (int)( Joint2modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
@@ -349,7 +354,7 @@ void Controller::ComputeControlLaw(long double timestep)
       //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
       // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
    double wn = 0.2;
-      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PI*wn/1.0e9))) );/*+ 
+      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PIc*wn/1.0e9))) );/*+ 
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
@@ -374,7 +379,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator((loop_reference_traj_[i]+1)*timestep/1.0e9, i,  ref_type_[i]);
+	      ReferenceGenerator((loop_reference_traj_[i]+9)*timestep/1.0e9, i,  ref_type_[i]);
 	      //ODEBUG("Inside Joint num:" << i );
              //ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_[i] - positions_[i];
@@ -382,13 +387,13 @@ void Controller::ComputeControlLaw(long double timestep)
 	      error_prev_[i] = error_now_[i];
            
               if(abs(error_now_[i]) >= criterror_)
-                integrated_error_ = integrated_error_ + 0.005*error_now_[i]*PI/180;
+                integrated_error_ = integrated_error_ + 0.005*error_now_[i]*PIc/180;
 
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
 	      
-              reference_[0] = 0.5*ref_traj_[i]*PI/180;
-              reference_[1] = ref_traj_[i]*PI/180;
+              reference_[0] = 0.5*ref_traj_[i]*PIc/180;
+              reference_[1] = ref_traj_[i]*PIc/180;
              
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
 
@@ -396,13 +401,12 @@ void Controller::ComputeControlLaw(long double timestep)
               reference_mpc_[1] = reference_[1];
               
               // Calling MPC controller
-              state_mpc_[0] = positions_[1]*PI/180; //xstate_[0];
-              state_mpc_[1] = positions_[3]*PI/180; //xstate_[1];
+              state_mpc_[0] = positions_[1]*PIc/180; //xstate_[0];
+              state_mpc_[1] = positions_[3]*PIc/180; //xstate_[1];
               mpc_u = mpc_controller.GetControl(state_mpc_, reference_mpc_);
-              //cout << "mpc_u :" << mpc_u[1] << endl;
-        
-             
- 
+              cout << "mpc_u :" << mpc_u[0] << endl;
+              
+              
               controls_[2*i] =  mpc_u[1];//pmodel -> Get_StateVector(0);
               controls_[2*i+1] = 4 - mpc_u[1]; //pmodel -> Get_StateVector(2); 
               
@@ -418,10 +422,14 @@ void Controller::ComputeControlLaw(long double timestep)
                   controls_[2*i] = 4.5;
              else if (controls_[2*i] <= 0.0)
                   controls_[2*i] = 0.0;
+             /*mpcU(0) = 2; mpcU(1) = 2; // simulating the dynamics
              
-             
-	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
-              loop_reference_traj_[i]++;
+             xtemp = Joint1modelp.computeNextState(mdt1, xt, mpcU);
+             xt = xtemp;
+             xtemp.setZero();
+	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
+             cout << "xt:" << xt(0) << endl;*/
+             loop_reference_traj_[i]++;
 	    }
 	  else
 	    {
@@ -429,13 +437,9 @@ void Controller::ComputeControlLaw(long double timestep)
 	      controls_[2*i+1] = initconfig_controls_[2*i+1];
               simulated_controls_[2*i] = simulated_initconfig_controls_[2*i];
 	      simulated_controls_[2*i+1] = simulated_initconfig_controls_[2*i+1];
-
 	    }
-	}
-         
+	}    
     }
-
-
 }
 /*double Integrator(double t, double error, double h)
 {
@@ -633,7 +637,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   {
       if (joint_num == 1)
       {
-        double f = 2*PI*0.1;
+        double f = 2*PIc*0.1;
         ref_traj_[joint_num] = 20+20*(sin((double)timestep*f ));
         ref_vel_[joint_num] = f*20*(cos((double)timestep*f));
         ref_acl_[joint_num] = -f*f *20*(sin((double)timestep*f ));
@@ -643,7 +647,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
 
       }
       else 
-        ref_traj_[joint_num] = 20* sin((double)timestep*2*PI/10);
+        ref_traj_[joint_num] = 20* sin((double)timestep*2*PIc/10);
   }
 
 

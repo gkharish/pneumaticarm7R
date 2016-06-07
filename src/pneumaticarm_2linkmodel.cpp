@@ -129,14 +129,14 @@ stateVec_t computejointderiv(double& dt, const stateVec_t& X,const commandVec_t&
     double g1 = (j2m1*j2link1_lc + j4m2*j2link1_l + mb*j2link1_l)*sin(X(0)) + (
                         j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
     
-    double g2 = (j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
+    double g2 = 9.8*(j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
 
     //%% viscous friction matrix
     double tf1 = -j2fv1*X(2);
     double tf2 = -j4fv2*X(3);
     
-    double Mat1 = inv_m11*(T1 + tf1 - c1 -g1) + inv_m12*(T2+tf2 -c2 -g2);
-    double Mat2 = inv_m21*(T1 + tf1 - c1 -g1) + inv_m22*(T2+tf2 -c2 -g2);
+    double Mat1 = inv_m11*(T1 + tf1 - c1 - 9.8*g1) + inv_m12*(T2+tf2 -c2 -g2);
+    double Mat2 = inv_m21*(T1 + tf1 - c1 - 9.8*g1) + inv_m22*(T2+tf2 -c2 -g2);
 
     jointstate_deriv(0) = X(2); //%joint_state(2);
     jointstate_deriv(1) = X(3); //%joint_state(2);
@@ -243,14 +243,14 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
     double g1 = (j2m1*j2link1_lc + j4m2*j2link1_l + mb*j2link1_l)*sin(X(0)) + (
                         j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
     
-    double g2 = (j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
+    double g2 = 9.8*(j4m2*j4link2_lc + mb*j4link2_l)*sin(X(0) + X(1));
 
     //%% viscous friction matrix
     double tf1 = -j2fv1*X(2);
     double tf2 = -j4fv2*X(3);
     
-    double Mat1 = inv_m11*(T1 + tf1 - c1 -g1) + inv_m12*(T2+tf2 -c2 -g2);
-    double Mat2 = inv_m21*(T1 + tf1 - c1 -g1) + inv_m22*(T2+tf2 -c2 -g2);
+    double Mat1 = inv_m11*(T1 + tf1 - c1 - 9.8*g1) + inv_m12*(T2+tf2 -c2 -g2);
+    double Mat2 = inv_m21*(T1 + tf1 - c1 - 9.8*g1) + inv_m22*(T2+tf2 -c2 -g2);
 
     jointstate_deriv(0) = X(2); //%joint_state(2);
     jointstate_deriv(1) = X(3); //%joint_state(2);
@@ -267,7 +267,7 @@ void PneumaticarmNonlinearModel::computeAllModelDeriv(double& dt, const stateVec
     //fx = fxBase;
   
 
-    double dh = 1e-4;
+    double dh = 5e-3;
     stateVec_t tempX, derivplus, derivminus;
     commandVec_t tempU;
     tempX = X;

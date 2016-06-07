@@ -14,6 +14,8 @@
 #include <cmath>
 #include <time.h>
 #include <math.h>
+#include <iostream>
+#include <fstream>
 //#include <random>
 #define PIc 3.14159265
 #include "shared_memory.hh"
@@ -124,7 +126,8 @@ public:
   std::vector<double> delta;
   std::vector<double> simulated_delta_;
   double criterror_, integrated_error_, integrated_simerror_, integrated_Terror_;
-
+  //Log data
+  ofstream control_logfx_, control_logfu_;
   /*! @{ Errors computation */
   /* \brief Current error */
   std::vector<double> error_now_;

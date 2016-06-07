@@ -1,6 +1,6 @@
 #include <MPCcontroller.hh>
 
-double mdt = 50e-3;
+double mdt = 10e-3;
 PneumaticarmNonlinearModel pneumaticarmModel(mdt);
 CostFunctionPneumaticarmElbow costPneumaticArmElbow;
 ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
@@ -14,10 +14,12 @@ MPCcontroller::MPCcontroller()
 
     T = 10;
     //M = 400;
-    dt=50e-3;
+    dt=10e-3;
     iterMax = 100;
     stopCrit = 1e-3;
-  
+    plimit.resize(2);
+    //plimit[0] = 3.0;
+    //plimit[1] = 4.0;
     /* --- test on romeo actuator --- */
     /*RomeoSimpleActuator romeoActuatorModel(dt);
     RomeoLinearActuator romeoLinearModel(dt);
@@ -65,7 +67,8 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
 
     iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
-    gettimeofday(&tbegin,NULL);
+    //gettimeofday(&tbegin,NULL);
+    
     /*for(int i=0;i<M;i++)
     {*/
         iLQRsolver.initSolver(xinit,xDes,T);
@@ -73,20 +76,35 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
         xList = lastTraj.xList;
         uList = lastTraj.uList;
+        //Apply limit
+        /*for(unsigned int i =0; i<2;i++)
+        {
+            for(unsigned int j=0;j<T;j++)
+            {
+                if(uList[j](i,0) >=plimit(i))
+                    uList[j](i,0) = plimit(i);
+                else if (uList[j](i,0) <= 0.0)
+                    uList[j](i,0)= 0.0;
+            }
+        }*/
+
+
+        //uList
         xinit(0) = xList[1](0,0);
         xinit(1) = xList[1](1,0);
         
-        cout  << "mpc position: " << xList[1](1,0) << endl;
+        //cout  << "mpc position: " << xList[1](1,0) << endl;
         //cout  << "mpc control: " << xList[1](1,0);
         // state feedback
         /*for(int j=0;j<T;j++) fichier  xList[j](0,0) << "," << xList[j](1,0) << "," << xList[j](2,0)  << "," << uList[j](0,0) << endl;
         fichier  xList[T](0,0) << "," << xList[T](1,0) << "," << xList[T](2,0)  << "," << 0.0 << endl;
     //}*/
-    gettimeofday(&tend,NULL);
+    //
+    //gettimeofday(&tend,NULL);
 
 
-    texec=((double)(1000*(tend.tv_sec-tbegin.tv_sec)+((tend.tv_usec-tbegin.tv_usec)/1000)))/1000.;
-    texec = (double)(tend.tv_usec - tbegin.tv_usec);
+    //texec=((double)(1000*(tend.tv_sec-tbegin.tv_sec)+((tend.tv_usec-tbegin.tv_usec)/1000)))/1000.;
+    //texec = (double)(tend.tv_usec - tbegin.tv_usec);
 
     /*cout  "temps d'execution total du solveur ";
     cout  texec/1000000.0 << endl;
@@ -109,5 +127,14 @@ MPCcontroller::~MPCcontroller()
 {
   
 }
+stateMat_t MPCcontroller::Get_mpc_fx()
+{
+    return(pneumaticarmModel.getfx());
+}
+stateR_commandC_t MPCcontroller::Get_mpc_fu()
+{
+    return(pneumaticarmModel.getfu());
+}
+
 
 

@@ -39,7 +39,9 @@ private:
     unsigned int iterMax;
     double stopCrit ;
     stateVec_t* xList;
-    commandVec_t* uList;
+    commandVec_t* uList; 
+    commandVec_t plimit;
+    //std::vector<double> plimit; 
     ILQRSolver::traj lastTraj;  // ofstream fichier("resultsMPC.csv",ios::out | ios::trunc);
 
     /* --- test on romeo actuator --- */
@@ -58,6 +60,8 @@ public:
     virtual ~MPCcontroller();
     std::vector<double> GetControl(vector<double>& xstate, vector<double>& reference);
     double GetState();
+    stateMat_t Get_mpc_fx();
+    stateR_commandC_t Get_mpc_fu();
 };
 
 #endif

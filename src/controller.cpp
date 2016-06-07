@@ -19,7 +19,7 @@ using namespace std;
 //PneumaticarmaNonlinearModel Joint1modelp(dt); // = new PneumaticarmNonlinearModel(dt);
 //PneumaticarmNonlinearModel *Joint2modelp = new PneumaticarmModel();
 //PneumaticarmNonlinearModel *Joint3modelp = new PneumaticarmModel();
-double mdt1 = 50e-3;
+double mdt1 = 10e-3;
 PneumaticarmNonlinearModel Joint1modelp(mdt1);
 stateVec_t xt, xtemp ;
 commandVec_t mpcU;
@@ -30,7 +30,7 @@ commandVec_t mpcU;
 
 // Joint 1 parameters
 // Joint 2 parameters
-double j2lo = 0.23;
+/*double j2lo = 0.23;
 double j2alphao = 20*PIc/180;
 double j2k = 1.1;
 double j2ro = 0.012;
@@ -47,7 +47,7 @@ double j3ro = 0.0085;
 double j3R = 0.015;
 double j3m = 2.6;
 double j3link_l = 0.32;
-double j3fv = 0.25;
+double j3fv = 0.25;*/
 
 void principale_controller_function(void *arg)
 {
@@ -164,6 +164,9 @@ Controller::Controller()
     }
 
   InitSharedMemory();
+  // Open the file to  be written
+  //control_logfx_.open("logfx.txt");
+  //control_logfu_.open("logfu.txt");
 }
 
 
@@ -184,7 +187,7 @@ void Controller::SetControllerType(int i)
 
 void Controller::ApplyControlLaw()
 {
-  RTIME   now, TASK_PERIOD = 50e6;//1000000; ..present,
+  RTIME   now, TASK_PERIOD = 10e6;//1000000; ..present,
   rt_task_set_periodic(NULL, TM_NOW, rt_timer_ns2ticks(TASK_PERIOD));
   unsigned int loop = 0;
   unsigned int filter_loop =0;
@@ -231,8 +234,8 @@ void Controller::ApplyControlLaw()
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
-    u[0] = 0.0;///;  //shmaddr_[6];  //Joint2modelp -> Get_ControlVector(0);  //shmaddr_[6];
-    u[1] = 3.0e5;  //shmaddr_[7];  //Joint2modelp -> Get_ControlVector(1); //shmaddr_[7];
+    //u[0] = 0.0;///;  //shmaddr_[6];  //Joint2modelp -> Get_ControlVector(0);  //shmaddr_[6];
+    //u[1] = 3.0e5;  //shmaddr_[7];  //Joint2modelp -> Get_ControlVector(1); //shmaddr_[7];
     simulated_initconfig_controls_[2] = 0.0; 
     simulated_initconfig_controls_[3] = 0.0; 
     
@@ -301,9 +304,11 @@ void Controller::ApplyControlLaw()
       //shmaddr_[21] = acceleration_[3];
       shmaddr_[24] = 0.4; //Joint1modelp.getX(0);//mpc_controller.GetState()*179/3.14;
       //shmaddr_[23] = (int)( Joint2modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      
       shm_sem_.Release();
       loop++;
     }
+    //control_logfx_.close(); control_logfu_.close();
 }
 
 void Controller::ComputeControlLaw(long double timestep)
@@ -404,12 +409,19 @@ void Controller::ComputeControlLaw(long double timestep)
               state_mpc_[0] = positions_[1]*PIc/180; //xstate_[0];
               state_mpc_[1] = positions_[3]*PIc/180; //xstate_[1];
               mpc_u = mpc_controller.GetControl(state_mpc_, reference_mpc_);
-              cout << "mpc_u :" << mpc_u[0] << endl;
-              
-              
+              //cout << "mpc_u :" << mpc_u[0] << endl;
+             
+                           
               controls_[2*i] =  mpc_u[1];//pmodel -> Get_StateVector(0);
               controls_[2*i+1] = 4 - mpc_u[1]; //pmodel -> Get_StateVector(2); 
-              
+              /*for(unsigned int i =0; i<2;i++)
+              {
+                  if(mpc_u[i] >=plimit[i])
+                      mpc_u[i] = plimit[i];
+                  else if (mpc_u[i] <= 0.0)
+                      mpc_u[i] = 0.0;
+              }*/
+
               controls_[2] =  mpc_u[0] ;//pmodel -> Get_StateVector(0);
               controls_[3] = 3 - mpc_u[0]; 
                          
@@ -422,13 +434,18 @@ void Controller::ComputeControlLaw(long double timestep)
                   controls_[2*i] = 4.5;
              else if (controls_[2*i] <= 0.0)
                   controls_[2*i] = 0.0;
-             /*mpcU(0) = 2; mpcU(1) = 2; // simulating the dynamics
+            /*mpcU(0) = 2; mpcU(1) = 2; // simulating the dynamics
              
              xtemp = Joint1modelp.computeNextState(mdt1, xt, mpcU);
              xt = xtemp;
              xtemp.setZero();
 	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
-             cout << "xt:" << xt(0) << endl;*/
+             cout << "xt:" << xt(1) << endl;
+             //stateMat_t ff =  Joint1modelp.getfx();
+             //std::vector<double> 
+             //control_logfx_ << xt(0)<< '\n' <<endl; 
+             //control_logfu_ << xt(1) << '\n' <<endl;*/
+
              loop_reference_traj_[i]++;
 	    }
 	  else

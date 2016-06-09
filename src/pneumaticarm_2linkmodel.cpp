@@ -67,10 +67,12 @@ double F_triceps = P2*ftterm;
 double Torque_pneumatics = (F_biceps -F_triceps )*R;
 return (Torque_pneumatics);
 }
-stateVec_t computejointderiv(double& dt, const stateVec_t& X,const commandVec_t& U)
+stateVec_t computejointderiv(double& dt, const stateVec_t& Xe,const stateVec_t& Xdes,const commandVec_t& U)
 {
     //    result(1,0)-=A10*sin(X(0));
     //result(3,0)+=A33atan*atan(a*X(3,0));
+    stateVec_t X;
+    X = Xe + Xdes;
     stateVec_t jointstate_deriv;
     double m = -0.0023;
     double c = 0.0136;
@@ -156,6 +158,7 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
     stateNb=8;
     commandNb=2;
     x1.resize(2);
+    dt = mydt;
     //state_vector_.resize(8);
     //state_derivative_.resize(8);
     //control_vector_.resize(2);
@@ -179,11 +182,12 @@ PneumaticarmNonlinearModel::PneumaticarmNonlinearModel(double& mydt)
     QuxCont.setZero();*/
 }
 
-stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateVec_t& X,const commandVec_t& U)
+stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateVec_t& Xe,const stateVec_t& Xdes,const commandVec_t& U)
 {
     //    result(1,0)-=A10*sin(X(0));
     //result(3,0)+=A33atan*atan(a*X(3,0));
     stateVec_t jointstate_deriv;
+    X = Xe + Xdes;
     double m = -0.0023;
     double c = 0.0136;
     double p1 = -0.009338;   //%(-0.01208, -0.006597)
@@ -262,11 +266,11 @@ stateVec_t PneumaticarmNonlinearModel::computeNextState(double& dt, const stateV
     return result;
 }
 
-void PneumaticarmNonlinearModel::computeAllModelDeriv(double& dt, const stateVec_t& X,const commandVec_t& U)
+void PneumaticarmNonlinearModel::computeAllModelDeriv(double& dt, const stateVec_t& Xe,const stateVec_t& Xdes,const commandVec_t& U)
 {
     //fx = fxBase;
   
-
+    Xreal = Xe + Xdes;
     double dh = 5e-3;
     stateVec_t tempX, derivplus, derivminus;
     commandVec_t tempU;
@@ -318,48 +322,18 @@ commandR_stateC_t PneumaticarmNonlinearModel::computeTensorContux(const stateVec
 }
 
 /// accessors ///
-unsigned int PneumaticarmNonlinearModel::getStateNb()
-{
-    return stateNb;
-}
-
-unsigned int PneumaticarmNonlinearModel::getCommandNb()
-{
-    return commandNb;
-}
-
-stateMat_t& PneumaticarmNonlinearModel::getfx()
+/*stateMat_t& PneumaticarmNonlinearModel::getfx()
 {
     return fx;
 }
    
-stateTens_t& PneumaticarmNonlinearModel::getfxx()
-{
-    return fxx;
-}
-
 stateR_commandC_t& PneumaticarmNonlinearModel::getfu()
 {
     return fu;
-}
-
-stateR_commandC_commandD_t& PneumaticarmNonlinearModel::getfuu()
-{
-    return fuu;
-}
-
-stateR_stateC_commandD_t& PneumaticarmNonlinearModel::getfxu()
-{
-    return fxu;
-}
-
-stateR_commandC_stateD_t& PneumaticarmNonlinearModel::getfux()
-{
-    return fux;
 }
 
 double PneumaticarmNonlinearModel::getX(unsigned int i)
 {
     return x1[i];
 }
-
+*/

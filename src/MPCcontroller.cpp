@@ -12,9 +12,9 @@ MPCcontroller::MPCcontroller()
     xinit  <<0.0,0.0, 0.0,0.0,0,0,0,0;
     //xDes  0.0,0.0,0.0, 0.0;
 
-    T = 10;
+    T = 40;
     //M = 400;
-    dt=10e-3;
+    dt = mdt;
     iterMax = 100;
     stopCrit = 1e-3;
     plimit.resize(2);
@@ -67,7 +67,7 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
 
     iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
 
-    //gettimeofday(&tbegin,NULL);
+    gettimeofday(&tbegin,NULL);
     
     /*for(int i=0;i<M;i++)
     {*/
@@ -100,16 +100,16 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
         fichier  xList[T](0,0) << "," << xList[T](1,0) << "," << xList[T](2,0)  << "," << 0.0 << endl;
     //}*/
     //
-    //gettimeofday(&tend,NULL);
+    gettimeofday(&tend,NULL);
 
 
-    //texec=((double)(1000*(tend.tv_sec-tbegin.tv_sec)+((tend.tv_usec-tbegin.tv_usec)/1000)))/1000.;
-    //texec = (double)(tend.tv_usec - tbegin.tv_usec);
+    /*texec=((double)(1000*(tend.tv_sec-tbegin.tv_sec)+((tend.tv_usec-tbegin.tv_usec)/1000)))/1000.;
+    texec = (double)(tend.tv_usec - tbegin.tv_usec);
 
-    /*cout  "temps d'execution total du solveur ";
-    cout  texec/1000000.0 << endl;
-    cout  "temps d'execution par pas de MPC ";
-    cout  texec/(T*1000000) << endl;*/
+    cout  << "temps d'execution total du solveur ";
+    cout  << texec/1000000.0 << endl;
+    cout  << "temps d'execution par pas de MPC ";
+    cout  << texec/(T*1000000) << endl;*/
 
 //    fichier.close();
     u[0] = uList[0](0,0);

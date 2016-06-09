@@ -384,7 +384,7 @@ void Controller::ComputeControlLaw(long double timestep)
 	{
 	  if (JOINT_NUM_[i] == true && reset_control_==false)  
 	    {
-	      ReferenceGenerator((loop_reference_traj_[i]+9)*timestep/1.0e9, i,  ref_type_[i]);
+	      //ReferenceGenerator((loop_reference_traj_[i]+9)*timestep/1.0e9, i,  ref_type_[i]);
 	      //ODEBUG("Inside Joint num:" << i );
              //ref_traj_ = ref_final_;
 	      error_now_[i] = ref_traj_[i] - positions_[i];
@@ -402,8 +402,8 @@ void Controller::ComputeControlLaw(long double timestep)
              
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
 
-              reference_mpc_[0] = reference_[0];
-              reference_mpc_[1] = reference_[1];
+              reference_mpc_[0] = 0.25*(loop_reference_traj_[i]+9)*timestep/1.0e9;//reference_[0];
+              reference_mpc_[1] = 0.5*(loop_reference_traj_[i]+9)*timestep/1.0e9;//reference_[1];
               
               // Calling MPC controller
               state_mpc_[0] = positions_[1]*PIc/180; //xstate_[0];

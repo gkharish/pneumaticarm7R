@@ -109,7 +109,7 @@ Controller::Controller()
   P_.resize(7);
   D_.resize(7);
 
-  //Here parameters are inititalized to test jont num 4 the elbow joint 
+  //Here parameters are inititalized to test jont num 4 the elbow joint
   // Elbow
   P_[3] = 0.0005;
   D_[3] = 0.000;
@@ -145,7 +145,7 @@ Controller::Controller()
   ref_slope_[4] = 1;
   ref_type_[4] = 1;
 
-  // Wrist 
+  // Wrist
   P_[5] = 0.0005;
   D_[5] = 0;
   Pid_factor_[5] = 1;
@@ -194,14 +194,14 @@ void Controller::ApplyControlLaw()
   double velocity1 = 0, velocity2 = 0, acceleration = 0;
   double u_pres[2] = {0, 0};
   /*Plant Model object created*/
- 
+
 
   //model -> server_start();
   double integrator_timestep = 0.005;
   double time_step = TASK_PERIOD/1e9;
   vector<double> previous_state, newstate,  u;
-             
-        
+
+
   //int control_len = 0, control_size, state_len = 0, states_size;
   u.resize(2);
   previous_state.resize(2);
@@ -217,44 +217,44 @@ void Controller::ApplyControlLaw()
   now = rt_timer_read();
   present_time = (double)now/1.0e9;
   previous_time = present_time;
-    
+
   for(unsigned int i=0; i <7; i++)
     {
       unsigned index1 = 16;
       positions_[i] = shmaddr_[index1++];
       ref_init_[i] = 0;   //positions_[i];
-       
-     
+
+
      loop_reference_traj_[i] = 0;
     }
-   
 
-    
+
+
     previous_state[0] = simulated_positions_[3];
     previous_state[1] = 0;
     newstate[0] = previous_state[0];
     newstate[1] = 0;
     //u[0] = 0.0;///;  //shmaddr_[6];  //Joint2modelp -> Get_ControlVector(0);  //shmaddr_[6];
     //u[1] = 3.0e5;  //shmaddr_[7];  //Joint2modelp -> Get_ControlVector(1); //shmaddr_[7];
-    simulated_initconfig_controls_[2] = 0.0; 
-    simulated_initconfig_controls_[3] = 0.0; 
-    
+    simulated_initconfig_controls_[2] = 0.0;
+    simulated_initconfig_controls_[3] = 0.0;
+
     while(1)
     {
       // Waiting the next iteration
-      rt_task_wait_period(NULL);      
+      rt_task_wait_period(NULL);
 
       shm_sem_.Acquire();
       unsigned int index =16;
       for(unsigned int i=0;i<7;i++)
       {
         positions_[i] = shmaddr_[index++];
-        
+
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
       ODEBUGL("DEbug Before referencegen" << position_store_[0], 0);
-            
+
       if(filter_loop <=2)
       {
           position_store_[2] = position_store_[1];
@@ -265,7 +265,7 @@ void Controller::ApplyControlLaw()
       if(filter_loop ==3)
           filter_loop = 0;
       position_store_[0] = positions_[3]*3.14/180;
-      
+
 
       velocity1 = (position_store_[1] - position_store_[2])/time_step;
       velocity2 = (position_store_[0] - position_store_[1])/time_step;
@@ -277,7 +277,7 @@ void Controller::ApplyControlLaw()
       velocity_[3] = velocity2;
       acceleration_[3] = acceleration;
       //xstate_[2] = acceleration;
-      
+
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
       // ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
@@ -291,7 +291,7 @@ void Controller::ApplyControlLaw()
       /* Ste*/
 
       previous_time = present_time;
-           
+
       for (unsigned int i=0; i<2; i++)
           previous_state[i] = newstate[i];
 
@@ -304,7 +304,7 @@ void Controller::ApplyControlLaw()
       //shmaddr_[21] = acceleration_[3];
       shmaddr_[24] = 0.4; //Joint1modelp.getX(0);//mpc_controller.GetState()*179/3.14;
       //shmaddr_[23] = (int)( Joint2modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
-      
+
       shm_sem_.Release();
       loop++;
     }
@@ -313,7 +313,7 @@ void Controller::ApplyControlLaw()
 
 void Controller::ComputeControlLaw(long double timestep)
 {
-   double u_pres[2] = {0,0};  
+   double u_pres[2] = {0,0};
     if (CONTROLLER_TYPE_== 3)
     {
       for (unsigned int i=0;i<16;i++)
@@ -329,7 +329,7 @@ void Controller::ComputeControlLaw(long double timestep)
                   controls_[i] -=0.001;
               }
           }
-          else 
+          else
           {
               controls_[i] = 0.0;
               simulated_controls_[i] = 0.0;
@@ -345,7 +345,7 @@ void Controller::ComputeControlLaw(long double timestep)
               controls_[i] = user_controls_[i];
               simulated_controls_[i] = user_controls_[i];
           }
-	  else 
+	  else
           {
               controls_[i] = 0.0;//initconfig_controls_[i];
               simulated_controls_[i] = 0.0;
@@ -359,8 +359,8 @@ void Controller::ComputeControlLaw(long double timestep)
       //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
       // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
    double wn = 0.2;
-      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PIc*wn/1.0e9))) );/*+ 
-                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+ 
+      double delc = 1*( (sin((double)(loop_reference_traj_[3]*timestep*2*PIc*wn/1.0e9))) );/*+
+                          (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.5)/1.0e9)))+
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*0.25)/1.0e9)))+
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.5)/1.0e9)))+
                           (sin((double)(loop_reference_traj_[3]*timestep*2*PI*(wn*1.75)/1.0e9))) );*/
@@ -371,7 +371,7 @@ void Controller::ComputeControlLaw(long double timestep)
       bool exit = false;
       int lp  = (int)(tim/step_time);
       delc1 = 3*tim;//step_amp*lp;
-      //delc1 = 0.02*(rand()%100); 
+      //delc1 = 0.02*(rand()%100);
       //delc1 = d(gen);
      if(delc1 > 3)
               delc1 = 3;
@@ -382,7 +382,7 @@ void Controller::ComputeControlLaw(long double timestep)
     criterror_ = 1e-8;
       for (unsigned int i =0; i<7; i++)
 	{
-	  if (JOINT_NUM_[i] == true && reset_control_==false)  
+	  if (JOINT_NUM_[i] == true && reset_control_==false)
 	    {
 	      //ReferenceGenerator((loop_reference_traj_[i]+9)*timestep/1.0e9, i,  ref_type_[i]);
 	      //ODEBUG("Inside Joint num:" << i );
@@ -390,30 +390,30 @@ void Controller::ComputeControlLaw(long double timestep)
 	      error_now_[i] = ref_traj_[i] - positions_[i];
               error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];
-           
+
               if(abs(error_now_[i]) >= criterror_)
                 integrated_error_ = integrated_error_ + 0.005*error_now_[i]*PIc/180;
 
 	      ODEBUGL("error_now: " << error_now_[i],3);
 	      ODEBUGL("error_prev:" << error_prev_[i],3);
-	      
+
               reference_[0] = 0.5*ref_traj_[i]*PIc/180;
               reference_[1] = ref_traj_[i]*PIc/180;
-             
+
               //Pdes_feedforward = Pdes_feedforward + 0.6*error_now_[i] + 0.1*integrated_error_;
 
               reference_mpc_[0] = 0.25*(loop_reference_traj_[i]+9)*timestep/1.0e9;//reference_[0];
               reference_mpc_[1] = 0.5*(loop_reference_traj_[i]+9)*timestep/1.0e9;//reference_[1];
-              
+
               // Calling MPC controller
               state_mpc_[0] = positions_[1]*PIc/180; //xstate_[0];
               state_mpc_[1] = positions_[3]*PIc/180; //xstate_[1];
               mpc_u = mpc_controller.GetControl(state_mpc_, reference_mpc_);
               //cout << "mpc_u :" << mpc_u[0] << endl;
-             
-                           
+
+
               controls_[2*i] =  mpc_u[1];//pmodel -> Get_StateVector(0);
-              controls_[2*i+1] = 4 - mpc_u[1]; //pmodel -> Get_StateVector(2); 
+              controls_[2*i+1] = 4 - mpc_u[1]; //pmodel -> Get_StateVector(2);
               /*for(unsigned int i =0; i<2;i++)
               {
                   if(mpc_u[i] >=plimit[i])
@@ -423,27 +423,27 @@ void Controller::ComputeControlLaw(long double timestep)
               }*/
 
               controls_[2] =  mpc_u[0] ;//pmodel -> Get_StateVector(0);
-              controls_[3] = 3 - mpc_u[0]; 
-                         
+              controls_[3] = 3 - mpc_u[0];
+
              if(controls_[2*i +1] >=4.5)
                   controls_[2*i +1] = 4.5;
              else if (controls_[2*i+1] <= 0.0)
                   controls_[2*i+1] = 0.0;
-              
+
              if(controls_[2*i] >=4.5)
                   controls_[2*i] = 4.5;
              else if (controls_[2*i] <= 0.0)
                   controls_[2*i] = 0.0;
             /*mpcU(0) = 2; mpcU(1) = 2; // simulating the dynamics
-             
+
              xtemp = Joint1modelp.computeNextState(mdt1, xt, mpcU);
              xt = xtemp;
              xtemp.setZero();
 	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
              cout << "xt:" << xt(1) << endl;
              //stateMat_t ff =  Joint1modelp.getfx();
-             //std::vector<double> 
-             //control_logfx_ << xt(0)<< '\n' <<endl; 
+             //std::vector<double>
+             //control_logfx_ << xt(0)<< '\n' <<endl;
              //control_logfu_ << xt(1) << '\n' <<endl;*/
 
              loop_reference_traj_[i]++;
@@ -455,7 +455,7 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_controls_[2*i] = simulated_initconfig_controls_[2*i];
 	      simulated_controls_[2*i+1] = simulated_initconfig_controls_[2*i+1];
 	    }
-	}    
+	}
     }
 }
 /*double Integrator(double t, double error, double h)
@@ -487,7 +487,7 @@ double Controller::PidController(double error, double error_derivative, int join
       update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
       delta[joint_num] = delta[joint_num]+update_delta;
     }
-   
+
   /*double control_limit_agonistic =  initconfig_controls_[2*joint_num]+ delta[joint_num];
   double control_limit_antagonistic = initconfig_controls_[2*joint_num+1] - delta[joint_num];
 
@@ -496,10 +496,10 @@ double Controller::PidController(double error, double error_derivative, int join
     { controls_[2*joint_num]= control_limit_agonistic;}
   else
     {
-      if (control_limit_agonistic < 0.0)  
+      if (control_limit_agonistic < 0.0)
         controls_[2*joint_num] = 0.0;
-      else 
-	if (control_limit_agonistic > 4.5) 
+      else
+	if (control_limit_agonistic > 4.5)
 	  controls_[2*joint_num] = 4.5;
     }
 
@@ -510,11 +510,11 @@ double Controller::PidController(double error, double error_derivative, int join
       if (control_limit_antagonistic <0.0) controls_[2*joint_num +1] = 0.0;
       else if (control_limit_antagonistic >4.5) controls_[2*joint_num+1] = 4.5;
     }
-     
+
 
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
-   
+
   ODEBUGL("Update delta:     " <<update_delta, 4);
   ODEBUGL("Pid command : " << delta[joint_num],4);*/
   return(delta[joint_num]);
@@ -531,7 +531,7 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       simulated_update_delta =  Pid_factor_[joint_num]*(P_[joint_num]*error + D_[joint_num]*error_derivative);
       simulated_delta_[joint_num] = simulated_delta_[joint_num] + simulated_update_delta;
     }
-   
+
   double simulated_control_limit_agonistic =  simulated_initconfig_controls_[2*joint_num] + 1.5; //simulated_delta_[joint_num];
   double simulated_control_limit_antagonistic = simulated_initconfig_controls_[2*joint_num +1] - 1.5;//simulated_delta_[joint_num];
 
@@ -540,10 +540,10 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
     { controls_[2*joint_num]= control_limit_agonistic;}
   else
     {
-      if (control_limit_agonistic < 0.0)  
+      if (control_limit_agonistic < 0.0)
         controls_[2*joint_num] = 0.0;
-      else 
-	if (control_limit_agonistic > 4.5) 
+      else
+	if (control_limit_agonistic > 4.5)
 	  controls_[2*joint_num] = 4.5;
     }
 
@@ -554,11 +554,11 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
       if (control_limit_antagonistic <0.0) controls_[2*joint_num +1] = 0.0;
       else if (control_limit_antagonistic >4.5) controls_[2*joint_num+1] = 4.5;
     }*/
-     
+
 
   simulated_controls_[2*joint_num] = 3.5 ;//controls_[6] - initconfig_controls_[6]; //simulated_control_limit_agonistic;
   simulated_controls_[2*joint_num+1] = 3.5 ;//controls_[7] -initconfig_controls_[7]; //simulated_control_limit_antagonistic;
-   
+
   ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
   ODEBUGL("Simulated Pid command : " << delta[joint_num],4);
 }
@@ -580,12 +580,12 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
      {
         ref_traj_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*(double)timestep;
         ref_vel_[joint_num] = ref_slope_[joint_num];
-                
+
         ref_final_[joint_num] = ref_init_[joint_num] + ref_slope_[joint_num]*4.0;
 
 
      }
-    
+
      if (timestep <= 20.0 && timestep > 4.0)
      {
         ref_traj_[joint_num] = ref_final_[joint_num];
@@ -594,7 +594,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
 
      }
 
-     if (timestep <= 24.0 && timestep > 20.0) 
+     if (timestep <= 24.0 && timestep > 20.0)
      {
         ref_traj_[joint_num] = ref_final_[joint_num] - ref_slope_[joint_num]*((double)timestep - 20.0);
         ref_vel_[joint_num] = -ref_slope_[joint_num];
@@ -638,12 +638,12 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
       else
       {
         ref_traj_[joint_num] = ref_init_[joint_num] - ref_slope_[joint_num]*(double)timestep;
-        ref_vel_[joint_num] = -ref_slope_[joint_num]; 
+        ref_vel_[joint_num] = -ref_slope_[joint_num];
         ref_acl_[joint_num] = 0;
       }
     }*/
   }
-  
+
   if (type == 1)
   {
       //SetStepResponse();
@@ -663,12 +663,12 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
 
 
       }
-      else 
+      else
         ref_traj_[joint_num] = 20* sin((double)timestep*2*PIc/10);
   }
 
 
- ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1); 
+ ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1);
 }
 
 double Controller::GetDesiredPosition(unsigned int idx)
@@ -705,7 +705,7 @@ void Controller::StartingRealTimeThread()
     {
       std::cerr << "Failed @ RT Create" << n << std::endl;
     }
-  else 
+  else
     { ODEBUGL("END of RT Create",3); }
 
   n = rt_task_start(&principal_task_, principale_controller_function, this);
@@ -713,7 +713,7 @@ void Controller::StartingRealTimeThread()
     {
       std::cerr<< "Failed of RT STart" <<n<< std::endl;
     }
-  else 
+  else
     { ODEBUGL("END of RT Start",3); }
 
 }
@@ -726,12 +726,12 @@ void Controller::InitSharedMemory()
            std::ofstream::out | std::ofstream::app);
   struct timeval current_time;
   gettimeofday(&current_time,0);
-    
-  aof << "Starting control " 
-      << current_time.tv_sec << "." 
+
+  aof << "Starting control "
+      << current_time.tv_sec << "."
       << current_time.tv_usec << std::endl;
   aof.close();
-  
+
   // Attached the shared memory to a memory segment.
   shmaddr_ = CreateSharedMemoryForPneumaticArm(false);
 
@@ -747,9 +747,9 @@ void Controller::CloseSharedMemory()
            std::ofstream::out | std::ofstream::app);
   struct timeval current_time;
   gettimeofday(&current_time,0);
-    
-  aof << " Stop control at " 
-      << current_time.tv_sec << "." 
+
+  aof << " Stop control at "
+      << current_time.tv_sec << "."
       << current_time.tv_usec << std::endl;
   aof.close();
 
@@ -775,4 +775,3 @@ bool Controller::GetJointNum(unsigned int idx)
 {
     return(JOINT_NUM_[idx]);
 }
-

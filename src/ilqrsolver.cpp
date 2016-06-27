@@ -7,13 +7,14 @@ using namespace std;
 
 using namespace Eigen;
 
-ILQRSolver::ILQRSolver(DynamicModel& myDynamicModel, CostFunction& myCostFunction,bool QPBox)
+ILQRSolver::ILQRSolver(DynamicModel& myDynamicModel, CostFunction& myCostFunction,bool fullDDP,bool QPBox)
 {
     dynamicModel = &myDynamicModel;
     costFunction = &myCostFunction;
     stateNb = myDynamicModel.getStateNb();
     commandNb = myDynamicModel.getCommandNb();
     enableQPBox = QPBox;
+    enableFullDDP = fullDDP;
     if(QPBox)
     {
         qp = new QProblemB(commandNb);
@@ -71,12 +72,13 @@ void ILQRSolver::FirstInitSolver(stateVec_t& myxInit, stateVec_t& myxDes, unsign
 
 void ILQRSolver::initSolver(stateVec_t& myxInit, stateVec_t& myxDes)
 {
-    xInit = myxInit-myxDes;
+    xInit = myxInit - myxDes;
     xDes = myxDes;
 }
 
 void ILQRSolver::solveTrajectory()
 {
+    
     initTrajectory();
     for(iter=0;iter<iterMax;iter++)
     {
@@ -84,7 +86,7 @@ void ILQRSolver::solveTrajectory()
         forwardLoop();
         if(changeAmount<stopCrit)
         {
-            break;
+          break;
         }
         tmpxPtr = xList;
         tmpuPtr = uList;
@@ -99,11 +101,14 @@ void ILQRSolver::initTrajectory()
 {
     xList[0] = xInit;
     commandVec_t zeroCommand;
+    stateVec_t Xe;
+    Xe = xInit;
     zeroCommand.setZero();
     for(unsigned int i=0;i<T;i++)
     {
         uList[i] = zeroCommand;
-        xList[i+1] = dynamicModel->computeNextState(dt,xList[i],xDes,zeroCommand);
+        xList[i+1] = dynamicModel->computeNextState(dt,xList[i] ,xDes,zeroCommand) - xDes;
+        //Xe = xList[i] - xDes;
     }
 }
 
@@ -134,9 +139,12 @@ void ILQRSolver::backwardLoop()
             Quu = costFunction->getluu() + dynamicModel->getfu().transpose() * (nextVxx+muEye) * dynamicModel->getfu();
             Qux = costFunction->getlux() + dynamicModel->getfu().transpose() * (nextVxx+muEye) * dynamicModel->getfx();
 
-            Qxx += dynamicModel->computeTensorContxx(nextVx);
-            Qux += dynamicModel->computeTensorContux(nextVx);
-            Quu += dynamicModel->computeTensorContuu(nextVx);
+            if(enableFullDDP)
+            {
+                Qxx += dynamicModel->computeTensorContxx(nextVx);
+                Qux += dynamicModel->computeTensorContux(nextVx);
+                Quu += dynamicModel->computeTensorContuu(nextVx);
+            }
 
             QuuInv = Quu.inverse();
 
@@ -174,7 +182,7 @@ void ILQRSolver::backwardLoop()
             {
                 k = -QuuInv*Qu;
                 K = -QuuInv*Qux;
-            }   
+            }
 
             /*nextVx = Qx - K.transpose()*Quu*k;
             nextVxx = Qxx - K.transpose()*Quu*K;*/
@@ -196,8 +204,8 @@ void ILQRSolver::forwardLoop()
     alpha = 1.0;
     for(unsigned int i=0;i<T;i++)
     {
-        updateduList[i] = uList[i] + alpha*kList[i] + KList[i]*(updatedxList[i]-xList[i]);
-        updatedxList[i+1] = dynamicModel->computeNextState(dt,updatedxList[i],xDes,updateduList[i]);
+        updateduList[i] = uList[i] + alpha*kList[i] + KList[i]*(updatedxList[i] - xList[i]);
+        updatedxList[i+1] = dynamicModel->computeNextState(dt,updatedxList[i],xDes,updateduList[i]) - xDes;
         for(unsigned int j=0;j<commandNb;j++)
         {
             changeAmount += abs(uList[i](j,0) - updateduList[i](j,0));

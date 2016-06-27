@@ -31,15 +31,15 @@ class MPCcontroller
 private:
     struct timeval tbegin,tend;
     double texec;
-    stateVec_t xinit,xDes;
+    stateVec_t xinit_MPC,xDes_MPC;
 
     unsigned int T ;
     unsigned int M ;
     double dt;
     unsigned int iterMax;
     double stopCrit ;
-    stateVec_t* xList;
-    commandVec_t* uList; 
+    stateVecTab_t xList_MPC;
+    commandVecTab_t uList_MPC; 
     commandVec_t plimit;
     //std::vector<double> plimit; 
     ILQRSolver::traj lastTraj;  // ofstream fichier("resultsMPC.csv",ios::out | ios::trunc);

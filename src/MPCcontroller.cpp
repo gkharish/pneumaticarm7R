@@ -9,7 +9,7 @@ ILQRSolver iLQRsolver(pneumaticarmModel, costPneumaticArmElbow);
 MPCcontroller::MPCcontroller()
 {
     texec=0.0;
-    xinit  <<0.0,0.0, 0.0,0.0,0,0,0,0;
+    xinit_MPC  << 0.0,0.0, 0.0,0.0,0,0,0,0;
     //xDes  0.0,0.0,0.0, 0.0;
 
     T = 40;
@@ -58,24 +58,24 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
     xinit(3) = reference[3]; //xstate[3];*/
     
 
-    xDes(0) = reference[0];
-    xDes(1) = reference[1];
+    xDes_MPC(0) = reference[0];
+    xDes_MPC(1) = reference[1];
     //xDes(2) = reference[2];
     //xDes(3) = reference[3];
     //xDes(2) = reference[2]*3.14/180;
     //cout  << "Reference position" << xDes(0) << endl;
 
-    iLQRsolver.FirstInitSolver(xinit,xDes,T,dt,iterMax,stopCrit);
+    iLQRsolver.FirstInitSolver(xinit_MPC,xDes_MPC,T,dt,iterMax,stopCrit);
 
     gettimeofday(&tbegin,NULL);
     
     /*for(int i=0;i<M;i++)
     {*/
-        iLQRsolver.initSolver(xinit,xDes,T);
+        iLQRsolver.initSolver(xinit_MPC,xDes_MPC);
         iLQRsolver.solveTrajectory();
         lastTraj = iLQRsolver.getLastSolvedTrajectory();
-        xList = lastTraj.xList;
-        uList = lastTraj.uList;
+        xList_MPC = lastTraj.xList;
+        uList_MPC = lastTraj.uList;
         //Apply limit
         /*for(unsigned int i =0; i<2;i++)
         {
@@ -90,8 +90,8 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
 
 
         //uList
-        xinit(0) = xList[1](0,0);
-        xinit(1) = xList[1](1,0);
+        xinit_MPC(0) = xList_MPC[1](0,0);
+        xinit_MPC(1) = xList_MPC[1](1,0);
         
         //cout  << "mpc position: " << xList[1](1,0) << endl;
         //cout  << "mpc control: " << xList[1](1,0);
@@ -112,15 +112,15 @@ vector<double> MPCcontroller::GetControl(vector<double>& xstate, vector<double>&
     cout  << texec/(T*1000000) << endl;*/
 
 //    fichier.close();
-    u[0] = uList[0](0,0);
-    u[1] = uList[0](1,0);
+    u[0] = uList_MPC[0](0,0);
+    u[1] = uList_MPC[0](1,0);
     return(u);
 
 }
 
 double MPCcontroller::GetState()
 {
-    return(xList[1](0,0));
+    return(xList_MPC[1](0,0));
 }
 
 MPCcontroller::~MPCcontroller()

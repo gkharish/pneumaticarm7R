@@ -13,9 +13,9 @@ PKG_CONFIG_USE_DEPENDENCY (test-pneumaticarm7R libxenomai_native)
 PKG_CONFIG_USE_DEPENDENCY (test-pneumaticarm7R libxenomai_vxworks)
 PKG_CONFIG_USE_DEPENDENCY (test-pneumaticarm7R ncurses)
 
-ADD_EXECUTABLE(test_ncurses_ui test_ncurses_ui.cpp  
-  ${CMAKE_SOURCE_DIR}/src/ncurses_ui.cpp 
-  ${CMAKE_SOURCE_DIR}/src/controller.cpp 
+ADD_EXECUTABLE(test_ncurses_ui test_ncurses_ui.cpp
+  ${CMAKE_SOURCE_DIR}/src/ncurses_ui.cpp
+  ${CMAKE_SOURCE_DIR}/src/controller.cpp
   ${CMAKE_SOURCE_DIR}/src/shared_memory.cpp
   ${CMAKE_SOURCE_DIR}/src/pneumaticarm_2linkmodel.cpp
   ${CMAKE_SOURCE_DIR}/src/pressuredynamic.cpp
@@ -26,11 +26,10 @@ ADD_EXECUTABLE(test_ncurses_ui test_ncurses_ui.cpp
   ${CMAKE_SOURCE_DIR}/src/costfunction.cpp
   ${CMAKE_SOURCE_DIR}/src/costfunctionpneumaticarmelbow.cpp
   #${CMAKE_SOURCE_DIR}/src/pneumaticarmnonlinearmodel.cpp  #pneumaticarmelbowlinear.cpp
-  )    
+  )
 
 
 PKG_CONFIG_USE_DEPENDENCY (test_ncurses_ui ncurses)
 PKG_CONFIG_USE_DEPENDENCY (test_ncurses_ui libxenomai_rtdm)
-PKG_CONFIG_USE_DEPENDENCY (test_ncurses_ui libxenomai_native)
 PKG_CONFIG_USE_DEPENDENCY (test_ncurses_ui libxenomai_vxworks)
 TARGET_LINK_LIBRARIES(test_ncurses_ui pthread)

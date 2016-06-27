@@ -15,6 +15,7 @@ public:
     CostFunctionPneumaticarmElbow();
 private:
     stateMat_t Q;
+    stateMat_t Qf;
     commandMat_t R;
     double dt;
 protected:

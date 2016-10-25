@@ -1,6 +1,6 @@
 // Setup the flags.
 #include "test_config.hh"
-
+// Trying to edit files directly on git repository
 test::test():
   DEFAULT_FLAG(0),
   CALIBRATION_FLAG(0),

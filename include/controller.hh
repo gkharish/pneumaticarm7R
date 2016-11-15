@@ -18,8 +18,6 @@
 #define PI 3.14159265
 #include "shared_memory.hh"
 #include "pneumaticarm_model.hh"
-#include "pressuredynamic.hh"
-#include "MPCcontroller.hh"
 using namespace std;
 //using namespace Eigen;
 class Controller 
@@ -64,14 +62,10 @@ public:
   /** \ Get COntroller Type */
   void SetControllerType(int idx);
   /** \ PID controller design  */
-  double  PidController(double error, double error_derivative , int joint_num);
+  void  PidController(double error, double error_derivative , int joint_num);
   void  SimulatedPidController(double error, double error_derivative , int joint_num);
   //double GetPidParameter();
   //void SetPidParameter();
-  /* MPC controller */
-  MPCcontroller mpc_controller;
-  std::vector<double> mpc_u;
-  std::vector<double> reference_mpc_;
   double  MeanPressure(int);
  /** \ Reference generator function   */
   double GetDesiredPosition(unsigned int idx);
@@ -94,11 +88,6 @@ public:
 
   // Positions values 
   std::vector<double> positions_;
-  std::vector<double> velocity_;
-  std::vector<double> acceleration_;
-  std::vector<double> position_store_;
-  std::vector<double> xstate_;
-  std::vector<double> state_mpc_;
   std::vector<double> simulated_positions_;
 
   // Control values
@@ -123,7 +112,6 @@ public:
   std::vector<double> D_;
   std::vector<double> delta;
   std::vector<double> simulated_delta_;
-  double criterror_, integrated_error_, integrated_Terror_;
 
   /*! @{ Errors computation */
   /* \brief Current error */
@@ -139,13 +127,7 @@ public:
   std::vector<double>ref_init_;
   std::vector<double>ref_final_;
   std::vector<double>ref_traj_;
-  std::vector<double>ref_vel_;
-  std::vector<double>ref_acl_;
-  std::vector<double> ref_jerk_;
-  std::vector<double> ref_jerkdot_;
-  std::vector<double>reference_;
   std::vector<double>ref_slope_;
-  
   //double ref_step_;
   std::vector<double>desired_position_;
   std::vector<unsigned int>ref_type_;

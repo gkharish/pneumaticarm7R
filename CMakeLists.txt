@@ -45,19 +45,11 @@ SET(${PROJECT_NAME}_HEADERS
 	include/joystick.h
 	include/modele.h
 	include/port.hh
-        #include/pneumaticarm_model.hh
+        include/pneumaticarm_model.hh
 	include/main_controleur.hh
-        include/dynamicmodel.h
-        include/config.h
-        include/costfunction.h
-        include/costfunctionpneumaticarmelbow.h
-        include/ilqrsolver.h
-        include/MPCcontroller.hh
-        #include/pneumaticarmelbowlinear.h
-        include/pneumaticarm_2linkmodel.hh
-        include/pressuredynamic.hh
+  include/test_config.hh
 
- )
+)
 SET(CXX_DISABLE_WERROR TRUE)
 
 ADD_REQUIRED_DEPENDENCY ("libxenomai_native")
@@ -73,4 +65,3 @@ SEARCH_FOR_EIGEN()
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(application)
 SETUP_PROJECT_FINALIZE()
-

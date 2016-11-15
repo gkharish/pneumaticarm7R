@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <unistd.h>
+
 /* Ncurses includes */
 #include <ncurses_ui.hh>
 
@@ -16,7 +16,7 @@ void * FunctionHandlingKeyboard(void *argc)
   ancursesui->HandlingKeyboard();
   return NULL;
 }
- 
+
 NCursesUI::NCursesUI(Controller *aController):
   end_of_loop_(false)
 {
@@ -27,13 +27,13 @@ NCursesUI::NCursesUI(Controller *aController):
  // Openinng file to log the data
  log_data_.open("logdata.txt");
   /* start the curses mode */
-  initscr();				
+  initscr();
   /* No waiting for the keyboard. */
   cbreak();
 
   // Initializing colors.
   if(has_colors() == FALSE)
-    {	
+    {
       endwin();
       printf("Your terminal does not support color\n");
       exit(1);
@@ -47,29 +47,25 @@ NCursesUI::NCursesUI(Controller *aController):
 					 * the number of colums of the screen */
 
   getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
-  
+
   main_win_ = newwin(LINES,COLS, 0,0);
 
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
-    0.0, 0.0, 0.5, 3.0, 1.2,
-    1.2, 0.7, 4.0, 0.1, 0.1,
-    0.0, 0.0, 0.0, 0.0, 
+    0.0, 0.0, 0.5, 3.0, 1.0,
+    1.0, 0.67, 3.0, 0.1, 0.1,
+    0.0, 0.0, 0.0, 0.0,
     0.0, 0.0};
-   ODEBUGL(" Controler:" << Controller_,3);
-   double Pressurecur[NB_CONTROLS];
-   unsigned int increment_step = 0;
+
+  ODEBUGL(" Controler:" << Controller_,3);
   if (Controller_!=0)
     {
-            for(unsigned int i=0;i<NB_CONTROLS;i++)
-            {
-                Pressurecur[i] = PressureForMuscles[i]*increment_step*1e-3/5;
-                ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
-                Controller_->SetUserControl(i, PressureForMuscles[i]); 
-
-	    }
-           
-       
+      for(unsigned int i=0;i<NB_CONTROLS;i++)
+	{
+	  ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
+	  Controller_->SetUserControl(i,
+				      PressureForMuscles[i]);
+	}
     }
 
 }
@@ -85,22 +81,22 @@ void NCursesUI::HandlingKeyboard()
     {
       // Reading key.
       int c = getch();
-     if (c=='r') 
-        { 
+     if (c=='r')
+        {
            Controller_->ResetControl(true);
         }
-     if (c=='i') 
-        { 
+     if (c=='i')
+        {
            Controller_->SetControllerType(3);
            controller_type_flag = 0;
-        } 
-     if (c=='l') 
-        { 
+        }
+     if (c=='l')
+        {
            Controller_->SetControllerType(2);
            controller_type_flag = 1;
         }
-     if (c=='o') 
-        { 
+     if (c=='o')
+        {
            Controller_->SetControllerType(1);
            //controller_type_flag = 1;
         }
@@ -108,7 +104,7 @@ void NCursesUI::HandlingKeyboard()
          {
              Controller_->SetControllerType(1);
              controller_type_flag = 0;
-           
+
          }
       if (c=='s')
         {
@@ -116,7 +112,7 @@ void NCursesUI::HandlingKeyboard()
               Controller_->StartingRealTimeThread();
          }
       if ((controller_type_flag==1) && (c>='1') && (c<='7'))
-        {                
+        {
 	  if  (Controller_!=0)
 	    {
 	     // unsigned int idx =2* c-1;
@@ -125,15 +121,15 @@ void NCursesUI::HandlingKeyboard()
               unsigned int idx = 2*idx1+1;
               Controller_->SetApplyControl(idx,true);
 	      Controller_->SetApplyControl(idx-1,true);
-              
+
               Controller_ -> SetJointNum(idx1);
               //Controller_ -> SetMeanPressure(idx1);
             }
 
         }
-        
+
       if ((controller_type_flag==0) && (c>='a') && (c<='f'))
-        {    
+        {
            if (Controller_!=0)
              {
                 unsigned int idx = 9+c-'a';
@@ -162,9 +158,9 @@ void NCursesUI::HandlingKeyboard()
           loop=false;
           end_of_loop_=true;
           FINITE_STATE = 5;
-        
-        }            
-     
+
+         }
+
     }
 
 
@@ -196,7 +192,7 @@ void NCursesUI::UpdateSharedMemory()
 
   for(unsigned int i=0;i<7;i++)
   {
-    
+
       if (Controller_->GetJointNum(i) == true)
             indx = i;
   }
@@ -220,11 +216,11 @@ void NCursesUI::Init()
 bool NCursesUI::DisplayInformation()
 {
   static unsigned long int counter=0;
-  
+
   int row,col;				/* to store the number of rows and *
 					 * the number of colums of the screen */
   wrefresh(main_win_);
-  
+
   getmaxyx(main_win_,row,col);
 
   {

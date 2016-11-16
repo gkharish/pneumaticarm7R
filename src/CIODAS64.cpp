@@ -77,17 +77,18 @@ void CIODAS64::adconv(int )
  if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
     {
       recv_packet_DAQ = (udppacket_DAQ *)recv_buffer ;
-      
+
       ODEBUGL("\n Sensor's data: ",3);//<<(*recv_packet_DAQ);
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3
 
-      printf("%x %u %f %f %f %f %f %f %f \n ",
+      printf(" Sensors data: %x %u %f %f %f %f %f %f %f %f %f \n ",
 	     (*recv_packet_DAQ).SERVER_HEADER[0],
 	     ( (*recv_packet_DAQ).label), (*recv_packet_DAQ).data[0],
 	     (*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],
 	     (*recv_packet_DAQ).data[3], (*recv_packet_DAQ).data[4],
-	     (*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6]);
+	     (*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6],
+       (*recv_packet_DAQ).data[7], (*recv_packet_DAQ).data[8]);
 #endif
 #endif
     }

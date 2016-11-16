@@ -1,6 +1,6 @@
-/* CIODAC16.cpp - corps de la classe ioboardsSortie 
-   refioboards : CIO-DAC16-I de Computer boards 
-   Erwan Guiochet - 2002 
+/* CIODAC16.cpp - corps de la classe ioboardsSortie
+   refioboards : CIO-DAC16-I de Computer boards
+   Erwan Guiochet - 2002
 */
 
 /*
@@ -65,7 +65,7 @@ void CIODAC16::daconv(int  , char header)
             }
         buffer_send = (char*)&send_packet;
        }
-         
+
       else
       {
         for(int loop =0; loop < 16; loop++)
@@ -91,7 +91,7 @@ void CIODAC16::daconv(int  , char header)
       send_packet_init.CLIENT_HEADER[0] = '0';
       send_packet_init.CLIENT_HEADER[1] = '0';
 
-      send_packet_init.ADC = 0x7;
+      send_packet_init.ADC = 0x9;
       send_packet_init.counters = 0x0;
       send_packet_init.errors = 0x0;
       send_packet_init.sampling_period = 10;

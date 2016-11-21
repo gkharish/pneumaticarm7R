@@ -133,9 +133,13 @@ double CIODAS64::read_sensors(int axis_num)
   int index = axis_num;
   //cout << "\n cioads64:read_sensors()1 " << index;
   //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
-  val1 = (*recv_packet_DAQ).data[6- index];
+  if(index <= 6)
+   val1 = (*recv_packet_DAQ).data[6- index];
+  
   if (index ==3 || index ==1 || index ==6)
       val1 = -val1;
+  if(index>=7)
+   val1 = (*recv_packet_DAQ).data[index];
 
   ODEBUGL(axis_num << " - cioads64:read_sensors() " << (double)val1 << " ",3);
 
@@ -152,8 +156,8 @@ void CIODAS64::logudpdata()
 
   udprecvlog << (*recv_packet_DAQ).data[0] << "\t" << (*recv_packet_DAQ).data[1] << "\t"
 	     << (*recv_packet_DAQ).data[2] << "\t" << (*recv_packet_DAQ).data[3] << "\t"
-	     << (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[5] << "\t"
-	     << (*recv_packet_DAQ).data[6] << "\n" << endl;
+	     << (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[7] << "\t"
+	     << (*recv_packet_DAQ).data[8] << "\n" << endl;
 }
 /*Permet une initialisation de la ioboards
 ****************************************************************************************

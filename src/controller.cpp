@@ -230,8 +230,8 @@ void Controller::ApplyControlLaw()
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
-      shmaddr_[23] = (int)ref_traj_[3];
-      shmaddr_[24] = ( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
+      shmaddr_[23] = 0; //(int)ref_traj_[3];
+      shmaddr_[24] = 0; //( modelp -> Get_StateVector(0)) *180/3.14;  //newstate[0]*180/3.14;
       shm_sem_.Release();
       loop++;
     }
@@ -327,8 +327,9 @@ void Controller::ComputeControlLaw(long double timestep)
               delc1 = 2;
     double init_pres1 = initconfig_controls_[2];
     double init_pres2 = initconfig_controls_[3];
-    controls_[2] = init_pres1 + 1.0 ;
-    controls_[3] = init_pres2 - 1.0 ;
+    //controls_[2] = init_pres1 + 1.0 ;
+    //controls_[3] = init_pres2 - 1.0 ;
+    controls_[15] = 5;
     }
 
 

@@ -52,10 +52,10 @@ NCursesUI::NCursesUI(Controller *aController):
 
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
-    0.0, 0.0, 0.5, 3.0, 1.0,
-    1.0, 0.67, 3.0, 0.1, 0.1,
+    0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.067, 0.0, 0.1, 1.0,
     0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0};
+    0.0, 4.0};
 
   ODEBUGL(" Controler:" << Controller_,3);
   if (Controller_!=0)

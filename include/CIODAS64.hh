@@ -187,7 +187,7 @@ typedef struct udppacket_COUNTER                    // serverheader = 'b';
 {
   char SERVER_HEADER[4];
   unsigned int label;
-  signed int data[1];
+  signed int data[12];
 }client_packet_COUNTER;
 
 typedef struct udppacket_error                      // serverheader = 'c';
@@ -212,6 +212,7 @@ class CIODAS64 : public ioboards//, public ClientUDP
   udppacket_COUNTER *recv_packet_COUNTER;
   udppacket_error *recv_packet_error;
   virtual double read_sensors(int);
+  virtual double read_encoders(int);
   ClientUDP* client_obj;
   ofstream udprecvlog;
   void get_client(ClientUDP* parent_client);

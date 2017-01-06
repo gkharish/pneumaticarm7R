@@ -117,12 +117,12 @@ void Controller::ApplyControlLaw()
       unsigned int index =16;
       for(unsigned int i=0;i<7;i++)
         positions_[i] = shmaddr_[index++];
-      //ODEBUGL("DEbug Before referencegen", 1);
+      ////ODEBUGL("DEbug Before referencegen", 1);
       
       // ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
-      // ODEBUGL("After Refgen", 1);
+      // //ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
-      // ODEBUGL("After Control Law" , 1);
+      // //ODEBUGL("After Control Law" , 1);
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
 
@@ -155,7 +155,7 @@ void Controller::ComputeControlLaw(long double timestep)
     }
   if (CONTROLLER_TYPE_ == 2)
     {
-      //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
+      ////ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
       // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
    
       for (unsigned int i =0; i<7; i++)
@@ -167,11 +167,11 @@ void Controller::ComputeControlLaw(long double timestep)
 	      error_now_[i] = ref_traj_ - positions_[i];
 	      error_derivative_[i] = error_now_[i] - error_prev_[i];
 	      error_prev_[i] = error_now_[i];  
-	      ODEBUGL("error_now: " << error_now_[i],3);
-	      ODEBUGL("error_prev:" << error_prev_[i],3);
+	      //ODEBUGL("error_now: " << error_now_[i],3);
+	      //ODEBUGL("error_prev:" << error_prev_[i],3);
 	      PidController(error_now_[i], error_derivative_[i],i);
 	      loop_reference_traj_[i]++;
-	      ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",3);
+	      //ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",3);
 	    }
 	  else
 	    {
@@ -231,9 +231,9 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
    
-  ODEBUGL("Update delta:     " <<update_delta, 1 );
+  //ODEBUGL("Update delta:     " <<update_delta, 1 );
                   
-  ODEBUGL("Pid command : " << delta[joint_num],1);
+  //ODEBUGL("Pid command : " << delta[joint_num],1);
 
 
 }
@@ -259,7 +259,7 @@ void Controller::ReferenceGenerator(long double timestep)
       else
         ref_traj_ = ref_init_ + ( (ref_final_ - ref_init_)/abs(ref_final_ - ref_init_) )*ref_slope_*timestep;
     }
-  // ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
+  // //ODEBUGL("Ref_traj_ : "<< ref_traj_, 1); 
 }
 
 double Controller::GetDesiredPosition()
@@ -297,7 +297,7 @@ void Controller::StartingRealTimeThread()
       std::cerr << "Failed @ RT Create" << n << std::endl;
     }
   else 
-    { ODEBUGL("END of RT Create",3); }
+    { //ODEBUGL("END of RT Create",3); }
 
   n = rt_task_start(&principal_task_, principale_controller_function, this);
   if (n!=0)
@@ -305,7 +305,7 @@ void Controller::StartingRealTimeThread()
       std::cerr<< "Failed of RT STart" <<n<< std::endl;
     }
   else 
-    { ODEBUGL("END of RT Start",3); }
+    { //ODEBUGL("END of RT Start",3); }
 
 }
 

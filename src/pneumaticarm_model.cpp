@@ -94,7 +94,7 @@ void PneumaticarmModel::computeStateDerivative(double time)
 
     state_derivative_[3] = (1/time_constant)*(-state_vector_[3] + control_vector_[1]);
 
-    ODEBUGL("State derivative: "<< state_derivative_[0],0);
+    //ODEBUGL("State derivative: "<< state_derivative_[0],0);
     }
  
         
@@ -112,7 +112,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
         st1[i] = state_derivative_[i];
         state_vector_[i] = state_vector_[i] + 0.5*h*st1[i];
     }
-    ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
+    //ODEBUGL("After St1 inside integraterk4" << state_vector_[0], 4);
 
     computeStateDerivative (t + (0.5 * h));
     for (unsigned int i =0; i <4; i++)
@@ -135,7 +135,7 @@ void PneumaticarmModel::integrateRK4 (double t, double h)
   
    for (unsigned int i =0; i <4; i++)
        state_vector_[i]= state_vector_[i] + ( (1/6.0) * h * (st1[i] + 2.0*st2[i] + 2.0*st3[i] + st4[i]) );
-   ODEBUGL("State vector: " << state_vector_[0],0);
+   //ODEBUGL("State vector: " << state_vector_[0],0);
 }
         
         
@@ -153,7 +153,7 @@ void PneumaticarmModel::Set_ControlVector (double value, unsigned int idx)
 
 {
     control_vector_[idx] = value;
-    ODEBUGL("Control vector is set" << control_vector_[idx],0);
+    //ODEBUGL("Control vector is set" << control_vector_[idx],0);
 }
 
 double PneumaticarmModel::Get_ControlVector(unsigned int idx)

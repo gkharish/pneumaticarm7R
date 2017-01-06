@@ -20,7 +20,7 @@ void * FunctionHandlingKeyboard(void *argc)
 NCursesUI::NCursesUI(Controller *aController):
   end_of_loop_(false)
 {
-  ODEBUGL(" Controler:" << aController,3);
+  //ODEBUGL(" Controler:" << aController,3);
   Controller_ = aController;
   for(unsigned int i=0;i<NB_CONTROLS;i++)
     control_[i] = 0.0;
@@ -53,16 +53,16 @@ NCursesUI::NCursesUI(Controller *aController):
   // Initialize pressure for all motors.
   double PressureForMuscles[NB_CONTROLS] = {
     0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.067, 0.0, 0.1, 1.0,
+    0.0, 0.067, 4.0, 0.1, 0.00,
     0.0, 0.0, 0.0, 0.0,
     0.0, 4.0};
 
-  ODEBUGL(" Controler:" << Controller_,3);
+  //ODEBUGL(" Controler:" << Controller_,3);
   if (Controller_!=0)
     {
       for(unsigned int i=0;i<NB_CONTROLS;i++)
 	{
-	  ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
+	  //ODEBUGL(" Pressure:" << PressureForMuscles[i] << " for muscle " << i ,0);
 	  Controller_->SetUserControl(i,
 				      PressureForMuscles[i]);
 	}

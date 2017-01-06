@@ -309,26 +309,26 @@ void Pneumatic7ArmRtThread::Initializing()
     }
 
 
-  ODEBUGL("Control flag after testconfig: "<<CTRL_FLAG(0),3);
-  ODEBUGL("Pressure array after testconfig: ",1);
-#ifndef NDEBUG  
+  //ODEBUGL("Control flag after testconfig: "<<CTRL_FLAG(0),3);
+  //ODEBUGL("Pressure array after testconfig: ",1);
+#ifndef NDEBUG
 #if DEBUG_LEVEL > 2
   for(unsigned int i=0;i<7;i++)
     cout << pressure_command_array_(i) <<",";
   cout << endl;
 #endif
-#endif 
+#endif
 
   // Starting new connection with the NI module.
   clientUDP -> client_start();
-  ODEBUGL("After client start",4);
+  //ODEBUGL("After client start",4);
 
   // Initializing ciodac16 and ciodac64 with the new UPD connection
   ciodac16_->get_client(clientUDP);
   ciodas64_->get_client(clientUDP);
   ciodas64_ -> openlogudpdata();
-  ODEBUGL("After IODAC initialization",4);
-  
+  //ODEBUGL("After IODAC initialization",4);
+
   for (int i = 0; i<7;i++)
     {
       // Linking sensors with the data IO boards
@@ -337,11 +337,11 @@ void Pneumatic7ArmRtThread::Initializing()
 
   // Initialize actuators
 InitActuators();
-  ODEBUGL("After Actuator initialization",4);
+  //ODEBUGL("After Actuator initialization",4);
 
   // Init IO boards.
   InitIOboards();
-  ODEBUGL("After controllers initialization",4);
+  //ODEBUGL("After controllers initialization",4);
 
   // Init shared memory
   CreateSharedMemory();
@@ -358,7 +358,7 @@ InitActuators();
 
 void Pneumatic7ArmRtThread::InitializeSensors ()
 {
-  ODEBUGL("\n inside init_sensors()1 \n",3);
+  //ODEBUGL("\n inside init_sensors()1 \n",3);
   char header = '1';
 
   ciodac16_ -> daconv(1, header);
@@ -411,7 +411,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
   time_start_loop  = round((double)now/1.0e9);
 
   InitializeSensors();
-  
+
   unsigned long long nb_it;
   while (1)
     {
@@ -439,7 +439,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
       // Sending desired pressure
      // ciodac16_ -> daconv(1, '1');
-       
+
       previous = now;
       if(LOGFLAG == 1)
       {
@@ -455,15 +455,15 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
           {
               for (unsigned int j = 0; j <= subsampling_itr; j++)
               {
-                
+
                   for (unsigned int i = 0; i < 16; i++)
                         log_pneumaticthread_data_ << data_array[j][i] << " ";
-                  
+
                   log_pneumaticthread_data_ << "\t";
-                
+
                   for (unsigned int i = 16; i <  23; i++)
                         log_pneumaticthread_data_ << data_array[j][i] << " ";
-                 
+
                   log_pneumaticthread_data_ << "\n";
               }
               subsampling_itr= 0;
@@ -504,7 +504,7 @@ void Pneumatic7ArmRtThread::PrincipalTask ()
 
   for (int i = 0; i < 7;i++)
     sensors_[i].~position_sensor();
-  
+
   ODEBUG("\n    ====== PROGRAM FINISHED ======    \n\n");
   ODEBUG("\n .... Electronics is reset ...\n");
 } //principale finish
@@ -531,7 +531,7 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
     {
       std::cerr << "Failed @ RT Create" << n <<endl;
     }
-  else 
+  else
     { ODEBUGL("END of RT Create",3); }
 
   n = rt_task_start(&principal_task_, &principale, this);
@@ -539,20 +539,20 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
     {
       std::cerr<< "Failed of RT STart" <<n<< endl;
     }
-  else 
+  else
     { ODEBUGL("END of RT Start",3); }
 
   pause();
 
-  ODEBUGL("END of Pause",3);
+  //ODEBUGL("END of Pause",3);
 
   n = rt_task_delete(&principal_task_);
-  
+
   if (n!=0)
     std::cerr << "Failed of RT Task delete" << endl;
-  else 
+  else
     { ODEBUG("END of RT taslk delete"); }
-  
+
   CloseSharedMemory();
 }
 
@@ -561,7 +561,7 @@ void Pneumatic7ArmRtThread::StartingRealTimeThread()
  *****************************************
  * The shared memory is linked with the  *
  * file /var/log/pneumatic_arm.shm       *
- * 
+ *
  *****************************************/
 void Pneumatic7ArmRtThread::CreateSharedMemory()
 {
@@ -571,7 +571,7 @@ void Pneumatic7ArmRtThread::CreateSharedMemory()
            std::ofstream::out | std::ofstream::app);
   struct timeval current_time;
   gettimeofday(&current_time,0);
-    
+
   aof << current_time.tv_sec << "." << current_time.tv_usec << std::endl;
   aof.close();
 
@@ -593,12 +593,12 @@ void Pneumatic7ArmRtThread::ApplyPressure()
   // Write desired pressure
   for(unsigned int muscle_j=0;muscle_j<14;muscle_j++)
     {
-      
+
       double pressure =  shmaddr_[muscle_j];
 
       ciodac16_->send_command_array(muscle_j, pressure);
-      ODEBUGL("Muscle " << muscle_j << " = " << pressure, 3 );
-    } 
+      //ODEBUGL("Muscle " << muscle_j << " = " << pressure, 3 );
+    }
   ciodac16_ -> daconv(1, '1');
 
  }
@@ -613,11 +613,11 @@ void Pneumatic7ArmRtThread::ReadStatus()
  for(unsigned int i=16;i<23;i++)
     {
       shmaddr_[i] = sensors_[i-16].read_sensors_array();
-      ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
+      //ODEBUGL("shmaddr_["<<i<<"]="<< shmaddr_[i],3);
     }
   FINITE_STATE_= 6;
   double jointposition5 =  shmaddr_[24];
- ODEBUGL("JointPosition : " << jointposition5, 0);
+ //ODEBUGL("JointPosition : " << jointposition5, 0);
 }
 void Pneumatic7ArmRtThread::CloseSharedMemory()
 {
@@ -629,7 +629,7 @@ void Pneumatic7ArmRtThread::CloseSharedMemory()
            std::ofstream::out | std::ofstream::app);
   struct timeval current_time;
   gettimeofday(&current_time,0);
-    
+
   aof << " - " << current_time.tv_sec << "." << current_time.tv_usec << std::endl;
   aof.close();
 

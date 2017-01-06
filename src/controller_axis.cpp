@@ -123,7 +123,7 @@ void controller_axis::set_sensor (position_sensor* pcap)
   psensor = pcap;
   //rapport=rap;
   double var = psensor -> read_sensors_array();//read_position();
-  ODEBUGL("\n controller_axis.setsensor read sensors array: " << var,3);
+  //ODEBUGL("\n controller_axis.setsensor read sensors array: " << var,3);
   double var1 = var - ControllerAxisData_.angle_repos;
   double offset_sensor = fabs( var1);
 }

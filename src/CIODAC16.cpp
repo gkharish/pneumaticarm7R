@@ -47,7 +47,7 @@ void CIODAC16::daconv(int  , char header)
 
   if(header == '1')
     {
-      ODEBUGL("CIOD16:daconv:header=1: error1",4);
+      //ODEBUGL("CIOD16:daconv:header=1: error1",4);
      if(boundary_error_ == false)
        {
          send_packet.CLIENT_HEADER[0] = '1';
@@ -80,7 +80,7 @@ void CIODAC16::daconv(int  , char header)
 
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3
-      ODEBUGL("\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control,2);
+      //ODEBUGL("\n  CIODAC16 message: CONTROL_CMD (unsigned int): " << *asp_control,2);
 #endif
 #endif
 
@@ -92,9 +92,9 @@ void CIODAC16::daconv(int  , char header)
       send_packet_init.CLIENT_HEADER[1] = '0';
 
       send_packet_init.ADC = 0x9;
-      send_packet_init.counters = 0x0;
+      send_packet_init.counters = 0x1;
       send_packet_init.errors = 0x0;
-      send_packet_init.sampling_period = 10;
+      send_packet_init.sampling_period = 20;
 
       buffer_send = (char*)&send_packet_init;
 
@@ -103,17 +103,15 @@ void CIODAC16::daconv(int  , char header)
 #if DEBUG_LEVEL > 3
 
       struct udppacket_init *asp_control1 = &send_packet_init;
-      ODEBUGL("\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1,3);
+      //ODEBUGL("\n  CIODAC16 message: To initialize NI-module init_packet sent: " << *asp_control1,3);
 #endif
 #endif
-      ODEBUGL("command raw packet \n",3);
+      //ODEBUGL("command raw packet \n",3);
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 2
       for(unsigned int lp =0; lp < sizeof(send_packet_init); lp++  )
 	{
 	  unsigned char auc=buffer_send[lp];
-	  printf("0x%02x ",auc);
-	  if (lp%4==3)
 	    printf("\t");
 	}
       printf("\n");
@@ -165,7 +163,7 @@ void CIODAC16::pressure_inidividualmuscle(int index, double pres)
   buffer_send = (char*)&send_packet;
   client_obj->client_send(buffer_send, sizeof(send_packet));
   struct udppacket_control *asp_control = &send_packet;
-  ODEBUGL("\n  CIODAC16 message: CONTROL_CMD to inidividual muscles : " << *asp_control,3);
+  //ODEBUGL("\n  CIODAC16 message: CONTROL_CMD to inidividual muscles : " << *asp_control,3);
 
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3

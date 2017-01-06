@@ -72,34 +72,28 @@ void CIODAS64::adconv(int )
 {
    client_obj->client_recv(recv_buffer, BUFLEN);
 
-  recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+  //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
 
  if(recv_buffer[0] == 'a'&&recv_buffer[1] == 'a'&&recv_buffer[2] == 'a'&&recv_buffer[3] == 'a')
     {
       recv_packet_DAQ = (udppacket_DAQ *)recv_buffer ;
 
-      ODEBUGL("\n Sensor's data: ",3);//<<(*recv_packet_DAQ);
+      //ODEBUGL("\n Sensor's data: "<<(*recv_packet_DAQ),0);//<<(*recv_packet_DAQ);
 #ifndef NDEBUG
 #if DEBUG_LEVEL > 3
 
-      printf(" Sensors data: %x %u %f %f %f %f %f %f %f %f %f \n ",
+      /*printf(" Sensors data: %x %u %f %f %f %f %f %f %f %f %f \n ",
 	     (*recv_packet_DAQ).SERVER_HEADER[0],
 	     ( (*recv_packet_DAQ).label), (*recv_packet_DAQ).data[0],
 	     (*recv_packet_DAQ).data[1], (*recv_packet_DAQ).data[2],
 	     (*recv_packet_DAQ).data[3], (*recv_packet_DAQ).data[4],
 	     (*recv_packet_DAQ).data[5], (*recv_packet_DAQ).data[6],
-       (*recv_packet_DAQ).data[7], (*recv_packet_DAQ).data[8]);
+       (*recv_packet_DAQ).data[7], (*recv_packet_DAQ).data[8]);*/
 #endif
 #endif
     }
 
 
-  else if	(recv_buffer[0] == 'b'&&recv_buffer[1] == 'b'&&recv_buffer[2] == 'b'&&recv_buffer[3] == 'b')
-    {
-      recv_packet_COUNTER = (udppacket_COUNTER *)recv_buffer;
-      cout << "\n Encoder's data in loop b: " << endl;
-      //recv_data(0) = 0;
-    }
 
   else if(recv_buffer[0] == 'c'&&recv_buffer[1] == 'c'&&recv_buffer[2] == 'c'&&recv_buffer[3] == 'c')
     {
@@ -107,7 +101,18 @@ void CIODAS64::adconv(int )
       cout << "\n Error's data in loop c: " << endl;
       //recv_data(0) = 0;
     }
-
+    else if	(recv_buffer[0] == 'b'&&recv_buffer[1] == 'b'&&recv_buffer[2] == 'b'&&recv_buffer[3] == 'b')
+    {
+    recv_packet_COUNTER = (udppacket_COUNTER *)recv_buffer;
+    ODEBUGL("\n Encoder's data in loop bbbbbbbbbbbbbbbbbbbb: " <<  (*recv_packet_COUNTER).SERVER_HEADER[0] << "\t" << (*recv_packet_COUNTER).SERVER_HEADER[1]
+    << "\t" << (*recv_packet_COUNTER).SERVER_HEADER[2] << "\t" << (*recv_packet_COUNTER).SERVER_HEADER[3] << "\t" << (*recv_packet_COUNTER).label
+    << "\t" <<  (*recv_packet_COUNTER).data[0] << "\n" , 0);// << "\t" << (*recv_packet_COUNTER).data[1]
+    //<< "\t" << (*recv_packet_COUNTER).data[2] << "\t" << (*recv_packet_COUNTER).data[3] << "\t" << (*recv_packet_COUNTER).data[4]
+    //<< "\t" << (*recv_packet_COUNTER).data[5] << "\t" << (*recv_packet_COUNTER).data[6] << "\t" << (*recv_packet_COUNTER).data[7]
+    //<< "\t" << (*recv_packet_COUNTER).data[8] << "\t" << (*recv_packet_COUNTER).data[9] << "\t" << (*recv_packet_COUNTER).data[10]
+    //<< "\t" << (*recv_packet_COUNTER).data[11], 0); //<< recv_packet_COUNTER << endl;
+        //recv_data(0) = 0;
+    }
 
   //return(recv_data);
 }
@@ -130,23 +135,42 @@ double CIODAS64::read_sensors(int axis_num)
 {
   //cout << "\n cioads64:read_sensors()0 ";
   float val1;
+  int val2;
   int index = axis_num;
   //cout << "\n cioads64:read_sensors()1 " << index;
   //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
   if(index <= 6)
    val1 = (*recv_packet_DAQ).data[6- index];
-  
+
   if (index ==3 || index ==1 || index ==6)
       val1 = -val1;
   if(index>=7)
    val1 = (*recv_packet_DAQ).data[index];
+   val2 = (*recv_packet_COUNTER).data[1];
 
-  ODEBUGL(axis_num << " - cioads64:read_sensors() " << (double)val1 << " ",3);
+  //ODEBUGL(axis_num << " - cioads64:read_encodres() " << val2 << " ",3);
 
   //float val2 = rand() % 10;
   //cout << "\n random  value in read_sensors: " << val2/10 << endl;
   return((double)val1);
 }
+
+double CIODAS64::read_encoders(int axis_num)
+{
+  //cout << "\n cioads64:read_sensors()0 ";
+  float val1;
+  int index = axis_num;
+  //cout << "\n cioads64:read_sensors()1 " << index;
+  //recv_packet_DAQ = (udppacket_DAQ *)recv_buffer;
+  val1 = (*recv_packet_COUNTER).data[0];
+
+  //ODEBUGL(axis_num << " - cioads64:read_encoders() " << (int)val1 << " ",0);
+
+  //float val2 = rand() % 10;
+  //cout << "\n random  value in read_sensors: " << val2/10 << endl;
+  return((double)val1);
+}
+
 void CIODAS64::openlogudpdata()
 {
   udprecvlog.open("udprecv_datalog.txt");
@@ -154,10 +178,9 @@ void CIODAS64::openlogudpdata()
 void CIODAS64::logudpdata()
 {
 
-  udprecvlog << (*recv_packet_DAQ).data[0] << "\t" << (*recv_packet_DAQ).data[1] << "\t"
-	     << (*recv_packet_DAQ).data[2] << "\t" << (*recv_packet_DAQ).data[3] << "\t"
-	     << (*recv_packet_DAQ).data[4] << "\t" << (*recv_packet_DAQ).data[7] << "\t"
-	     << (*recv_packet_DAQ).data[8] << "\n" << endl;
+  udprecvlog  << (*recv_packet_DAQ).data[1] << "\t" << (*recv_packet_DAQ).data[3] << "\t"
+	     << (*recv_packet_DAQ).data[7] << "\t" << (*recv_packet_DAQ).data[8] << "\t"
+       << (*recv_packet_COUNTER).data[0] <<"\t" << (*recv_packet_COUNTER).label << "\n" <<  endl;
 }
 /*Permet une initialisation de la ioboards
 ****************************************************************************************

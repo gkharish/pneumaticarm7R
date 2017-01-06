@@ -137,7 +137,7 @@ void Controller::ApplyControlLaw()
   /*Plant Model object created*/
   PneumaticarmModel *modelp = new PneumaticarmModel();
   if(modelp!=0)
-      ODEBUGL("Pneumatic model object is created",4);
+      //ODEBUGL("Pneumatic model object is created",4);
   modelp -> setProblemDimension(1);
   //model -> server_start();
   double integrator_timestep = 0.001;
@@ -199,19 +199,19 @@ void Controller::ApplyControlLaw()
         ref_final_[i] = GetDesiredPosition(i);
       }
       shm_sem_.Release();
-      ODEBUGL("DEbug Before referencegen", 4);
+      //ODEBUGL("DEbug Before referencegen", 4);
       //modelp -> Set_StateVector(positions_[3]*3.14/180, 0);
 
 
       //ReferenceGenerator(loop*TASK_PERIOD/1.0e9);
-      // ODEBUGL("After Refgen", 1);
+      // //ODEBUGL("After Refgen", 1);
       ComputeControlLaw(TASK_PERIOD);
 
       u[0] = simulated_controls_[6];
       u[1] = simulated_controls_[7];
       for (unsigned int i =0; i<2; i++)
           modelp -> Set_ControlVector(u[i], i);
-       ODEBUGL("DEbug after set_Controlvector", 4);
+       //ODEBUGL("DEbug after set_Controlvector", 4);
 
      /* clock_gettime(CLOCK_REALTIME, &spec);
       now  = spec.tv_sec;
@@ -221,12 +221,12 @@ void Controller::ApplyControlLaw()
       t = present_time - previous_time;
       modelp -> integrateRK4(t, integrator_timestep);
       simulated_positions_[3] = (modelp -> Get_StateVector(0))*180/3.14;
-      ODEBUGL("DEbug after integrator", 1);
+      //ODEBUGL("DEbug after integrator", 1);
 
       for (unsigned int i=0; i<2; i++)
           previous_state[i] = newstate[i];
 
-      // ODEBUGL("After Control Law" , 1);
+      // //ODEBUGL("After Control Law" , 1);
       shm_sem_.Acquire();
       for(unsigned int i=0;i<16;i++)
 	shmaddr_[i] = controls_[i];
@@ -276,7 +276,7 @@ void Controller::ComputeControlLaw(long double timestep)
     }
   if (CONTROLLER_TYPE_ == 2)
     {
-      //ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
+      ////ODEBUGL("Inside Pid control: " << JOINT_NUM_[3], 1);
       // JOINT_NUM_[3] = tru= true && end_of_loop_ == false)
 
       for (unsigned int i =0; i<7; i++)
@@ -292,12 +292,12 @@ void Controller::ComputeControlLaw(long double timestep)
               simulated_error_derivative_[i] = simulated_error_now_[i] - simulated_error_prev_[i];
 	      error_prev_[i] = error_now_[i];
               simulated_error_prev_[i]  = simulated_error_now_[i];
-	      ODEBUGL("error_now: " << error_now_[i],3);
-	      ODEBUGL("error_prev:" << error_prev_[i],3);
+	      //ODEBUGL("error_now: " << error_now_[i],3);
+	      //ODEBUGL("error_prev:" << error_prev_[i],3);
 	      PidController(error_now_[i], error_derivative_[i],i);
               SimulatedPidController(simulated_error_now_[i], simulated_error_derivative_[i],i);
               loop_reference_traj_[i]++;
-	     ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
+	     //ODEBUGL(" loop_traj" << loop_reference_traj_[i] << "\n",0);
 	    }
 	  else
 	    {
@@ -377,8 +377,8 @@ void Controller::PidController(double error, double error_derivative, int joint_
   // controls_[2*joint_num] = MeanPressure(joint_num)+ delta[joint_num];
   // controls_[2*joint_num+1] = MeanPressure(joint_num) - (delta[joint_num]);
 
-  ODEBUGL("Update delta:     " <<update_delta, 4);
-  ODEBUGL("Pid command : " << delta[joint_num],4);
+  //ODEBUGL("Update delta:     " <<update_delta, 4);
+  //ODEBUGL("Pid command : " << delta[joint_num],4);
 }
 
 void Controller::SimulatedPidController(double error, double error_derivative, int joint_num)
@@ -419,8 +419,8 @@ void Controller::SimulatedPidController(double error, double error_derivative, i
   simulated_controls_[2*joint_num] = simulated_control_limit_agonistic;
   simulated_controls_[2*joint_num+1] = simulated_control_limit_antagonistic;
 
-  ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
-  ODEBUGL("Simulated Pid command : " << delta[joint_num],4);
+  //ODEBUGL("Simulated Update delta:     " <<simulated_update_delta, 4);
+  //ODEBUGL("Simulated Pid command : " << delta[joint_num],4);
 }
 
 
@@ -470,7 +470,7 @@ void Controller::ReferenceGenerator(long double timestep, unsigned int joint_num
   }
 
 
- ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1);
+ //ODEBUGL("Ref_traj_ : "<< ref_traj_[joint_num], 1);
 }
 
 double Controller::GetDesiredPosition(unsigned int idx)
